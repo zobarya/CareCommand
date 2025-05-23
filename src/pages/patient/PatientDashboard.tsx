@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { Calendar, MessageSquare, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
+import { Button } from '@/components/ui/button';
 
 const PatientDashboard: React.FC = () => {
   // Mock data
@@ -32,9 +34,9 @@ const PatientDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">Upcoming Care Visit</h2>
-          <button className="text-sm text-primary font-medium hover:underline">
+          <Link to="/patient/visits" className="text-sm text-primary font-medium hover:underline">
             View All
-          </button>
+          </Link>
         </div>
         <div className="p-4 border border-primary/20 rounded-lg bg-blue-50">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -94,9 +96,9 @@ const PatientDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Your Care Plan</h2>
-              <button className="text-sm text-primary font-medium hover:underline">
+              <Link to="/patient/care-plan" className="text-sm text-primary font-medium hover:underline">
                 View Details
-              </button>
+              </Link>
             </div>
             <div className="space-y-3">
               <div className="p-3 border-l-4 border-green-500 bg-green-50 rounded-r-lg">
@@ -119,14 +121,18 @@ const PatientDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
             <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full text-left p-3 rounded-lg bg-primary text-white flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Request New Visit
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-accent text-secondary flex items-center">
-                <MessageSquare className="h-5 w-5 mr-2" />
-                Contact Care Team
-              </button>
+              <Button className="w-full text-left justify-start" asChild>
+                <Link to="/patient/requests">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Request New Visit
+                </Link>
+              </Button>
+              <Button className="w-full text-left justify-start" asChild>
+                <Link to="/patient/messages">
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Contact Care Team
+                </Link>
+              </Button>
             </div>
           </div>
           

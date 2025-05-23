@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
 import StatusBadge from '@/components/ui/status-badge';
+import { Button } from '@/components/ui/button';
 
 const FamilyDashboard: React.FC = () => {
   // Mock data - with proper typing to avoid readonly arrays issue
@@ -50,12 +51,16 @@ const FamilyDashboard: React.FC = () => {
             <p className="text-sm text-gray-600">Last updated: Today, 8:30 AM</p>
           </div>
           <div className="flex">
-            <button className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-2">
-              <Bell className="h-5 w-5" />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <MessageSquare className="h-5 w-5" />
-            </button>
+            <Button className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-2 p-0" asChild>
+              <Link to="/family/notifications">
+                <Bell className="h-5 w-5" />
+              </Link>
+            </Button>
+            <Button className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center p-0" asChild>
+              <Link to="/family/messages">
+                <MessageSquare className="h-5 w-5" />
+              </Link>
+            </Button>
           </div>
         </div>
         
@@ -137,18 +142,24 @@ const FamilyDashboard: React.FC = () => {
           <h2 className="text-lg font-bold mb-3">Quick Actions</h2>
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
             <div className="space-y-2">
-              <Link to="/family/messages" className="block w-full text-left p-3 rounded-lg bg-primary text-white flex items-center">
-                <MessageSquare className="h-5 w-5 mr-2" />
-                Contact Care Team
-              </Link>
-              <Link to="/family/requests" className="block w-full text-left p-3 rounded-lg bg-secondary text-white flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Request Schedule Change
-              </Link>
-              <Link to="/family/notifications" className="block w-full text-left p-3 rounded-lg bg-accent text-secondary flex items-center">
-                <Bell className="h-5 w-5 mr-2" />
-                Update Notifications
-              </Link>
+              <Button className="block w-full text-left justify-start" asChild>
+                <Link to="/family/messages">
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Contact Care Team
+                </Link>
+              </Button>
+              <Button className="block w-full text-left justify-start" asChild>
+                <Link to="/family/requests">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Request Schedule Change
+                </Link>
+              </Button>
+              <Button className="block w-full text-left justify-start" asChild>
+                <Link to="/family/notifications">
+                  <Bell className="h-5 w-5 mr-2" />
+                  Update Notifications
+                </Link>
+              </Button>
             </div>
           </div>
           

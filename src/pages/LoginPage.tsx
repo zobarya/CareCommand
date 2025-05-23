@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const LoginPage: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleLogin = (role: 'admin' | 'caregiver' | 'patient' | 'family') => {
     toast({
@@ -14,19 +15,19 @@ const LoginPage: React.FC = () => {
       description: `You are now logged in as ${role}`,
     });
     
-    // Redirect based on role
+    // Redirect based on role using React Router
     switch(role) {
       case 'admin':
-        window.location.href = '/admin';
+        navigate('/admin');
         break;
       case 'caregiver':
-        window.location.href = '/caregiver';
+        navigate('/caregiver');
         break;
       case 'patient':
-        window.location.href = '/patient';
+        navigate('/patient');
         break;
       case 'family':
-        window.location.href = '/family';
+        navigate('/family');
         break;
     }
   };

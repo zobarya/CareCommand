@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
+import { Button } from '@/components/ui/button';
 
 const CaregiverDashboard: React.FC = () => {
   // Mock data - with proper typing to avoid readonly arrays issue
@@ -64,14 +66,18 @@ const CaregiverDashboard: React.FC = () => {
           <h2 className="text-xl font-bold mb-2">Welcome back, Jane!</h2>
           <p className="opacity-90 mb-4">You have 2 visits scheduled for today.</p>
           <div className="flex">
-            <Link to="/caregiver/checklist" className="bg-white text-primary font-medium rounded-lg px-4 py-2 mr-3 flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              Start Visit
-            </Link>
-            <Link to="/caregiver/schedule" className="bg-white/20 text-white font-medium rounded-lg px-4 py-2 flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
-              View Schedule
-            </Link>
+            <Button className="bg-white text-primary font-medium rounded-lg px-4 py-2 mr-3 flex items-center" asChild>
+              <Link to="/caregiver/checklist">
+                <Clock className="h-4 w-4 mr-2" />
+                Start Visit
+              </Link>
+            </Button>
+            <Button className="bg-white/20 text-white font-medium rounded-lg px-4 py-2 flex items-center" asChild>
+              <Link to="/caregiver/schedule">
+                <Calendar className="h-4 w-4 mr-2" />
+                View Schedule
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -100,12 +106,14 @@ const CaregiverDashboard: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 flex">
-              <button className="bg-primary text-white font-medium rounded-lg px-4 py-2 mr-3">
-                Start Visit
-              </button>
-              <button className="bg-gray-100 text-gray-700 font-medium rounded-lg px-4 py-2">
+              <Button className="bg-primary text-white font-medium rounded-lg px-4 py-2 mr-3" asChild>
+                <Link to="/caregiver/checklist">
+                  Start Visit
+                </Link>
+              </Button>
+              <Button className="bg-gray-100 text-gray-700 font-medium rounded-lg px-4 py-2">
                 View Details
-              </button>
+              </Button>
             </div>
           </div>
         </div>

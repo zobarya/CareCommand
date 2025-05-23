@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { Calendar, Clock, File, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import CardStat from '@/components/ui/card-stat';
 import VisitCard from '@/components/ui/visit-card';
+import { Button } from '@/components/ui/button';
 
 const AdminDashboard: React.FC = () => {
   // Mock data - with proper typing to avoid readonly arrays issue
@@ -70,9 +73,9 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold">Today's Schedule</h2>
-              <button className="text-sm text-primary font-medium hover:underline">
+              <Link to="/admin/calendar" className="text-sm text-primary font-medium hover:underline">
                 View Full Calendar
-              </button>
+              </Link>
             </div>
             
             <div className="space-y-4">
@@ -136,27 +139,33 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
             <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full text-left p-3 rounded-lg bg-primary text-white flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Schedule New Visit
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-secondary text-white flex items-center">
-                <User className="h-5 w-5 mr-2" />
-                Add New Patient
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-accent text-secondary flex items-center">
-                <File className="h-5 w-5 mr-2" />
-                Generate Report
-              </button>
+              <Button className="w-full text-left justify-start bg-primary text-white" asChild>
+                <Link to="/admin/calendar">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Schedule New Visit
+                </Link>
+              </Button>
+              <Button className="w-full text-left justify-start bg-secondary text-white" asChild>
+                <Link to="/admin/patients">
+                  <User className="h-5 w-5 mr-2" />
+                  Add New Patient
+                </Link>
+              </Button>
+              <Button className="w-full text-left justify-start bg-accent text-secondary" asChild>
+                <Link to="/admin/reports">
+                  <File className="h-5 w-5 mr-2" />
+                  Generate Report
+                </Link>
+              </Button>
             </div>
           </div>
           
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mt-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold">Upcoming Visits</h2>
-              <button className="text-sm text-primary font-medium hover:underline">
+              <Link to="/admin/calendar" className="text-sm text-primary font-medium hover:underline">
                 View All
-              </button>
+              </Link>
             </div>
             
             <div className="space-y-4">
