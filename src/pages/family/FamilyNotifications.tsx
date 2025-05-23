@@ -1,0 +1,177 @@
+
+import React, { useState } from 'react';
+import Layout from '@/components/layout/Layout';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Bell, CheckCircle, Calendar, Clock, User, AlertCircle, MessageSquare } from 'lucide-react';
+
+const FamilyNotifications: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('all');
+  
+  // Mock data for notifications
+  const notifications = [
+    {
+      id: 1,
+      type: 'visit-complete',
+      title: 'Visit Completed',
+      message: 'Jane Doe completed a visit with Robert Smith',
+      time: '2 hours ago',
+      isRead: false,
+      patient: 'Robert Smith (Father)'
+    },
+    {
+      id: 2,
+      type: 'medication',
+      title: 'Medication Update',
+      message: 'Blood pressure medication dosage has been updated',
+      time: 'Yesterday',
+      isRead: false,
+      patient: 'Robert Smith (Father)'
+    },
+    {
+      id: 3,
+      type: 'request',
+      title: 'Request Approved',
+      message: 'Your request for weekend visits has been approved',
+      time: 'Yesterday',
+      isRead: true,
+      patient: 'Robert Smith (Father)'
+    },
+    {
+      id: 4,
+      type: 'message',
+      title: 'New Message',
+      message: 'You have a new message from Dr. Johnson',
+      time: 'May 20, 2025',
+      isRead: true,
+      patient: 'Robert Smith (Father)'
+    },
+    {
+      id: 5,
+      type: 'care-plan',
+      title: 'Care Plan Updated',
+      message: 'The care plan for Robert Smith has been updated',
+      time: 'May 19, 2025',
+      isRead: true,
+      patient: 'Robert Smith (Father)'
+    }
+  ];
+  
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'visit-complete':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'medication':
+        return <AlertCircle className="h-5 w-5 text-amber-500" />;
+      case 'request':
+        return <CheckCircle className="h-5 w-5 text-blue-500" />;
+      case 'message':
+        return <MessageSquare className="h-5 w-5 text-purple-500" />;
+      case 'care-plan':
+        return <User className="h-5 w-5 text-primary" />;
+      default:
+        return <Bell className="h-5 w-5 text-gray-500" />;
+    }
+  };
+  
+  const filteredNotifications = activeTab === 'all' 
+    ? notifications 
+    : activeTab === 'unread' 
+    ? notifications.filter(n => !n.isRead)
+    : notifications.filter(n => n.isRead);
+  
+  return (
+    <Layout title="Notifications" role="family">
+      <div className="flex justify-between mb-6">
+        <div className="flex space-x-1">
+          <Button 
+            variant={activeTab === 'all' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('all')}
+          >
+            All
+          </Button>
+          <Button 
+            variant={activeTab === 'unread' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('unread')}
+            className="relative"
+          >
+            Unread
+            {notifications.filter(n => !n.isRead).length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {notifications.filter(n => !n.isRead).length}
+              </span>
+            )}
+          </Button>
+          <Button 
+            variant={activeTab === 'read' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('read')}
+          >
+            Read
+          </Button>
+        </div>
+        
+        <Button variant="outline" className="flex items-center">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Mark All as Read
+        </Button>
+      </div>
+      
+      <div className="space-y-4">
+        {filteredNotifications.map((notification) => (
+          <Card 
+            key={notification.id} 
+            className={`p-4 ${!notification.isRead ? 'border-l-4 border-l-primary' : ''}`}
+          >
+            <div className="flex">
+              <div className="mr-4">
+                {getNotificationIcon(notification.type)}
+              </div>
+              
+              <div className="flex-grow">
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className="font-medium">
+                    {notification.title}
+                    {!notification.isRead && (
+                      <span className="ml-2 inline-block w-2 h-2 bg-primary rounded-full"></span>
+                    )}
+                  </h3>
+                  <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                    {notification.time}
+                  </span>
+                </div>
+                
+                <p className="text-sm text-gray-600 mb-2">{notification.message}</p>
+                
+                <div className="text-xs text-gray-500">
+                  Regarding: {notification.patient}
+                </div>
+              </div>
+              
+              <div className="ml-4">
+                <Button variant="outline" size="sm">View</Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+        
+        {filteredNotifications.length === 0 && (
+          <div className="text-center py-12">
+            <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-700 mb-2">No notifications</h3>
+            <p className="text-gray-500">
+              {activeTab === 'unread' ? 'You have no unread notifications' : 'No notifications to display'}
+            </p>
+          </div>
+        )}
+      </div>
+      
+      {filteredNotifications.length > 0 && (
+        <div className="mt-6 text-center">
+          <Button variant="outline">Load More</Button>
+        </div>
+      )}
+    </Layout>
+  );
+};
+
+export default FamilyNotifications;
