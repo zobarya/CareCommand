@@ -8,9 +8,19 @@ import {
   Settings, 
   User,
   Bell,
-  File,
+  FileText,
   Clock,
-  LogOut
+  LogOut,
+  Clipboard,
+  Award,
+  Heart,
+  ThumbsUp,
+  Send,
+  FileCheck,
+  FileEdit,
+  Users,
+  DollarSign,
+  BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -32,10 +42,10 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const adminNavItems: NavItem[] = [
     { label: 'Dashboard', href: '/admin', icon: Home },
     { label: 'Scheduler', href: '/admin/calendar', icon: Calendar },
-    { label: 'Caregivers', href: '/admin/caregivers', icon: User },
-    { label: 'Patients', href: '/admin/patients', icon: User },
-    { label: 'Billing', href: '/admin/billing', icon: File },
-    { label: 'Reports', href: '/admin/reports', icon: File },
+    { label: 'Caregivers', href: '/admin/caregivers', icon: Users },
+    { label: 'Patients', href: '/admin/patients', icon: Heart },
+    { label: 'Billing', href: '/admin/billing', icon: DollarSign },
+    { label: 'Reports', href: '/admin/reports', icon: BarChart },
     { label: 'Messages', href: '/admin/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/admin/notifications', icon: Bell },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
@@ -44,9 +54,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const caregiverNavItems: NavItem[] = [
     { label: 'Home', href: '/caregiver', icon: Home },
     { label: 'Schedule', href: '/caregiver/schedule', icon: Calendar },
-    { label: 'Checklist', href: '/caregiver/checklist', icon: File },
-    { label: 'Notes', href: '/caregiver/notes', icon: File },
-    { label: 'Certifications', href: '/caregiver/certifications', icon: File },
+    { label: 'Checklist', href: '/caregiver/checklist', icon: Clipboard },
+    { label: 'Notes', href: '/caregiver/notes', icon: FileEdit },
+    { label: 'Certifications', href: '/caregiver/certifications', icon: Award },
     { label: 'Messages', href: '/caregiver/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/caregiver/notifications', icon: Bell },
     { label: 'Profile', href: '/caregiver/profile', icon: User },
@@ -55,9 +65,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const patientNavItems: NavItem[] = [
     { label: 'Home', href: '/patient', icon: Home },
     { label: 'Visit History', href: '/patient/visits', icon: Clock },
-    { label: 'Care Plan', href: '/patient/care-plan', icon: File },
-    { label: 'Requests', href: '/patient/requests', icon: File },
-    { label: 'Feedback', href: '/patient/feedback', icon: MessageSquare },
+    { label: 'Care Plan', href: '/patient/care-plan', icon: FileCheck },
+    { label: 'Requests', href: '/patient/requests', icon: Send },
+    { label: 'Feedback', href: '/patient/feedback', icon: ThumbsUp },
     { label: 'Messages', href: '/patient/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/patient/notifications', icon: Bell },
     { label: 'Settings', href: '/patient/settings', icon: Settings },
@@ -66,8 +76,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const familyNavItems: NavItem[] = [
     { label: 'Home', href: '/family', icon: Home },
     { label: 'Visit Summary', href: '/family/visits', icon: Clock },
-    { label: 'Feedback', href: '/family/feedback', icon: MessageSquare },
-    { label: 'Requests', href: '/family/requests', icon: File },
+    { label: 'Feedback', href: '/family/feedback', icon: ThumbsUp },
+    { label: 'Requests', href: '/family/requests', icon: Send },
     { label: 'Messages', href: '/family/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/family/notifications', icon: Bell },
     { label: 'Settings', href: '/family/settings', icon: Settings },
@@ -157,3 +167,4 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
 };
 
 export default Sidebar;
+

@@ -17,32 +17,33 @@ interface BottomNavProps {
 const BottomNav: React.FC<BottomNavProps> = ({ role }) => {
   const location = useLocation();
   
+  // Reduced navigation items for mobile - only showing most important
   const adminNavItems: NavItem[] = [
     { label: 'Dashboard', href: '/admin', icon: Home },
     { label: 'Calendar', href: '/admin/calendar', icon: Calendar },
+    { label: 'Messages', href: '/admin/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/admin/notifications', icon: Bell },
-    { label: 'Settings', href: '/admin/settings', icon: Settings },
   ];
   
   const caregiverNavItems: NavItem[] = [
     { label: 'Home', href: '/caregiver', icon: Home },
     { label: 'Schedule', href: '/caregiver/schedule', icon: Calendar },
-    { label: 'Notifications', href: '/caregiver/notifications', icon: Bell },
+    { label: 'Messages', href: '/caregiver/messages', icon: MessageSquare },
     { label: 'Profile', href: '/caregiver/profile', icon: User },
   ];
   
   const patientNavItems: NavItem[] = [
     { label: 'Home', href: '/patient', icon: Home },
     { label: 'Visits', href: '/patient/visits', icon: Calendar },
+    { label: 'Messages', href: '/patient/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/patient/notifications', icon: Bell },
-    { label: 'Settings', href: '/patient/settings', icon: Settings },
   ];
   
   const familyNavItems: NavItem[] = [
     { label: 'Home', href: '/family', icon: Home },
     { label: 'Visits', href: '/family/visits', icon: Calendar },
+    { label: 'Messages', href: '/family/messages', icon: MessageSquare },
     { label: 'Notifications', href: '/family/notifications', icon: Bell },
-    { label: 'Profile', href: '/family/profile', icon: User },
   ];
   
   const navItemsByRole = {
@@ -81,3 +82,4 @@ const BottomNav: React.FC<BottomNavProps> = ({ role }) => {
 };
 
 export default BottomNav;
+
