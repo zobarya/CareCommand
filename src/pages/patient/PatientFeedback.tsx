@@ -8,12 +8,28 @@ import { Label } from '@/components/ui/label';
 import { Star, Calendar, User, MessageCircle, Plus, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+// Define proper types for our feedback items
+interface BaseFeedback {
+  id: number;
+  caregiverName: string;
+  caregiverRole: string;
+  date: string;
+  visitType: string;
+}
+
+interface PendingFeedback extends BaseFeedback {}
+
+interface GivenFeedback extends BaseFeedback {
+  rating: number;
+  comment: string;
+}
+
 const PatientFeedback: React.FC = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const navigate = useNavigate();
   
-  // Mock data for feedback
-  const pendingFeedback = [
+  // Mock data for feedback with proper typing
+  const pendingFeedback: PendingFeedback[] = [
     {
       id: 1,
       caregiverName: 'Jane Doe',
@@ -30,7 +46,7 @@ const PatientFeedback: React.FC = () => {
     }
   ];
   
-  const givenFeedback = [
+  const givenFeedback: GivenFeedback[] = [
     {
       id: 3,
       caregiverName: 'Sarah Wilson',
@@ -87,6 +103,11 @@ const PatientFeedback: React.FC = () => {
         onClick={() => activeFeedback && setRating(i + 1)}
       />
     ));
+  };
+
+  // Helper function to type check if a feedback item has a rating
+  const hasRating = (feedback: BaseFeedback): feedback is GivenFeedback => {
+    return 'rating' in feedback;
   };
 
   return (
@@ -228,14 +249,14 @@ const PatientFeedback: React.FC = () => {
                     Visit type: {feedback.visitType}
                   </p>
                   
-                  {'rating' in feedback && (
+                  {hasRating(feedback) && (
                     <div className="flex items-center">
                       {renderStars(feedback.rating, 5)}
                     </div>
                   )}
                 </div>
                 
-                {'comment' in feedback && (
+                {hasRating(feedback) && (
                   <div className="md:w-2/3">
                     <div className="bg-gray-50 p-4 rounded-lg relative">
                       <MessageCircle className="h-4 w-4 text-primary absolute -top-2 -left-2" />
@@ -245,7 +266,7 @@ const PatientFeedback: React.FC = () => {
                   </div>
                 )}
                 
-                {!('comment' in feedback) && submittedFeedback.includes(feedback.id) && (
+                {!hasRating(feedback) && submittedFeedback.includes(feedback.id) && (
                   <div className="md:w-2/3 flex items-center justify-center">
                     <div className="text-center">
                       <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
