@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Check, File, HeartPulse, Pills, Stethoscope } from 'lucide-react';
+import { Calendar, Check, File, HeartPulse, Pill, Stethoscope } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 
 const PatientCarePlan: React.FC = () => {
@@ -14,7 +14,7 @@ const PatientCarePlan: React.FC = () => {
       {
         id: "1",
         name: "Medication Management",
-        icon: Pills,
+        icon: Pill,
         description: "Daily medication administration and monitoring",
         schedule: "3 times daily",
         details: [
