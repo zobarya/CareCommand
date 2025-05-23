@@ -191,40 +191,6 @@ const LoginPage: React.FC = () => {
               </Button>
             </form>
           </Form>
-            
-          <div className="mt-6">
-            <p className="text-center text-sm text-gray-600">Demo Access:</p>
-            <div className="grid grid-cols-2 gap-3 mt-2">
-              <Button 
-                variant="outline" 
-                onClick={() => form.setValue('role', 'admin')}
-                className={form.getValues('role') === 'admin' ? 'bg-accent/20' : ''}
-              >
-                Agency Admin
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => form.setValue('role', 'caregiver')}
-                className={form.getValues('role') === 'caregiver' ? 'bg-accent/20' : ''}
-              >
-                Caregiver
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => form.setValue('role', 'patient')}
-                className={form.getValues('role') === 'patient' ? 'bg-accent/20' : ''}
-              >
-                Patient
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => form.setValue('role', 'family')}
-                className={form.getValues('role') === 'family' ? 'bg-accent/20' : ''}
-              >
-                Family Member
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
