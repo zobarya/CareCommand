@@ -1,22 +1,59 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+const formSchema = z.object({
+  role: z.enum(["admin", "caregiver", "patient", "family"], {
+    required_error: "Please select a role.",
+  }),
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 const LoginPage: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  const handleLogin = (role: 'admin' | 'caregiver' | 'patient' | 'family') => {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      role: "admin",
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleLogin = (data: FormValues) => {
     toast({
       title: "Logged in successfully",
-      description: `You are now logged in as ${role}`,
+      description: `You are now logged in as ${data.role}`,
     });
     
     // Redirect based on role using React Router
-    switch(role) {
+    switch(data.role) {
       case 'admin':
         navigate('/admin');
         break;
@@ -73,57 +110,119 @@ const LoginPage: React.FC = () => {
             <p className="text-gray-600">Access your Homecare account</p>
           </div>
           
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <Input id="email" type="email" placeholder="Enter your email" />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <Input id="password" type="password" placeholder="Enter your password" />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User Role</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="admin">Agency Admin</SelectItem>
+                        <SelectItem value="caregiver">Caregiver</SelectItem>
+                        <SelectItem value="patient">Patient</SelectItem>
+                        <SelectItem value="family">Family Member</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-sm">
+                  <a href="#" className="font-medium text-primary hover:underline">
+                    Forgot your password?
+                  </a>
+                </div>
               </div>
-              <div className="text-sm">
-                <a href="#" className="font-medium text-primary hover:underline">
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
-            <Button className="w-full" onClick={() => handleLogin('admin')}>
-              Sign in
-            </Button>
+              
+              <Button className="w-full" type="submit">
+                Sign in
+              </Button>
+            </form>
+          </Form>
             
-            <div className="mt-6">
-              <p className="text-center text-sm text-gray-600">Demo Access:</p>
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                <Button variant="outline" onClick={() => handleLogin('admin')}>
-                  Agency Admin
-                </Button>
-                <Button variant="outline" onClick={() => handleLogin('caregiver')}>
-                  Caregiver
-                </Button>
-                <Button variant="outline" onClick={() => handleLogin('patient')}>
-                  Patient
-                </Button>
-                <Button variant="outline" onClick={() => handleLogin('family')}>
-                  Family Member
-                </Button>
-              </div>
+          <div className="mt-6">
+            <p className="text-center text-sm text-gray-600">Demo Access:</p>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <Button 
+                variant="outline" 
+                onClick={() => form.setValue('role', 'admin')}
+                className={form.getValues('role') === 'admin' ? 'bg-accent/20' : ''}
+              >
+                Agency Admin
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => form.setValue('role', 'caregiver')}
+                className={form.getValues('role') === 'caregiver' ? 'bg-accent/20' : ''}
+              >
+                Caregiver
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => form.setValue('role', 'patient')}
+                className={form.getValues('role') === 'patient' ? 'bg-accent/20' : ''}
+              >
+                Patient
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => form.setValue('role', 'family')}
+                className={form.getValues('role') === 'family' ? 'bg-accent/20' : ''}
+              >
+                Family Member
+              </Button>
             </div>
           </div>
         </div>
