@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import LoginPage from "./pages/LoginPage";
 
 // Admin Routes
@@ -51,55 +52,57 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/calendar" element={<AdminCalendar />} />
-          <Route path="/admin/caregivers" element={<AdminCaregivers />} />
-          <Route path="/admin/patients" element={<AdminPatients />} />
-          <Route path="/admin/billing" element={<AdminBilling />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
-          <Route path="/admin/messages" element={<AdminMessages />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          
-          {/* Caregiver Routes */}
-          <Route path="/caregiver" element={<CaregiverDashboard />} />
-          <Route path="/caregiver/schedule" element={<CaregiverSchedule />} />
-          <Route path="/caregiver/checklist" element={<CaregiverChecklist />} />
-          <Route path="/caregiver/notes" element={<CaregiverNotes />} />
-          <Route path="/caregiver/certifications" element={<CaregiverCertifications />} />
-          <Route path="/caregiver/messages" element={<CaregiverMessages />} />
-          <Route path="/caregiver/profile" element={<CaregiverProfile />} />
-          
-          {/* Patient Routes */}
-          <Route path="/patient" element={<PatientDashboard />} />
-          <Route path="/patient/visits" element={<PatientVisits />} />
-          <Route path="/patient/care-plan" element={<PatientCarePlan />} />
-          <Route path="/patient/requests" element={<PatientRequests />} />
-          <Route path="/patient/feedback" element={<PatientFeedback />} />
-          <Route path="/patient/messages" element={<PatientMessages />} />
-          <Route path="/patient/settings" element={<PatientSettings />} />
-          <Route path="/patient/profile" element={<PatientProfile />} />
-          
-          {/* Family Routes */}
-          <Route path="/family" element={<FamilyDashboard />} />
-          <Route path="/family/visits" element={<FamilyVisits />} />
-          <Route path="/family/feedback" element={<FamilyFeedback />} />
-          <Route path="/family/requests" element={<FamilyRequests />} />
-          <Route path="/family/messages" element={<FamilyMessages />} />
-          <Route path="/family/notifications" element={<FamilyNotifications />} />
-          <Route path="/family/settings" element={<FamilySettings />} />
-          <Route path="/family/profile" element={<FamilyProfile />} />
-          
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/calendar" element={<AdminCalendar />} />
+            <Route path="/admin/caregivers" element={<AdminCaregivers />} />
+            <Route path="/admin/patients" element={<AdminPatients />} />
+            <Route path="/admin/billing" element={<AdminBilling />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/messages" element={<AdminMessages />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            
+            {/* Caregiver Routes */}
+            <Route path="/caregiver" element={<CaregiverDashboard />} />
+            <Route path="/caregiver/schedule" element={<CaregiverSchedule />} />
+            <Route path="/caregiver/checklist" element={<CaregiverChecklist />} />
+            <Route path="/caregiver/notes" element={<CaregiverNotes />} />
+            <Route path="/caregiver/certifications" element={<CaregiverCertifications />} />
+            <Route path="/caregiver/messages" element={<CaregiverMessages />} />
+            <Route path="/caregiver/profile" element={<CaregiverProfile />} />
+            
+            {/* Patient Routes */}
+            <Route path="/patient" element={<PatientDashboard />} />
+            <Route path="/patient/visits" element={<PatientVisits />} />
+            <Route path="/patient/care-plan" element={<PatientCarePlan />} />
+            <Route path="/patient/requests" element={<PatientRequests />} />
+            <Route path="/patient/feedback" element={<PatientFeedback />} />
+            <Route path="/patient/messages" element={<PatientMessages />} />
+            <Route path="/patient/settings" element={<PatientSettings />} />
+            <Route path="/patient/profile" element={<PatientProfile />} />
+            
+            {/* Family Routes */}
+            <Route path="/family" element={<FamilyDashboard />} />
+            <Route path="/family/visits" element={<FamilyVisits />} />
+            <Route path="/family/feedback" element={<FamilyFeedback />} />
+            <Route path="/family/requests" element={<FamilyRequests />} />
+            <Route path="/family/messages" element={<FamilyMessages />} />
+            <Route path="/family/notifications" element={<FamilyNotifications />} />
+            <Route path="/family/settings" element={<FamilySettings />} />
+            <Route path="/family/profile" element={<FamilyProfile />} />
+            
+            {/* Catch-all route for 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };

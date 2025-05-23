@@ -3,6 +3,7 @@ import React from 'react';
 import { Calendar, User } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { 
   Tooltip,
   TooltipContent,
@@ -33,6 +34,8 @@ interface WorkloadCardProps {
 }
 
 const WorkloadCard: React.FC<WorkloadCardProps> = ({ caregiver, loadStatus, loadPercentage }) => {
+  const navigate = useNavigate();
+  
   // Determine progress color
   const getProgressColor = (percentage: number) => {
     if (percentage >= 95) return 'bg-red-500';
@@ -42,6 +45,11 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({ caregiver, loadStatus, load
 
   // Check if overloaded
   const isOverloaded = caregiver.assignedHours > caregiver.maxHours;
+  
+  // Handle view schedule click
+  const handleViewSchedule = () => {
+    navigate(`/admin/calendar?caregiverId=${caregiver.id}`);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 transition-all hover:shadow-md">
@@ -101,7 +109,7 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({ caregiver, loadStatus, load
         </div>
       </div>
       
-      <Button variant="outline" className="w-full" size="sm">
+      <Button variant="outline" className="w-full" size="sm" onClick={handleViewSchedule}>
         <Calendar className="h-4 w-4 mr-2" />
         View Schedule
       </Button>

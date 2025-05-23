@@ -3,6 +3,7 @@ import React from 'react';
 import { Clock, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import StatusBadge from './status-badge';
+import { useNavigate } from 'react-router-dom';
 
 interface VisitCardProps {
   visit: {
@@ -26,9 +27,28 @@ const VisitCard: React.FC<VisitCardProps> = ({
   onClick,
   className 
 }) => {
+  const navigate = useNavigate();
   const isCaregiver = role === 'caregiver';
   const isAdmin = role === 'admin';
   
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    
+    // Default navigation based on role
+    if (isAdmin) {
+      navigate(`/admin/calendar?visitId=${visit.id}`);
+    } else if (isCaregiver) {
+      navigate(`/caregiver/schedule?visitId=${visit.id}`);
+    } else if (role === 'patient') {
+      navigate(`/patient/visits?visitId=${visit.id}`);
+    } else if (role === 'family') {
+      navigate(`/family/visits?visitId=${visit.id}`);
+    }
+  };
+
   return (
     <div 
       className={cn(
@@ -36,7 +56,7 @@ const VisitCard: React.FC<VisitCardProps> = ({
         'hover:shadow-md transition-shadow cursor-pointer',
         className
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className="flex justify-between items-start mb-2">
         <div>
@@ -49,7 +69,6 @@ const VisitCard: React.FC<VisitCardProps> = ({
         <StatusBadge status={visit.status} />
       </div>
       
-      {/* Show patient info for admin/caregiver, caregiver info for patient/family */}
       <div className="flex items-center text-sm mt-3">
         <User className="h-4 w-4 mr-1 text-gray-500" />
         <span className="text-gray-700">
