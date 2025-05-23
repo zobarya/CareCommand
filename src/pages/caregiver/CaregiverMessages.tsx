@@ -4,56 +4,58 @@ import Layout from '@/components/layout/Layout';
 import { Card } from '@/components/ui/card';
 import { Search, User, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CaregiverMessages: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState<number | null>(1);
   const [messageInput, setMessageInput] = useState('');
+  const isMobile = useIsMobile();
   
   const conversations = [
     {
       id: 1,
-      name: 'Admin Office',
-      role: 'Admin',
-      avatar: 'AO',
-      unread: 1,
-      lastMessage: 'Your schedule has been updated for next week',
-      lastTime: '3:45 PM'
-    },
-    {
-      id: 2,
       name: 'John Smith',
       role: 'Patient',
       avatar: 'JS',
+      unread: 2,
+      lastMessage: 'When will you arrive tomorrow?',
+      lastTime: '4:30 PM'
+    },
+    {
+      id: 2,
+      name: 'Admin Office',
+      role: 'Admin',
+      avatar: 'AO',
       unread: 0,
-      lastMessage: 'Thank you for the help today',
+      lastMessage: 'Please submit your hours by Friday',
       lastTime: 'Yesterday'
     },
     {
       id: 3,
-      name: 'Mary Wilson',
+      name: 'Jennifer Smith',
       role: 'Family Member',
-      avatar: 'MW',
-      unread: 2,
-      lastMessage: 'When will you visit next?',
-      lastTime: 'Yesterday'
+      avatar: 'JS',
+      unread: 1,
+      lastMessage: 'Thank you for taking care of my father',
+      lastTime: 'May 20'
     },
   ];
   
   const messages = [
     {
       id: 1,
-      sender: 'Admin Office',
-      content: 'Hello, your schedule has been updated for next week. Please review the changes.',
-      time: '3:45 PM',
+      sender: 'John Smith',
+      content: 'When will you arrive tomorrow? I need to prepare for the appointment.',
+      time: '4:30 PM',
       isOutgoing: false
     },
     {
       id: 2,
       sender: 'You',
-      content: 'Thank you for letting me know. I will check it right away.',
-      time: '3:50 PM',
+      content: 'I\'ll be there at 10:00 AM. We\'ll be focusing on the new exercise routine that Dr. Chen prescribed.',
+      time: '4:35 PM',
       isOutgoing: true
-    },
+    }
   ];
   
   const handleSendMessage = () => {
@@ -64,9 +66,9 @@ const CaregiverMessages: React.FC = () => {
   
   return (
     <Layout title="Messages" role="caregiver">
-      <div className="flex flex-col md:flex-row h-[calc(100vh-8rem)]">
+      <div className={`flex flex-col ${!isMobile ? 'md:flex-row' : ''} h-[calc(100vh-8rem)]`}>
         {/* Conversations List */}
-        <div className="w-full md:w-1/3 lg:w-1/4 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className={`w-full ${isMobile ? 'mb-4' : 'md:w-1/3 lg:w-1/4'} bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden`}>
           <div className="p-4 border-b">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -78,7 +80,7 @@ const CaregiverMessages: React.FC = () => {
             </div>
           </div>
           
-          <div className="overflow-y-auto h-[calc(100%-4rem)]">
+          <div className={`overflow-y-auto ${isMobile ? 'max-h-64' : 'h-[calc(100%-4rem)]'}`}>
             {conversations.map((conversation) => (
               <div 
                 key={conversation.id}
@@ -115,7 +117,7 @@ const CaregiverMessages: React.FC = () => {
         </div>
         
         {/* Message area */}
-        <div className="flex-grow bg-white rounded-lg shadow-sm border border-gray-100 ml-0 md:ml-4 mt-4 md:mt-0 flex flex-col">
+        <div className={`flex-grow bg-white rounded-lg shadow-sm border border-gray-100 ${isMobile ? '' : 'ml-4'} flex flex-col`}>
           {selectedConversation ? (
             <>
               {/* Conversation Header */}
@@ -163,7 +165,7 @@ const CaregiverMessages: React.FC = () => {
                     </div>
                     {message.isOutgoing && (
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary ml-2 flex-shrink-0">
-                        Y
+                        C
                       </div>
                     )}
                   </div>

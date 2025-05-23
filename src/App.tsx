@@ -33,6 +33,7 @@ import PatientRequests from "./pages/patient/PatientRequests";
 import PatientFeedback from "./pages/patient/PatientFeedback";
 import PatientMessages from "./pages/patient/PatientMessages";
 import PatientSettings from "./pages/patient/PatientSettings";
+import PatientProfile from "./pages/patient/PatientProfile";
 
 // Family Routes
 import FamilyDashboard from "./pages/family/FamilyDashboard";
@@ -84,6 +85,7 @@ const App = () => (
           <Route path="/patient/feedback" element={<PatientFeedback />} />
           <Route path="/patient/messages" element={<PatientMessages />} />
           <Route path="/patient/settings" element={<PatientSettings />} />
+          <Route path="/patient/profile" element={<PatientProfile />} />
           
           {/* Family Routes */}
           <Route path="/family" element={<FamilyDashboard />} />

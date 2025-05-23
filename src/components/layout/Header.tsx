@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Bell } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeaderProps {
   title: string;
@@ -8,17 +10,41 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title, role }) => {
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
+  const getNotificationsUrl = () => {
+    switch (role) {
+      case 'admin':
+        return '/admin/messages';
+      case 'caregiver':
+        return '/caregiver/messages'; 
+      case 'patient':
+        return '/patient/messages';
+      case 'family':
+        return '/family/notifications';
+      default:
+        return '/';
+    }
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="md:hidden font-bold text-secondary text-lg">Homecare</div>
         <h1 className="text-xl font-bold md:text-2xl hidden md:block">{title}</h1>
         <div className="flex items-center space-x-4">
-          <button className="relative p-1 rounded-full hover:bg-gray-100">
+          <Link
+            to={getNotificationsUrl()}
+            className="relative p-1 rounded-full hover:bg-gray-100"
+          >
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-          </button>
-          <div className="flex items-center">
+          </Link>
+          <div 
+            className="flex items-center cursor-pointer" 
+            onClick={() => navigate(`/${role}/profile`)}
+          >
             <div className="hidden md:block text-sm text-right mr-3">
               <div className="font-medium">
                 {role === 'admin' ? 'Admin User' : 

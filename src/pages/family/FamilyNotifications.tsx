@@ -4,9 +4,12 @@ import Layout from '@/components/layout/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bell, CheckCircle, Calendar, Clock, User, AlertCircle, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const FamilyNotifications: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const isMobile = useIsMobile();
   
   // Mock data for notifications
   const notifications = [
@@ -17,7 +20,8 @@ const FamilyNotifications: React.FC = () => {
       message: 'Jane Doe completed a visit with Robert Smith',
       time: '2 hours ago',
       isRead: false,
-      patient: 'Robert Smith (Father)'
+      patient: 'Robert Smith (Father)',
+      linkTo: '/family/visits'
     },
     {
       id: 2,
@@ -26,7 +30,8 @@ const FamilyNotifications: React.FC = () => {
       message: 'Blood pressure medication dosage has been updated',
       time: 'Yesterday',
       isRead: false,
-      patient: 'Robert Smith (Father)'
+      patient: 'Robert Smith (Father)',
+      linkTo: '/family/visits'
     },
     {
       id: 3,
@@ -35,7 +40,8 @@ const FamilyNotifications: React.FC = () => {
       message: 'Your request for weekend visits has been approved',
       time: 'Yesterday',
       isRead: true,
-      patient: 'Robert Smith (Father)'
+      patient: 'Robert Smith (Father)',
+      linkTo: '/family/requests'
     },
     {
       id: 4,
@@ -44,7 +50,8 @@ const FamilyNotifications: React.FC = () => {
       message: 'You have a new message from Dr. Johnson',
       time: 'May 20, 2025',
       isRead: true,
-      patient: 'Robert Smith (Father)'
+      patient: 'Robert Smith (Father)',
+      linkTo: '/family/messages'
     },
     {
       id: 5,
@@ -53,7 +60,8 @@ const FamilyNotifications: React.FC = () => {
       message: 'The care plan for Robert Smith has been updated',
       time: 'May 19, 2025',
       isRead: true,
-      patient: 'Robert Smith (Father)'
+      patient: 'Robert Smith (Father)',
+      linkTo: '/family/visits'
     }
   ];
   
@@ -74,6 +82,11 @@ const FamilyNotifications: React.FC = () => {
     }
   };
   
+  const markAllAsRead = () => {
+    // In a real app, this would call an API to mark all notifications as read
+    console.log('Marking all notifications as read');
+  };
+  
   const filteredNotifications = activeTab === 'all' 
     ? notifications 
     : activeTab === 'unread' 
@@ -82,18 +95,19 @@ const FamilyNotifications: React.FC = () => {
   
   return (
     <Layout title="Notifications" role="family">
-      <div className="flex justify-between mb-6">
-        <div className="flex space-x-1">
+      <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} mb-6`}>
+        <div className={`flex ${isMobile ? 'mb-3 w-full' : 'space-x-1'}`}>
           <Button 
             variant={activeTab === 'all' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('all')}
+            className={isMobile ? 'flex-1' : ''}
           >
             All
           </Button>
           <Button 
             variant={activeTab === 'unread' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('unread')}
-            className="relative"
+            className={`relative ${isMobile ? 'flex-1' : ''}`}
           >
             Unread
             {notifications.filter(n => !n.isRead).length > 0 && (
@@ -105,12 +119,13 @@ const FamilyNotifications: React.FC = () => {
           <Button 
             variant={activeTab === 'read' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('read')}
+            className={isMobile ? 'flex-1' : ''}
           >
             Read
           </Button>
         </div>
         
-        <Button variant="outline" className="flex items-center">
+        <Button variant="outline" className="flex items-center" onClick={markAllAsRead}>
           <CheckCircle className="h-4 w-4 mr-2" />
           Mark All as Read
         </Button>
@@ -122,8 +137,8 @@ const FamilyNotifications: React.FC = () => {
             key={notification.id} 
             className={`p-4 ${!notification.isRead ? 'border-l-4 border-l-primary' : ''}`}
           >
-            <div className="flex">
-              <div className="mr-4">
+            <div className={`flex ${isMobile ? 'flex-col' : ''}`}>
+              <div className={`${isMobile ? 'mb-3' : 'mr-4'}`}>
                 {getNotificationIcon(notification.type)}
               </div>
               
@@ -135,7 +150,7 @@ const FamilyNotifications: React.FC = () => {
                       <span className="ml-2 inline-block w-2 h-2 bg-primary rounded-full"></span>
                     )}
                   </h3>
-                  <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                  <span className={`text-xs text-gray-500 whitespace-nowrap ${isMobile ? 'ml-auto' : 'ml-2'}`}>
                     {notification.time}
                   </span>
                 </div>
@@ -147,8 +162,10 @@ const FamilyNotifications: React.FC = () => {
                 </div>
               </div>
               
-              <div className="ml-4">
-                <Button variant="outline" size="sm">View</Button>
+              <div className={`${isMobile ? 'mt-3 text-right' : 'ml-4'}`}>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={notification.linkTo}>View</Link>
+                </Button>
               </div>
             </div>
           </Card>
