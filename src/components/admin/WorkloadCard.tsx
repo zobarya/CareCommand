@@ -65,7 +65,7 @@ const WorkloadCard: React.FC<WorkloadCardProps> = ({ caregiver, loadStatus, load
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-bold">
+                <span className="text-sm font-bold cursor-help">
                   {caregiver.assignedHours}/{caregiver.maxHours} hrs
                 </span>
               </TooltipTrigger>
