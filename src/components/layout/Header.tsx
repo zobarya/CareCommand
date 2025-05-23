@@ -1,8 +1,16 @@
 
-import React from 'react';
-import { Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 interface HeaderProps {
   title: string;
@@ -16,11 +24,11 @@ const Header: React.FC<HeaderProps> = ({ title, role }) => {
   const getNotificationsUrl = () => {
     switch (role) {
       case 'admin':
-        return '/admin/messages';
+        return '/admin/notifications';
       case 'caregiver':
-        return '/caregiver/messages'; 
+        return '/caregiver/notifications'; 
       case 'patient':
-        return '/patient/messages';
+        return '/patient/notifications';
       case 'family':
         return '/family/notifications';
       default:
@@ -57,6 +65,12 @@ const Header: React.FC<HeaderProps> = ({ title, role }) => {
     }
   };
 
+  const handleLogout = () => {
+    // In a real app this would clear auth tokens, etc.
+    toast.success("You've been logged out successfully");
+    navigate('/');
+  };
+
   const roleInfo = getRoleSpecificInfo();
 
   return (
@@ -72,18 +86,32 @@ const Header: React.FC<HeaderProps> = ({ title, role }) => {
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
           </Link>
-          <div 
-            className="flex items-center cursor-pointer" 
-            onClick={() => navigate(roleInfo.profilePath)}
-          >
-            <div className="hidden md:block text-sm text-right mr-3">
-              <div className="font-medium">{roleInfo.name}</div>
-              <div className="text-xs text-gray-500">{roleInfo.title}</div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-secondary font-medium">
-              {role.charAt(0).toUpperCase()}
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center cursor-pointer">
+                <div className="hidden md:block text-sm text-right mr-3">
+                  <div className="font-medium">{roleInfo.name}</div>
+                  <div className="text-xs text-gray-500">{roleInfo.title}</div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-secondary font-medium">
+                  {role.charAt(0).toUpperCase()}
+                </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => navigate(roleInfo.profilePath)}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate(`/${role}/settings`)}>
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-500">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="md:hidden px-4 py-2">

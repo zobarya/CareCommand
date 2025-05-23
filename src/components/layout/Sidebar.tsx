@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Calendar, 
   Home, 
@@ -9,9 +9,11 @@ import {
   User,
   Bell,
   File,
-  Clock
+  Clock,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface NavItem {
   label: string;
@@ -25,6 +27,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const adminNavItems: NavItem[] = [
     { label: 'Dashboard', href: '/admin', icon: Home },
@@ -34,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { label: 'Billing', href: '/admin/billing', icon: File },
     { label: 'Reports', href: '/admin/reports', icon: File },
     { label: 'Messages', href: '/admin/messages', icon: MessageSquare },
+    { label: 'Notifications', href: '/admin/notifications', icon: Bell },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
   ];
   
@@ -44,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { label: 'Notes', href: '/caregiver/notes', icon: File },
     { label: 'Certifications', href: '/caregiver/certifications', icon: File },
     { label: 'Messages', href: '/caregiver/messages', icon: MessageSquare },
+    { label: 'Notifications', href: '/caregiver/notifications', icon: Bell },
     { label: 'Profile', href: '/caregiver/profile', icon: User },
   ];
   
@@ -54,6 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { label: 'Requests', href: '/patient/requests', icon: File },
     { label: 'Feedback', href: '/patient/feedback', icon: MessageSquare },
     { label: 'Messages', href: '/patient/messages', icon: MessageSquare },
+    { label: 'Notifications', href: '/patient/notifications', icon: Bell },
     { label: 'Settings', href: '/patient/settings', icon: Settings },
   ];
   
@@ -76,13 +82,19 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   
   const navItems = navItemsByRole[role];
   
+  const handleLogout = () => {
+    // In a real app this would clear auth tokens, etc.
+    toast.success("You've been logged out successfully");
+    navigate('/');
+  };
+  
   return (
     <aside className="hidden md:flex flex-col w-64 h-screen bg-secondary text-white">
       <div className="p-4 flex items-center">
         <h1 className="text-xl font-bold">Homecare</h1>
       </div>
       
-      <div className="p-2">
+      <div className="p-2 flex-grow">
         <div className="text-sm uppercase text-white/60 mb-2 px-3">
           {role === 'admin' ? 'Agency Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
         </div>
@@ -109,7 +121,17 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
         </nav>
       </div>
       
-      <div className="mt-auto p-4 border-t border-white/10">
+      <div className="p-2">
+        <button
+          onClick={handleLogout}
+          className="flex items-center px-3 py-2 rounded-md transition-colors w-full text-white/80 hover:bg-white/10"
+        >
+          <LogOut className="w-5 h-5 mr-3" />
+          <span>Logout</span>
+        </button>
+      </div>
+      
+      <div className="p-4 border-t border-white/10">
         <div className="flex items-center">
           <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-secondary font-medium mr-2">
             {role.charAt(0).toUpperCase()}

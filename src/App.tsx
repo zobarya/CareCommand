@@ -14,6 +14,7 @@ import AdminPatients from "./pages/admin/AdminPatients";
 import AdminBilling from "./pages/admin/AdminBilling";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 // Caregiver Routes
@@ -23,6 +24,7 @@ import CaregiverChecklist from "./pages/caregiver/CaregiverChecklist";
 import CaregiverNotes from "./pages/caregiver/CaregiverNotes";
 import CaregiverCertifications from "./pages/caregiver/CaregiverCertifications";
 import CaregiverMessages from "./pages/caregiver/CaregiverMessages";
+import CaregiverNotifications from "./pages/caregiver/CaregiverNotifications";
 import CaregiverProfile from "./pages/caregiver/CaregiverProfile";
 
 // Patient Routes
@@ -32,6 +34,7 @@ import PatientCarePlan from "./pages/patient/PatientCarePlan";
 import PatientRequests from "./pages/patient/PatientRequests";
 import PatientFeedback from "./pages/patient/PatientFeedback";
 import PatientMessages from "./pages/patient/PatientMessages";
+import PatientNotifications from "./pages/patient/PatientNotifications";
 import PatientSettings from "./pages/patient/PatientSettings";
 import PatientProfile from "./pages/patient/PatientProfile";
 
@@ -67,6 +70,7 @@ const App = () => {
             <Route path="/admin/billing" element={<AdminBilling />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/messages" element={<AdminMessages />} />
+            <Route path="/admin/notifications" element={<AdminNotifications />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             
             {/* Caregiver Routes */}
@@ -76,6 +80,7 @@ const App = () => {
             <Route path="/caregiver/notes" element={<CaregiverNotes />} />
             <Route path="/caregiver/certifications" element={<CaregiverCertifications />} />
             <Route path="/caregiver/messages" element={<CaregiverMessages />} />
+            <Route path="/caregiver/notifications" element={<CaregiverNotifications />} />
             <Route path="/caregiver/profile" element={<CaregiverProfile />} />
             
             {/* Patient Routes */}
@@ -85,6 +90,7 @@ const App = () => {
             <Route path="/patient/requests" element={<PatientRequests />} />
             <Route path="/patient/feedback" element={<PatientFeedback />} />
             <Route path="/patient/messages" element={<PatientMessages />} />
+            <Route path="/patient/notifications" element={<PatientNotifications />} />
             <Route path="/patient/settings" element={<PatientSettings />} />
             <Route path="/patient/profile" element={<PatientProfile />} />
             
