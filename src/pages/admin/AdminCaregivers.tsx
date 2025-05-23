@@ -1,9 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Pencil, Plus, Search, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
+import AddCaregiverDialog from '@/components/admin/AddCaregiverDialog';
 
 const AdminCaregivers: React.FC = () => {
+  const [isAddCaregiverOpen, setIsAddCaregiverOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Mock data
   const caregivers = [
     {
@@ -53,6 +58,12 @@ const AdminCaregivers: React.FC = () => {
     },
   ];
 
+  const filteredCaregivers = caregivers.filter(caregiver => 
+    caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    caregiver.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    caregiver.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Layout title="Caregivers" role="admin">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -63,13 +74,18 @@ const AdminCaregivers: React.FC = () => {
               type="text" 
               placeholder="Search caregivers..." 
               className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
-        <button className="bg-primary text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap">
+        <Button 
+          className="flex items-center whitespace-nowrap"
+          onClick={() => setIsAddCaregiverOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Caregiver
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
@@ -87,7 +103,7 @@ const AdminCaregivers: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {caregivers.map(caregiver => (
+              {filteredCaregivers.map(caregiver => (
                 <tr key={caregiver.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div className="flex items-center">
@@ -121,6 +137,8 @@ const AdminCaregivers: React.FC = () => {
           </table>
         </div>
       </div>
+
+      <AddCaregiverDialog open={isAddCaregiverOpen} onOpenChange={setIsAddCaregiverOpen} />
     </Layout>
   );
 };

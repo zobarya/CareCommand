@@ -1,10 +1,14 @@
 
-import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Clock, Search, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, Search, User, Plus } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import StatusBadge from '@/components/ui/status-badge';
+import AddVisitDialog from '@/components/admin/AddVisitDialog';
+import { Button } from '@/components/ui/button';
 
 const AdminCalendar: React.FC = () => {
+  const [isAddVisitOpen, setIsAddVisitOpen] = useState(false);
+
   // Mock data
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const today = new Date();
@@ -64,14 +68,17 @@ const AdminCalendar: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="bg-primary text-white px-4 py-2 rounded-lg flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
+          <Button 
+            className="flex items-center"
+            onClick={() => setIsAddVisitOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
             New Visit
-          </button>
-          <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg flex items-center">
+          </Button>
+          <Button variant="outline" className="flex items-center">
             <User className="h-4 w-4 mr-2" />
             Filter
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -171,6 +178,8 @@ const AdminCalendar: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <AddVisitDialog open={isAddVisitOpen} onOpenChange={setIsAddVisitOpen} />
     </Layout>
   );
 };

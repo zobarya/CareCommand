@@ -1,9 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Pencil, Plus, Search, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import AddPatientDialog from '@/components/admin/AddPatientDialog';
+import { Button } from '@/components/ui/button';
 
 const AdminPatients: React.FC = () => {
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Mock data
   const patients = [
     {
@@ -53,6 +58,11 @@ const AdminPatients: React.FC = () => {
     },
   ];
 
+  const filteredPatients = patients.filter(patient => 
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.caregiver.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Layout title="Patients" role="admin">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -63,13 +73,18 @@ const AdminPatients: React.FC = () => {
               type="text" 
               placeholder="Search patients..." 
               className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
-        <button className="bg-primary text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap">
+        <Button 
+          className="bg-primary text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap"
+          onClick={() => setIsAddPatientOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Patient
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
@@ -87,7 +102,7 @@ const AdminPatients: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {patients.map(patient => (
+              {filteredPatients.map(patient => (
                 <tr key={patient.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div className="flex items-center">
@@ -121,6 +136,8 @@ const AdminPatients: React.FC = () => {
           </table>
         </div>
       </div>
+      
+      <AddPatientDialog open={isAddPatientOpen} onOpenChange={setIsAddPatientOpen} />
     </Layout>
   );
 };
