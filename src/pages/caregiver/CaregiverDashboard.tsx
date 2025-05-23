@@ -1,18 +1,18 @@
-
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
 
 const CaregiverDashboard: React.FC = () => {
-  // Mock data
+  // Mock data - with proper typing to avoid readonly arrays issue
   const upcomingVisits = [
     {
       id: '1',
       date: 'Today',
       time: '9:00 AM',
       duration: '1 hour',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       patientName: 'John Smith',
       tasks: ['Medication', 'Vitals', 'Exercises']
     },
@@ -21,7 +21,7 @@ const CaregiverDashboard: React.FC = () => {
       date: 'Today',
       time: '11:30 AM',
       duration: '45 min',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       patientName: 'Emma Wilson',
       tasks: ['Bathing', 'Meal Prep', 'Light Cleaning']
     },
@@ -30,11 +30,11 @@ const CaregiverDashboard: React.FC = () => {
       date: 'Tomorrow',
       time: '10:00 AM',
       duration: '1 hour',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       patientName: 'Robert Brown',
       tasks: ['Wound Care', 'Medication', 'Vitals']
     },
-  ] as const;
+  ];
   
   const recentVisits = [
     {
@@ -42,7 +42,7 @@ const CaregiverDashboard: React.FC = () => {
       date: 'Yesterday',
       time: '2:00 PM',
       duration: '1 hour',
-      status: 'completed',
+      status: 'completed' as const,
       patientName: 'Sarah Johnson',
       tasks: ['Medication', 'Vitals', 'Physical Therapy']
     },
@@ -51,11 +51,11 @@ const CaregiverDashboard: React.FC = () => {
       date: 'Yesterday',
       time: '10:30 AM',
       duration: '45 min',
-      status: 'completed',
+      status: 'completed' as const,
       patientName: 'Michael Roberts',
       tasks: ['Meal Prep', 'Mobility Assistance']
     },
-  ] as const;
+  ];
 
   return (
     <Layout title="Home" role="caregiver">
@@ -64,14 +64,14 @@ const CaregiverDashboard: React.FC = () => {
           <h2 className="text-xl font-bold mb-2">Welcome back, Jane!</h2>
           <p className="opacity-90 mb-4">You have 2 visits scheduled for today.</p>
           <div className="flex">
-            <button className="bg-white text-primary font-medium rounded-lg px-4 py-2 mr-3 flex items-center">
+            <Link to="/caregiver/checklist" className="bg-white text-primary font-medium rounded-lg px-4 py-2 mr-3 flex items-center">
               <Clock className="h-4 w-4 mr-2" />
               Start Visit
-            </button>
-            <button className="bg-white/20 text-white font-medium rounded-lg px-4 py-2 flex items-center">
+            </Link>
+            <Link to="/caregiver/schedule" className="bg-white/20 text-white font-medium rounded-lg px-4 py-2 flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
               View Schedule
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -118,9 +118,9 @@ const CaregiverDashboard: React.FC = () => {
             {upcomingVisits.map((visit) => (
               <VisitCard key={visit.id} visit={visit} role="caregiver" />
             ))}
-            <button className="w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
+            <Link to="/caregiver/schedule" className="block w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
               View Full Schedule
-            </button>
+            </Link>
           </div>
         </div>
         
@@ -130,9 +130,9 @@ const CaregiverDashboard: React.FC = () => {
             {recentVisits.map((visit) => (
               <VisitCard key={visit.id} visit={visit} role="caregiver" />
             ))}
-            <button className="w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
+            <Link to="/caregiver/schedule" className="block w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
               View All Visits
-            </button>
+            </Link>
           </div>
         </div>
       </div>

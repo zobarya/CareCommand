@@ -1,19 +1,20 @@
 
 import React from 'react';
 import { Bell, Calendar, MessageSquare, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
 import StatusBadge from '@/components/ui/status-badge';
 
 const FamilyDashboard: React.FC = () => {
-  // Mock data
+  // Mock data - with proper typing to avoid readonly arrays issue
   const upcomingVisits = [
     {
       id: '1',
       date: 'Today',
       time: '9:00 AM',
       duration: '1 hour',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       caregiverName: 'Jane Doe, RN',
       tasks: ['Medication', 'Vitals', 'Exercises']
     },
@@ -22,11 +23,11 @@ const FamilyDashboard: React.FC = () => {
       date: 'Friday, May 26',
       time: '11:30 AM',
       duration: '45 min',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       caregiverName: 'Mike Johnson, HHA',
       tasks: ['Bathing', 'Meal Prep', 'Light Cleaning']
     },
-  ] as const;
+  ];
   
   const recentVisits = [
     {
@@ -34,11 +35,11 @@ const FamilyDashboard: React.FC = () => {
       date: 'Yesterday',
       time: '2:00 PM',
       duration: '1 hour',
-      status: 'completed',
+      status: 'completed' as const,
       caregiverName: 'Jane Doe, RN',
       tasks: ['Medication', 'Vitals', 'Physical Therapy']
     },
-  ] as const;
+  ];
 
   return (
     <Layout title="Home" role="family">
@@ -136,18 +137,18 @@ const FamilyDashboard: React.FC = () => {
           <h2 className="text-lg font-bold mb-3">Quick Actions</h2>
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
             <div className="space-y-2">
-              <button className="w-full text-left p-3 rounded-lg bg-primary text-white flex items-center">
+              <Link to="/family/messages" className="block w-full text-left p-3 rounded-lg bg-primary text-white flex items-center">
                 <MessageSquare className="h-5 w-5 mr-2" />
                 Contact Care Team
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-secondary text-white flex items-center">
+              </Link>
+              <Link to="/family/requests" className="block w-full text-left p-3 rounded-lg bg-secondary text-white flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
                 Request Schedule Change
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-accent text-secondary flex items-center">
+              </Link>
+              <Link to="/family/notifications" className="block w-full text-left p-3 rounded-lg bg-accent text-secondary flex items-center">
                 <Bell className="h-5 w-5 mr-2" />
                 Update Notifications
-              </button>
+              </Link>
             </div>
           </div>
           
@@ -156,9 +157,9 @@ const FamilyDashboard: React.FC = () => {
             {upcomingVisits.map((visit) => (
               <VisitCard key={visit.id} visit={visit} role="family" />
             ))}
-            <button className="w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
+            <Link to="/family/visits" className="block w-full py-2 text-primary font-medium text-center border border-primary rounded-lg hover:bg-primary/5">
               View All Visits
-            </button>
+            </Link>
           </div>
         </div>
       </div>

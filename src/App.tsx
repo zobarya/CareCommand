@@ -6,9 +6,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCalendar from "./pages/admin/AdminCalendar";
+import AdminCaregivers from "./pages/admin/AdminCaregivers";
+import AdminPatients from "./pages/admin/AdminPatients";
 import CaregiverDashboard from "./pages/caregiver/CaregiverDashboard";
+import CaregiverSchedule from "./pages/caregiver/CaregiverSchedule";
+import CaregiverChecklist from "./pages/caregiver/CaregiverChecklist";
 import PatientDashboard from "./pages/patient/PatientDashboard";
+import PatientVisits from "./pages/patient/PatientVisits";
+import PatientCarePlan from "./pages/patient/PatientCarePlan";
 import FamilyDashboard from "./pages/family/FamilyDashboard";
+import FamilyVisits from "./pages/family/FamilyVisits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,9 +32,9 @@ const App = () => (
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/calendar" element={<AdminDashboard />} />
-          <Route path="/admin/caregivers" element={<AdminDashboard />} />
-          <Route path="/admin/patients" element={<AdminDashboard />} />
+          <Route path="/admin/calendar" element={<AdminCalendar />} />
+          <Route path="/admin/caregivers" element={<AdminCaregivers />} />
+          <Route path="/admin/patients" element={<AdminPatients />} />
           <Route path="/admin/billing" element={<AdminDashboard />} />
           <Route path="/admin/reports" element={<AdminDashboard />} />
           <Route path="/admin/messages" element={<AdminDashboard />} />
@@ -34,8 +42,8 @@ const App = () => (
           
           {/* Caregiver Routes */}
           <Route path="/caregiver" element={<CaregiverDashboard />} />
-          <Route path="/caregiver/schedule" element={<CaregiverDashboard />} />
-          <Route path="/caregiver/checklist" element={<CaregiverDashboard />} />
+          <Route path="/caregiver/schedule" element={<CaregiverSchedule />} />
+          <Route path="/caregiver/checklist" element={<CaregiverChecklist />} />
           <Route path="/caregiver/notes" element={<CaregiverDashboard />} />
           <Route path="/caregiver/certifications" element={<CaregiverDashboard />} />
           <Route path="/caregiver/messages" element={<CaregiverDashboard />} />
@@ -43,8 +51,8 @@ const App = () => (
           
           {/* Patient Routes */}
           <Route path="/patient" element={<PatientDashboard />} />
-          <Route path="/patient/visits" element={<PatientDashboard />} />
-          <Route path="/patient/care-plan" element={<PatientDashboard />} />
+          <Route path="/patient/visits" element={<PatientVisits />} />
+          <Route path="/patient/care-plan" element={<PatientCarePlan />} />
           <Route path="/patient/requests" element={<PatientDashboard />} />
           <Route path="/patient/feedback" element={<PatientDashboard />} />
           <Route path="/patient/messages" element={<PatientDashboard />} />
@@ -52,7 +60,7 @@ const App = () => (
           
           {/* Family Routes */}
           <Route path="/family" element={<FamilyDashboard />} />
-          <Route path="/family/visits" element={<FamilyDashboard />} />
+          <Route path="/family/visits" element={<FamilyVisits />} />
           <Route path="/family/feedback" element={<FamilyDashboard />} />
           <Route path="/family/requests" element={<FamilyDashboard />} />
           <Route path="/family/messages" element={<FamilyDashboard />} />

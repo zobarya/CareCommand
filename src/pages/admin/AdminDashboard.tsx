@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, Clock, File, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
@@ -6,14 +5,14 @@ import CardStat from '@/components/ui/card-stat';
 import VisitCard from '@/components/ui/visit-card';
 
 const AdminDashboard: React.FC = () => {
-  // Mock data
+  // Mock data - with proper typing to avoid readonly arrays issue
   const upcomingVisits = [
     {
       id: '1',
       date: 'Today',
       time: '9:00 AM',
       duration: '1 hour',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       caregiverName: 'Jane Doe, RN',
       patientName: 'John Smith',
       tasks: ['Medication', 'Vitals', 'Exercises']
@@ -23,7 +22,7 @@ const AdminDashboard: React.FC = () => {
       date: 'Today',
       time: '11:30 AM',
       duration: '45 min',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       caregiverName: 'Mike Johnson, HHA',
       patientName: 'Emma Wilson',
       tasks: ['Bathing', 'Meal Prep', 'Light Cleaning']
@@ -33,12 +32,12 @@ const AdminDashboard: React.FC = () => {
       date: 'Tomorrow',
       time: '10:00 AM',
       duration: '1 hour',
-      status: 'scheduled',
+      status: 'scheduled' as const,
       caregiverName: 'Jane Doe, RN',
       patientName: 'Robert Brown',
       tasks: ['Wound Care', 'Medication', 'Vitals']
     },
-  ] as const;
+  ];
   
   return (
     <Layout title="Dashboard" role="admin">
