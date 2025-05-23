@@ -3,176 +3,154 @@ import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Phone, MapPin, Calendar, FileText, Clock } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { User, Mail, Phone, Home, Calendar, FileText, Heart } from 'lucide-react';
+import { Separator } from "@/components/ui/separator";
 
 const PatientProfile: React.FC = () => {
-  const isMobile = useIsMobile();
-  
+  // Mock patient data
+  const patientData = {
+    name: "John Smith",
+    email: "john.smith@example.com",
+    phone: "(555) 123-4567",
+    address: "123 Main St, Anytown, CA 12345",
+    dob: "May 15, 1955",
+    emergencyContact: "Mary Smith (Wife) - (555) 987-6543",
+    primaryPhysician: "Dr. Robert Williams",
+    medicalConditions: ["Hypertension", "Type 2 Diabetes", "Osteoarthritis"],
+    allergies: ["Penicillin", "Shellfish"],
+    medications: [
+      { name: "Lisinopril", dosage: "10mg", schedule: "Once daily" },
+      { name: "Metformin", dosage: "500mg", schedule: "Twice daily" },
+      { name: "Acetaminophen", dosage: "500mg", schedule: "As needed for pain" }
+    ],
+    insuranceProvider: "HealthPlus Insurance",
+    policyNumber: "HP-12345678",
+    lastVisit: "May 20, 2025"
+  };
+
   return (
     <Layout title="My Profile" role="patient">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Personal Info */}
-        <Card className="p-6 col-span-1">
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <User className="h-16 w-16 text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold">John Smith</h2>
-            <p className="text-gray-500 mb-2">Patient</p>
-            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-              Active
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <Mail className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-500">Email Address</p>
-                <p>john.smith@example.com</p>
+      <div className="space-y-6">
+        {/* Basic Information */}
+        <Card className="p-6">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex justify-center md:justify-start">
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <User className="h-12 w-12" />
               </div>
             </div>
             
-            <div className="flex items-start">
-              <Phone className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-500">Phone</p>
-                <p>(555) 123-4567</p>
+            <div className="flex-grow text-center md:text-left">
+              <h2 className="text-2xl font-bold">{patientData.name}</h2>
+              <p className="text-gray-500">Patient ID: PT-10042</p>
+              
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-center">
+                  <Mail className="h-4 w-4 text-gray-500 mr-2" />
+                  <span>{patientData.email}</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-4 w-4 text-gray-500 mr-2" />
+                  <span>{patientData.phone}</span>
+                </div>
+                <div className="flex items-center">
+                  <Home className="h-4 w-4 text-gray-500 mr-2" />
+                  <span>{patientData.address}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                  <span>DOB: {patientData.dob}</span>
+                </div>
               </div>
             </div>
             
-            <div className="flex items-start">
-              <MapPin className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-500">Address</p>
-                <p>123 Main Street<br />Hometown, CA 90210</p>
-              </div>
+            <div className="flex justify-center md:justify-end items-start">
+              <Button>Edit Profile</Button>
             </div>
-            
-            <div className="flex items-start">
-              <Calendar className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-500">Date of Birth</p>
-                <p>January 15, 1955</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-6">
-            <Button className="w-full">Edit Profile</Button>
           </div>
         </Card>
         
-        {/* Middle Column - Medical Info */}
-        <Card className="p-6 col-span-1">
-          <h3 className="text-lg font-medium mb-4 flex items-center">
-            <FileText className="h-5 w-5 mr-2 text-primary" /> Medical Information
-          </h3>
+        {/* Medical Information */}
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-4">Medical Information</h3>
           
           <div className="space-y-4">
-            <div className="p-4 border border-gray-100 rounded-lg">
-              <h4 className="font-medium mb-2">Primary Diagnosis</h4>
-              <p className="text-sm">Type 2 Diabetes, Hypertension</p>
+            <div>
+              <h4 className="font-medium text-gray-700">Emergency Contact</h4>
+              <p>{patientData.emergencyContact}</p>
             </div>
             
-            <div className="p-4 border border-gray-100 rounded-lg">
-              <h4 className="font-medium mb-2">Allergies</h4>
-              <p className="text-sm">Penicillin, Shellfish</p>
+            <Separator />
+            
+            <div>
+              <h4 className="font-medium text-gray-700">Primary Physician</h4>
+              <p>{patientData.primaryPhysician}</p>
             </div>
             
-            <div className="p-4 border border-gray-100 rounded-lg">
-              <h4 className="font-medium mb-2">Current Medications</h4>
-              <ul className="text-sm space-y-1">
-                <li>• Metformin 500mg twice daily</li>
-                <li>• Lisinopril 10mg once daily</li>
-                <li>• Aspirin 81mg once daily</li>
-              </ul>
+            <Separator />
+            
+            <div>
+              <h4 className="font-medium text-gray-700">Medical Conditions</h4>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {patientData.medicalConditions.map((condition, index) => (
+                  <span key={index} className="bg-blue-50 text-blue-700 px-2 py-1 text-xs rounded-full">
+                    {condition}
+                  </span>
+                ))}
+              </div>
             </div>
             
-            <div className="p-4 border border-gray-100 rounded-lg">
-              <h4 className="font-medium mb-2">Emergency Contact</h4>
-              <p className="text-sm">Jennifer Smith (Daughter)<br />(555) 987-6543</p>
+            <Separator />
+            
+            <div>
+              <h4 className="font-medium text-gray-700">Allergies</h4>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {patientData.allergies.map((allergy, index) => (
+                  <span key={index} className="bg-red-50 text-red-700 px-2 py-1 text-xs rounded-full">
+                    {allergy}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-          
-          <Button variant="outline" className="mt-4 w-full">
-            View Complete Medical Record
-          </Button>
         </Card>
         
-        {/* Right Column - Care Plan & Recent Activity */}
-        <Card className="p-6 col-span-1">
-          <h3 className="text-lg font-medium mb-4 flex items-center">
-            <Clock className="h-5 w-5 mr-2 text-primary" /> Care Plan & Activity
-          </h3>
+        {/* Medications */}
+        <Card className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold">Medications</h3>
+            <Button variant="outline" size="sm">
+              <FileText className="h-4 w-4 mr-2" />
+              View Full List
+            </Button>
+          </div>
           
-          <div className="space-y-6">
-            <div>
-              <h4 className="font-medium mb-3">Next Visit</h4>
-              <Card className="p-3 bg-blue-50 border-blue-200">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-10 w-10 text-blue-500" />
-                  <div>
-                    <p className="font-medium">May 25, 2025 at 10:00 AM</p>
-                    <p className="text-sm text-gray-600">Physical Therapy with Robert Johnson</p>
-                  </div>
+          <div className="space-y-4">
+            {patientData.medications.map((medication, index) => (
+              <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                <Heart className="h-5 w-5 text-primary mr-3 mt-0.5" />
+                <div>
+                  <h4 className="font-medium">{medication.name}</h4>
+                  <p className="text-sm text-gray-600">{medication.dosage} - {medication.schedule}</p>
                 </div>
-                <Button size="sm" variant="outline" className="mt-3 w-full border-blue-200 text-blue-800 hover:bg-blue-100">
-                  View Details
-                </Button>
-              </Card>
+              </div>
+            ))}
+          </div>
+        </Card>
+        
+        {/* Insurance */}
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-4">Insurance Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="font-medium text-gray-700">Provider</h4>
+              <p>{patientData.insuranceProvider}</p>
             </div>
             
             <div>
-              <h4 className="font-medium mb-3">Recent Activity</h4>
-              <div className="space-y-2">
-                <div className="text-sm p-2 border-l-2 border-primary/70 pl-3">
-                  <p>Completed physical therapy session</p>
-                  <p className="text-xs text-gray-500">Yesterday at 11:00 AM</p>
-                </div>
-                <div className="text-sm p-2 border-l-2 border-primary/70 pl-3">
-                  <p>Blood pressure checked: 128/82</p>
-                  <p className="text-xs text-gray-500">May 20, 2025 at 9:30 AM</p>
-                </div>
-                <div className="text-sm p-2 border-l-2 border-primary/70 pl-3">
-                  <p>Medication review completed</p>
-                  <p className="text-xs text-gray-500">May 18, 2025 at 2:15 PM</p>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-3">Care Team</h4>
-              <div className="space-y-2">
-                <div className="bg-gray-50 p-3 rounded-lg flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Dr. Emily Chen</p>
-                    <p className="text-xs text-gray-500">Primary Physician</p>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Jane Doe</p>
-                    <p className="text-xs text-gray-500">Registered Nurse</p>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Robert Johnson</p>
-                    <p className="text-xs text-gray-500">Physical Therapist</p>
-                  </div>
-                </div>
-              </div>
+              <h4 className="font-medium text-gray-700">Policy Number</h4>
+              <p>{patientData.policyNumber}</p>
             </div>
           </div>
         </Card>

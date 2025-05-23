@@ -1,207 +1,174 @@
 
 import React, { useState } from 'react';
+import { Search, MessageCircle, User, Calendar } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Card } from '@/components/ui/card';
-import { Search, User, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Input } from '@/components/ui/input';
+
+interface Message {
+  id: number;
+  sender: string;
+  role: string;
+  message: string;
+  time: string;
+  isUnread: boolean;
+  avatar?: string;
+}
 
 const CaregiverMessages: React.FC = () => {
-  const [selectedConversation, setSelectedConversation] = useState<number | null>(1);
-  const [messageInput, setMessageInput] = useState('');
-  const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState<'all' | 'patients' | 'admin'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   
-  const conversations = [
-    {
-      id: 1,
-      name: 'John Smith',
-      role: 'Patient',
-      avatar: 'JS',
-      unread: 2,
-      lastMessage: 'When will you arrive tomorrow?',
-      lastTime: '4:30 PM'
-    },
-    {
-      id: 2,
-      name: 'Admin Office',
-      role: 'Admin',
-      avatar: 'AO',
-      unread: 0,
-      lastMessage: 'Please submit your hours by Friday',
-      lastTime: 'Yesterday'
-    },
-    {
-      id: 3,
-      name: 'Jennifer Smith',
-      role: 'Family Member',
-      avatar: 'JS',
-      unread: 1,
-      lastMessage: 'Thank you for taking care of my father',
-      lastTime: 'May 20'
-    },
-  ];
-  
-  const messages = [
+  // Mock messages data
+  const allMessages: Message[] = [
     {
       id: 1,
       sender: 'John Smith',
-      content: 'When will you arrive tomorrow? I need to prepare for the appointment.',
-      time: '4:30 PM',
-      isOutgoing: false
+      role: 'Patient',
+      message: 'When will you arrive for today\'s appointment?',
+      time: '10 min ago',
+      isUnread: true
     },
     {
       id: 2,
-      sender: 'You',
-      content: 'I\'ll be there at 10:00 AM. We\'ll be focusing on the new exercise routine that Dr. Chen prescribed.',
-      time: '4:35 PM',
-      isOutgoing: true
+      sender: 'Admin Team',
+      role: 'Admin',
+      message: 'Please complete your timesheet for last week',
+      time: '1 hour ago',
+      isUnread: true
+    },
+    {
+      id: 3,
+      sender: 'Emma Wilson',
+      role: 'Patient',
+      message: 'Thank you for your help yesterday',
+      time: 'Yesterday',
+      isUnread: false
+    },
+    {
+      id: 4,
+      sender: 'Sarah Johnson',
+      role: 'Patient',
+      message: 'Can we reschedule Friday\'s appointment?',
+      time: '2 days ago',
+      isUnread: false
+    },
+    {
+      id: 5,
+      sender: 'Scheduling',
+      role: 'Admin',
+      message: 'New visit added to your schedule',
+      time: '3 days ago',
+      isUnread: false
     }
   ];
   
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-    console.log('Sending message:', messageInput);
-    setMessageInput('');
-  };
+  // Filter messages based on active tab and search query
+  const filteredMessages = allMessages
+    .filter(msg => {
+      if (activeTab === 'all') return true;
+      if (activeTab === 'patients') return msg.role === 'Patient';
+      if (activeTab === 'admin') return msg.role === 'Admin';
+      return true;
+    })
+    .filter(msg => {
+      if (!searchQuery) return true;
+      return msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) || 
+             msg.message.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  
+  // Count unread messages
+  const unreadCount = allMessages.filter(msg => msg.isUnread).length;
   
   return (
     <Layout title="Messages" role="caregiver">
-      <div className={`flex flex-col ${!isMobile ? 'md:flex-row' : ''} h-[calc(100vh-8rem)]`}>
-        {/* Conversations List */}
-        <div className={`w-full ${isMobile ? 'mb-4' : 'md:w-1/3 lg:w-1/4'} bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden`}>
-          <div className="p-4 border-b">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input 
-                type="text" 
-                placeholder="Search messages..." 
-                className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg"
-              />
-            </div>
-          </div>
-          
-          <div className={`overflow-y-auto ${isMobile ? 'max-h-64' : 'h-[calc(100%-4rem)]'}`}>
-            {conversations.map((conversation) => (
-              <div 
-                key={conversation.id}
-                className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                  selectedConversation === conversation.id ? 'bg-gray-50' : ''
-                }`}
-                onClick={() => setSelectedConversation(conversation.id)}
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-3">
-                    {conversation.avatar}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className="font-medium">{conversation.name}</h3>
-                      <span className="text-xs text-gray-500">{conversation.lastTime}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-gray-600 truncate max-w-[150px]">
-                        {conversation.lastMessage}
-                      </p>
-                      {conversation.unread > 0 && (
-                        <span className="ml-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          {conversation.unread}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-400">{conversation.role}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="mb-6">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+          <Input
+            className="pl-10"
+            placeholder="Search messages..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
         
-        {/* Message area */}
-        <div className={`flex-grow bg-white rounded-lg shadow-sm border border-gray-100 ${isMobile ? '' : 'ml-4'} flex flex-col`}>
-          {selectedConversation ? (
-            <>
-              {/* Conversation Header */}
-              <div className="p-4 border-b flex justify-between items-center">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-3">
-                    {conversations.find(c => c.id === selectedConversation)?.avatar}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">
-                      {conversations.find(c => c.id === selectedConversation)?.name}
-                    </h3>
-                    <span className="text-xs text-gray-500">
-                      {conversations.find(c => c.id === selectedConversation)?.role}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Messages */}
-              <div className="flex-grow p-4 overflow-y-auto">
-                {messages.map((message) => (
-                  <div 
-                    key={message.id}
-                    className={`mb-4 flex ${message.isOutgoing ? 'justify-end' : 'justify-start'}`}
-                  >
-                    {!message.isOutgoing && (
-                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-2 flex-shrink-0">
-                        {conversations.find(c => c.id === selectedConversation)?.avatar[0]}
-                      </div>
-                    )}
-                    <div 
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        message.isOutgoing 
-                          ? 'bg-primary text-white rounded-br-none' 
-                          : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                      }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
-                      <span className={`text-xs block text-right mt-1 ${
-                        message.isOutgoing ? 'text-white/70' : 'text-gray-500'
-                      }`}>
-                        {message.time}
-                      </span>
-                    </div>
-                    {message.isOutgoing && (
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary ml-2 flex-shrink-0">
-                        C
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              
-              {/* Message Input */}
-              <div className="p-4 border-t">
-                <div className="flex">
-                  <input
-                    type="text"
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    placeholder="Type your message..."
-                    className="flex-grow border border-gray-200 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  />
-                  <Button 
-                    className="rounded-l-none" 
-                    onClick={handleSendMessage}
-                  >
-                    <Send className="h-4 w-4 mr-2" /> Send
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <User className="h-12 w-12 text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-700 mb-2">No conversation selected</h3>
-              <p className="text-gray-500 max-w-md">
-                Select a conversation from the list to view messages.
-              </p>
-            </div>
-          )}
+        <div className="flex space-x-1">
+          <Button 
+            variant={activeTab === 'all' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('all')}
+            className="relative"
+          >
+            All
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </Button>
+          <Button 
+            variant={activeTab === 'patients' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('patients')}
+          >
+            Patients
+          </Button>
+          <Button 
+            variant={activeTab === 'admin' ? 'default' : 'outline'} 
+            onClick={() => setActiveTab('admin')}
+          >
+            Admin
+          </Button>
         </div>
+      </div>
+      
+      <div className="space-y-4">
+        {filteredMessages.map((message) => (
+          <Card 
+            key={message.id} 
+            className={`p-4 ${message.isUnread ? 'border-l-4 border-l-primary' : ''}`}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                <User className="h-5 w-5" />
+              </div>
+              
+              <div className="flex-grow">
+                <div className="flex items-start justify-between mb-1">
+                  <div>
+                    <h3 className="font-medium flex items-center">
+                      {message.sender}
+                      {message.isUnread && (
+                        <span className="ml-2 inline-block w-2 h-2 bg-primary rounded-full"></span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-gray-500">{message.role}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">{message.time}</span>
+                </div>
+                
+                <p className="text-sm text-gray-600">{message.message}</p>
+                
+                <div className="mt-3 flex justify-end">
+                  <Button size="sm" variant="outline" className="mr-2">View</Button>
+                  <Button size="sm">Reply</Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+        
+        {filteredMessages.length === 0 && (
+          <div className="text-center py-12">
+            <MessageCircle className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-700 mb-2">No messages found</h3>
+            <p className="text-gray-500">
+              {searchQuery 
+                ? 'Try changing your search terms' 
+                : 'Your message inbox is empty'}
+            </p>
+          </div>
+        )}
       </div>
     </Layout>
   );

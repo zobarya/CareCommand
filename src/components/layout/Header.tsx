@@ -28,6 +28,37 @@ const Header: React.FC<HeaderProps> = ({ title, role }) => {
     }
   };
 
+  const getRoleSpecificInfo = () => {
+    switch (role) {
+      case 'admin':
+        return {
+          name: 'Admin User',
+          title: 'Administrator',
+          profilePath: '/admin/settings'
+        };
+      case 'caregiver':
+        return {
+          name: 'Jane Doe, RN',
+          title: 'Caregiver',
+          profilePath: '/caregiver/profile'
+        }; 
+      case 'patient':
+        return {
+          name: 'John Smith',
+          title: 'Patient',
+          profilePath: '/patient/profile'
+        };
+      case 'family':
+        return {
+          name: 'Family Member',
+          title: 'Family Access',
+          profilePath: '/family/profile'
+        };
+    }
+  };
+
+  const roleInfo = getRoleSpecificInfo();
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="flex items-center justify-between px-4 py-3">
@@ -43,21 +74,11 @@ const Header: React.FC<HeaderProps> = ({ title, role }) => {
           </Link>
           <div 
             className="flex items-center cursor-pointer" 
-            onClick={() => navigate(`/${role}/profile`)}
+            onClick={() => navigate(roleInfo.profilePath)}
           >
             <div className="hidden md:block text-sm text-right mr-3">
-              <div className="font-medium">
-                {role === 'admin' ? 'Admin User' : 
-                 role === 'caregiver' ? 'Jane Doe, RN' : 
-                 role === 'patient' ? 'John Smith' : 
-                 'Family Member'}
-              </div>
-              <div className="text-xs text-gray-500">
-                {role === 'admin' ? 'Administrator' : 
-                 role === 'caregiver' ? 'Caregiver' : 
-                 role === 'patient' ? 'Patient' : 
-                 'Family Access'}
-              </div>
+              <div className="font-medium">{roleInfo.name}</div>
+              <div className="text-xs text-gray-500">{roleInfo.title}</div>
             </div>
             <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-secondary font-medium">
               {role.charAt(0).toUpperCase()}
