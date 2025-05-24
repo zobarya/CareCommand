@@ -112,7 +112,15 @@ const AdminCaregivers: React.FC = () => {
     },
   ]);
 
-  const handleEditCaregiver = (caregiver: Caregiver) => {
+  const handleCaregiverClick = (caregiver: Caregiver) => {
+    setSelectedCaregiver(caregiver);
+    setIsEditCaregiverOpen(true);
+  };
+
+  const handleEditCaregiver = (caregiver: Caregiver, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation(); // Prevent row click when clicking edit button
+    }
     setSelectedCaregiver(caregiver);
     setIsEditCaregiverOpen(true);
   };
@@ -209,7 +217,11 @@ const AdminCaregivers: React.FC = () => {
                 </thead>
                 <tbody>
                   {filteredCaregivers.map(caregiver => (
-                    <tr key={caregiver.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr 
+                      key={caregiver.id} 
+                      className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleCaregiverClick(caregiver)}
+                    >
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
@@ -234,7 +246,7 @@ const AdminCaregivers: React.FC = () => {
                       <td className="py-3 px-4 text-right">
                         <button 
                           className="text-gray-600 hover:text-primary"
-                          onClick={() => handleEditCaregiver(caregiver)}
+                          onClick={(e) => handleEditCaregiver(caregiver, e)}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>

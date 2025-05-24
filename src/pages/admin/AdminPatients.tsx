@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Pencil, Plus, Search, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
@@ -71,7 +70,15 @@ const AdminPatients: React.FC = () => {
     },
   ]);
 
-  const handleEditPatient = (patient: Patient) => {
+  const handlePatientClick = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsEditPatientOpen(true);
+  };
+
+  const handleEditPatient = (patient: Patient, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation(); // Prevent row click when clicking edit button
+    }
     setSelectedPatient(patient);
     setIsEditPatientOpen(true);
   };
@@ -138,7 +145,11 @@ const AdminPatients: React.FC = () => {
             </thead>
             <tbody>
               {filteredPatients.map(patient => (
-                <tr key={patient.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr 
+                  key={patient.id} 
+                  className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handlePatientClick(patient)}
+                >
                   <td className="py-3 px-4">
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-3">
@@ -163,7 +174,7 @@ const AdminPatients: React.FC = () => {
                   <td className="py-3 px-4 text-right">
                     <button 
                       className="text-gray-600 hover:text-primary"
-                      onClick={() => handleEditPatient(patient)}
+                      onClick={(e) => handleEditPatient(patient, e)}
                     >
                       <Pencil className="h-4 w-4" />
                     </button>

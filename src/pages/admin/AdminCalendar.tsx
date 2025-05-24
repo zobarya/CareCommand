@@ -61,7 +61,15 @@ const AdminCalendar: React.FC = () => {
     }
   ]);
 
-  const handleEditVisit = (visit: Visit) => {
+  const handleVisitClick = (visit: Visit) => {
+    setSelectedVisit(visit);
+    setIsEditVisitOpen(true);
+  };
+
+  const handleEditVisit = (visit: Visit, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation(); // Prevent row click when clicking edit button
+    }
     setSelectedVisit(visit);
     setIsEditVisitOpen(true);
   };
@@ -192,7 +200,11 @@ const AdminCalendar: React.FC = () => {
             v.date.getMonth() === today.getMonth() && 
             v.date.getFullYear() === today.getFullYear()
           ).map(visit => (
-            <div key={visit.id} className="flex items-start p-4 border rounded-lg">
+            <div 
+              key={visit.id} 
+              className="flex items-start p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              onClick={() => handleVisitClick(visit)}
+            >
               <div className="flex-shrink-0 mr-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                   <Clock className="h-6 w-6 text-primary" />
@@ -208,7 +220,7 @@ const AdminCalendar: React.FC = () => {
               </div>
               <button 
                 className="flex-shrink-0 ml-2 text-primary hover:underline text-sm"
-                onClick={() => handleEditVisit(visit)}
+                onClick={(e) => handleEditVisit(visit, e)}
               >
                 <Pencil className="h-4 w-4" />
               </button>
