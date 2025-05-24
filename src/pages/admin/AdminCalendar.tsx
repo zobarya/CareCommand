@@ -1,21 +1,28 @@
-
 import React, { useState } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Clock, Search, User, Plus } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, Search, User, Plus, Pencil } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import StatusBadge from '@/components/ui/status-badge';
 import AddVisitDialog from '@/components/admin/AddVisitDialog';
+import EditVisitDialog from '@/components/admin/EditVisitDialog';
 import { Button } from '@/components/ui/button';
+
+interface Visit {
+  id: string;
+  date: Date;
+  time: string;
+  patientName: string;
+  caregiverName: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  duration: string;
+}
 
 const AdminCalendar: React.FC = () => {
   const [isAddVisitOpen, setIsAddVisitOpen] = useState(false);
+  const [isEditVisitOpen, setIsEditVisitOpen] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
 
-  // Mock data
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const today = new Date();
-  const currentMonth = today.toLocaleString('default', { month: 'long' });
-  const currentYear = today.getFullYear();
-  
-  const visits = [
+  // Mock data with state management
+  const [visits, setVisits] = useState<Visit[]>([
     {
       id: '1',
       date: new Date(2025, 4, 23),
@@ -52,8 +59,36 @@ const AdminCalendar: React.FC = () => {
       status: 'completed' as const,
       duration: '1 hour'
     }
-  ];
+  ]);
 
+  const handleEditVisit = (visit: Visit) => {
+    setSelectedVisit(visit);
+    setIsEditVisitOpen(true);
+  };
+
+  const handleUpdateVisit = (updatedVisit: Visit) => {
+    setVisits(prev => prev.map(v => v.id === updatedVisit.id ? updatedVisit : v));
+  };
+
+  const handleAddVisit = (newVisitData: any) => {
+    const newVisit: Visit = {
+      id: (visits.length + 1).toString(),
+      date: new Date(newVisitData.date),
+      time: newVisitData.startTime,
+      patientName: newVisitData.patient,
+      caregiverName: newVisitData.caregiver,
+      status: 'scheduled',
+      duration: '1 hour' // Default duration
+    };
+    setVisits(prev => [...prev, newVisit]);
+  };
+
+  // Mock data
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const today = new Date();
+  const currentMonth = today.toLocaleString('default', { month: 'long' });
+  const currentYear = today.getFullYear();
+  
   return (
     <Layout title="Calendar" role="admin">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -171,15 +206,28 @@ const AdminCalendar: React.FC = () => {
                 <p className="font-medium">{visit.patientName}</p>
                 <p className="text-sm text-gray-600">Caregiver: {visit.caregiverName}</p>
               </div>
-              <button className="flex-shrink-0 ml-2 text-primary hover:underline text-sm">
-                Details
+              <button 
+                className="flex-shrink-0 ml-2 text-primary hover:underline text-sm"
+                onClick={() => handleEditVisit(visit)}
+              >
+                <Pencil className="h-4 w-4" />
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      <AddVisitDialog open={isAddVisitOpen} onOpenChange={setIsAddVisitOpen} />
+      <AddVisitDialog 
+        open={isAddVisitOpen} 
+        onOpenChange={setIsAddVisitOpen}
+        onAdd={handleAddVisit}
+      />
+      <EditVisitDialog 
+        open={isEditVisitOpen} 
+        onOpenChange={setIsEditVisitOpen}
+        visit={selectedVisit}
+        onUpdate={handleUpdateVisit}
+      />
     </Layout>
   );
 };

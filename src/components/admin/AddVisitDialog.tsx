@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,10 @@ import { toast } from 'sonner';
 interface AddVisitDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAdd?: (visitData: any) => void;
 }
 
-const AddVisitDialog: React.FC<AddVisitDialogProps> = ({ open, onOpenChange }) => {
+const AddVisitDialog: React.FC<AddVisitDialogProps> = ({ open, onOpenChange, onAdd }) => {
   const [formData, setFormData] = useState({
     patient: '',
     caregiver: '',
@@ -51,6 +51,9 @@ const AddVisitDialog: React.FC<AddVisitDialogProps> = ({ open, onOpenChange }) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (onAdd) {
+      onAdd(formData);
+    }
     toast.success('Visit scheduled successfully');
     onOpenChange(false);
     // Reset form
@@ -85,7 +88,7 @@ const AddVisitDialog: React.FC<AddVisitDialogProps> = ({ open, onOpenChange }) =
               >
                 <option value="">Select a patient</option>
                 {patients.map(patient => (
-                  <option key={patient.id} value={patient.id}>
+                  <option key={patient.id} value={patient.name}>
                     {patient.name}
                   </option>
                 ))}
@@ -104,7 +107,7 @@ const AddVisitDialog: React.FC<AddVisitDialogProps> = ({ open, onOpenChange }) =
               >
                 <option value="">Select a caregiver</option>
                 {caregivers.map(caregiver => (
-                  <option key={caregiver.id} value={caregiver.id}>
+                  <option key={caregiver.id} value={caregiver.name}>
                     {caregiver.name}
                   </option>
                 ))}

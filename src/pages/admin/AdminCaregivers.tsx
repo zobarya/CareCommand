@@ -1,17 +1,34 @@
-
 import React, { useState } from 'react';
 import { Pencil, Plus, Search, User, Calendar, Filter } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import AddCaregiverDialog from '@/components/admin/AddCaregiverDialog';
+import EditCaregiverDialog from '@/components/admin/EditCaregiverDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import WorkloadCard from '@/components/admin/WorkloadCard';
 import { Progress } from '@/components/ui/progress';
 import DateRangePicker from '@/components/admin/DateRangePicker';
 
+interface Caregiver {
+  id: string;
+  name: string;
+  role: string;
+  specialty: string;
+  status: string;
+  patients: number;
+  availability: string;
+  region: string;
+  assignedHours: number;
+  maxHours: number;
+  visits: number;
+  photo: string;
+}
+
 const AdminCaregivers: React.FC = () => {
   const [isAddCaregiverOpen, setIsAddCaregiverOpen] = useState(false);
+  const [isEditCaregiverOpen, setIsEditCaregiverOpen] = useState(false);
+  const [selectedCaregiver, setSelectedCaregiver] = useState<Caregiver | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeView, setActiveView] = useState<'list' | 'workload'>('list');
   const [region, setRegion] = useState<string>('all');
@@ -21,8 +38,8 @@ const AdminCaregivers: React.FC = () => {
     end: new Date(new Date().setDate(new Date().getDate() + 6)), // Default to current week
   });
 
-  // Mock data
-  const caregivers = [
+  // Mock data with state management
+  const [caregivers, setCaregivers] = useState<Caregiver[]>([
     {
       id: '1',
       name: 'Jane Doe',
@@ -93,7 +110,34 @@ const AdminCaregivers: React.FC = () => {
       visits: 14,
       photo: 'LM'
     },
-  ];
+  ]);
+
+  const handleEditCaregiver = (caregiver: Caregiver) => {
+    setSelectedCaregiver(caregiver);
+    setIsEditCaregiverOpen(true);
+  };
+
+  const handleUpdateCaregiver = (updatedCaregiver: Caregiver) => {
+    setCaregivers(prev => prev.map(c => c.id === updatedCaregiver.id ? updatedCaregiver : c));
+  };
+
+  const handleAddCaregiver = (newCaregiverData: any) => {
+    const newCaregiver: Caregiver = {
+      id: (caregivers.length + 1).toString(),
+      name: `${newCaregiverData.firstName} ${newCaregiverData.lastName}`,
+      role: newCaregiverData.role,
+      specialty: newCaregiverData.specialty || 'General Care',
+      status: 'Active',
+      patients: 0,
+      availability: newCaregiverData.availability.charAt(0).toUpperCase() + newCaregiverData.availability.slice(1),
+      region: 'Central',
+      assignedHours: 0,
+      maxHours: newCaregiverData.availability === 'full-time' ? 40 : 25,
+      visits: 0,
+      photo: `${newCaregiverData.firstName.charAt(0)}${newCaregiverData.lastName.charAt(0)}`
+    };
+    setCaregivers(prev => [...prev, newCaregiver]);
+  };
 
   const filteredCaregivers = caregivers.filter(caregiver => {
     const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -188,7 +232,10 @@ const AdminCaregivers: React.FC = () => {
                       <td className="py-3 px-4">{caregiver.patients}</td>
                       <td className="py-3 px-4">{caregiver.availability}</td>
                       <td className="py-3 px-4 text-right">
-                        <button className="text-gray-600 hover:text-primary">
+                        <button 
+                          className="text-gray-600 hover:text-primary"
+                          onClick={() => handleEditCaregiver(caregiver)}
+                        >
                           <Pencil className="h-4 w-4" />
                         </button>
                       </td>
@@ -258,7 +305,17 @@ const AdminCaregivers: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      <AddCaregiverDialog open={isAddCaregiverOpen} onOpenChange={setIsAddCaregiverOpen} />
+      <AddCaregiverDialog 
+        open={isAddCaregiverOpen} 
+        onOpenChange={setIsAddCaregiverOpen}
+        onAdd={handleAddCaregiver}
+      />
+      <EditCaregiverDialog 
+        open={isEditCaregiverOpen} 
+        onOpenChange={setIsEditCaregiverOpen}
+        caregiver={selectedCaregiver}
+        onUpdate={handleUpdateCaregiver}
+      />
     </Layout>
   );
 };

@@ -3,14 +3,27 @@ import React, { useState } from 'react';
 import { Pencil, Plus, Search, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import AddPatientDialog from '@/components/admin/AddPatientDialog';
+import EditPatientDialog from '@/components/admin/EditPatientDialog';
 import { Button } from '@/components/ui/button';
+
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  carePlan: string;
+  status: string;
+  caregiver: string;
+  nextVisit: string;
+}
 
 const AdminPatients: React.FC = () => {
   const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+  const [isEditPatientOpen, setIsEditPatientOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data
-  const patients = [
+  // Mock data with state management
+  const [patients, setPatients] = useState<Patient[]>([
     {
       id: '1',
       name: 'John Smith',
@@ -56,7 +69,29 @@ const AdminPatients: React.FC = () => {
       caregiver: 'Not Assigned',
       nextVisit: 'None'
     },
-  ];
+  ]);
+
+  const handleEditPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsEditPatientOpen(true);
+  };
+
+  const handleUpdatePatient = (updatedPatient: Patient) => {
+    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
+  };
+
+  const handleAddPatient = (newPatientData: any) => {
+    const newPatient: Patient = {
+      id: (patients.length + 1).toString(),
+      name: `${newPatientData.firstName} ${newPatientData.lastName}`,
+      age: new Date().getFullYear() - new Date(newPatientData.dateOfBirth).getFullYear(),
+      carePlan: newPatientData.carePlan.charAt(0).toUpperCase() + newPatientData.carePlan.slice(1),
+      status: 'Active',
+      caregiver: newPatientData.primaryCaregiver || 'Not Assigned',
+      nextVisit: 'To be scheduled'
+    };
+    setPatients(prev => [...prev, newPatient]);
+  };
 
   const filteredPatients = patients.filter(patient => 
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,7 +161,10 @@ const AdminPatients: React.FC = () => {
                   <td className="py-3 px-4">{patient.caregiver}</td>
                   <td className="py-3 px-4">{patient.nextVisit}</td>
                   <td className="py-3 px-4 text-right">
-                    <button className="text-gray-600 hover:text-primary">
+                    <button 
+                      className="text-gray-600 hover:text-primary"
+                      onClick={() => handleEditPatient(patient)}
+                    >
                       <Pencil className="h-4 w-4" />
                     </button>
                   </td>
@@ -137,7 +175,17 @@ const AdminPatients: React.FC = () => {
         </div>
       </div>
       
-      <AddPatientDialog open={isAddPatientOpen} onOpenChange={setIsAddPatientOpen} />
+      <AddPatientDialog 
+        open={isAddPatientOpen} 
+        onOpenChange={setIsAddPatientOpen}
+        onAdd={handleAddPatient}
+      />
+      <EditPatientDialog 
+        open={isEditPatientOpen} 
+        onOpenChange={setIsEditPatientOpen}
+        patient={selectedPatient}
+        onUpdate={handleUpdatePatient}
+      />
     </Layout>
   );
 };

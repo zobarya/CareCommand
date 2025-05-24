@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,10 @@ import { toast } from 'sonner';
 interface AddPatientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAdd?: (patientData: any) => void;
 }
 
-const AddPatientDialog: React.FC<AddPatientDialogProps> = ({ open, onOpenChange }) => {
+const AddPatientDialog: React.FC<AddPatientDialogProps> = ({ open, onOpenChange, onAdd }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -36,6 +36,9 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({ open, onOpenChange 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (onAdd) {
+      onAdd(formData);
+    }
     toast.success('Patient added successfully');
     onOpenChange(false);
     // Reset form
@@ -156,7 +159,7 @@ const AddPatientDialog: React.FC<AddPatientDialogProps> = ({ open, onOpenChange 
               >
                 <option value="">Select a caregiver</option>
                 {caregivers.map(caregiver => (
-                  <option key={caregiver.id} value={caregiver.id}>
+                  <option key={caregiver.id} value={caregiver.name}>
                     {caregiver.name}
                   </option>
                 ))}
