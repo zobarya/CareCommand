@@ -80,7 +80,7 @@ const CaregiverWorkloadView: React.FC<CaregiverWorkloadViewProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span>Underutilized (<60%)</span>
+            <span>Underutilized (&lt;60%)</span>
           </div>
         </div>
       </div>
