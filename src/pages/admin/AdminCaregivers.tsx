@@ -4,6 +4,7 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import AddCaregiverDialog from '@/components/admin/AddCaregiverDialog';
 import EditCaregiverDialog from '@/components/admin/EditCaregiverDialog';
+import CaregiverDetailsDialog from '@/components/admin/CaregiverDetailsDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import WorkloadCard from '@/components/admin/WorkloadCard';
@@ -28,6 +29,7 @@ interface Caregiver {
 const AdminCaregivers: React.FC = () => {
   const [isAddCaregiverOpen, setIsAddCaregiverOpen] = useState(false);
   const [isEditCaregiverOpen, setIsEditCaregiverOpen] = useState(false);
+  const [isDetailsCaregiverOpen, setIsDetailsCaregiverOpen] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<Caregiver | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeView, setActiveView] = useState<'list' | 'workload'>('list');
@@ -114,7 +116,7 @@ const AdminCaregivers: React.FC = () => {
 
   const handleCaregiverClick = (caregiver: Caregiver) => {
     setSelectedCaregiver(caregiver);
-    setIsEditCaregiverOpen(true);
+    setIsDetailsCaregiverOpen(true);
   };
 
   const handleEditCaregiver = (caregiver: Caregiver, e?: React.MouseEvent) => {
@@ -327,6 +329,11 @@ const AdminCaregivers: React.FC = () => {
         onOpenChange={setIsEditCaregiverOpen}
         caregiver={selectedCaregiver}
         onUpdate={handleUpdateCaregiver}
+      />
+      <CaregiverDetailsDialog 
+        open={isDetailsCaregiverOpen} 
+        onOpenChange={setIsDetailsCaregiverOpen}
+        caregiver={selectedCaregiver}
       />
     </Layout>
   );

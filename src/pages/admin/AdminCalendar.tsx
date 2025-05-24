@@ -4,6 +4,7 @@ import Layout from '@/components/layout/Layout';
 import StatusBadge from '@/components/ui/status-badge';
 import AddVisitDialog from '@/components/admin/AddVisitDialog';
 import EditVisitDialog from '@/components/admin/EditVisitDialog';
+import VisitDetailsDialog from '@/components/admin/VisitDetailsDialog';
 import { Button } from '@/components/ui/button';
 
 interface Visit {
@@ -19,6 +20,7 @@ interface Visit {
 const AdminCalendar: React.FC = () => {
   const [isAddVisitOpen, setIsAddVisitOpen] = useState(false);
   const [isEditVisitOpen, setIsEditVisitOpen] = useState(false);
+  const [isDetailsVisitOpen, setIsDetailsVisitOpen] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
 
   // Mock data with state management
@@ -63,7 +65,7 @@ const AdminCalendar: React.FC = () => {
 
   const handleVisitClick = (visit: Visit) => {
     setSelectedVisit(visit);
-    setIsEditVisitOpen(true);
+    setIsDetailsVisitOpen(true);
   };
 
   const handleEditVisit = (visit: Visit, e?: React.MouseEvent) => {
@@ -239,6 +241,11 @@ const AdminCalendar: React.FC = () => {
         onOpenChange={setIsEditVisitOpen}
         visit={selectedVisit}
         onUpdate={handleUpdateVisit}
+      />
+      <VisitDetailsDialog 
+        open={isDetailsVisitOpen} 
+        onOpenChange={setIsDetailsVisitOpen}
+        visit={selectedVisit}
       />
     </Layout>
   );
