@@ -9,6 +9,9 @@ import CaregiverDetailsDialog from '@/components/admin/CaregiverDetailsDialog';
 import CaregiverTable from '@/components/admin/CaregiverTable';
 import CaregiverWorkloadView from '@/components/admin/CaregiverWorkloadView';
 import CaregiverFilters from '@/components/admin/CaregiverFilters';
+import WorkloadSummaryStats from '@/components/admin/WorkloadSummaryStats';
+import WorkloadActions from '@/components/admin/WorkloadActions';
+import WorkloadInsights from '@/components/admin/WorkloadInsights';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCaregivers } from '@/hooks/useCaregivers';
 
@@ -56,6 +59,11 @@ const AdminCaregivers: React.FC = () => {
     setIsEditCaregiverOpen(true);
   };
 
+  const handleRefreshData = () => {
+    // In a real app, this would refetch data from the server
+    console.log('Refreshing workload data...');
+  };
+
   const filteredCaregivers = caregivers.filter(caregiver => {
     const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       caregiver.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,6 +74,14 @@ const AdminCaregivers: React.FC = () => {
     
     return matchesSearch && matchesRegion && matchesRole;
   });
+
+  const activeCaregivers = filteredCaregivers.filter(c => c.status === 'Active');
+  const hasOverloadedStaff = activeCaregivers.some(c => 
+    c.maxHours > 0 && (c.assignedHours / c.maxHours) >= 0.95
+  );
+  const hasUnderutilizedStaff = activeCaregivers.some(c => 
+    c.maxHours > 0 && (c.assignedHours / c.maxHours) < 0.6
+  );
 
   return (
     <Layout title="Caregivers" role="admin">
@@ -106,7 +122,17 @@ const AdminCaregivers: React.FC = () => {
           />
         </TabsContent>
 
-        <TabsContent value="workload">
+        <TabsContent value="workload" className="space-y-6">
+          <WorkloadSummaryStats caregivers={filteredCaregivers} />
+          
+          <WorkloadActions 
+            onRefresh={handleRefreshData}
+            hasOverloadedStaff={hasOverloadedStaff}
+            hasUnderutilizedStaff={hasUnderutilizedStaff}
+          />
+          
+          <WorkloadInsights caregivers={filteredCaregivers} />
+          
           <CaregiverFilters
             region={region}
             role={role}
@@ -117,6 +143,7 @@ const AdminCaregivers: React.FC = () => {
             onRoleChange={setRole}
             onDateRangeChange={setDateRange}
           />
+          
           <CaregiverWorkloadView caregivers={filteredCaregivers} />
         </TabsContent>
       </Tabs>
