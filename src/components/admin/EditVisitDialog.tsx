@@ -35,7 +35,7 @@ const EditVisitDialog: React.FC<EditVisitDialogProps> = ({
     date: '',
     time: '',
     duration: '',
-    status: 'scheduled' as const,
+    status: 'scheduled' as 'scheduled' | 'completed' | 'cancelled',
   });
 
   useEffect(() => {
