@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Pencil, Plus, Search, User } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import AddPatientDialog from '@/components/admin/AddPatientDialog';
 import EditPatientDialog from '@/components/admin/EditPatientDialog';
+import PatientDetailsDialog from '@/components/admin/PatientDetailsDialog';
 import { Button } from '@/components/ui/button';
 
 interface Patient {
@@ -18,6 +20,7 @@ interface Patient {
 const AdminPatients: React.FC = () => {
   const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
   const [isEditPatientOpen, setIsEditPatientOpen] = useState(false);
+  const [isDetailsPatientOpen, setIsDetailsPatientOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -72,7 +75,7 @@ const AdminPatients: React.FC = () => {
 
   const handlePatientClick = (patient: Patient) => {
     setSelectedPatient(patient);
-    setIsEditPatientOpen(true);
+    setIsDetailsPatientOpen(true);
   };
 
   const handleEditPatient = (patient: Patient, e?: React.MouseEvent) => {
@@ -196,6 +199,11 @@ const AdminPatients: React.FC = () => {
         onOpenChange={setIsEditPatientOpen}
         patient={selectedPatient}
         onUpdate={handleUpdatePatient}
+      />
+      <PatientDetailsDialog 
+        open={isDetailsPatientOpen} 
+        onOpenChange={setIsDetailsPatientOpen}
+        patient={selectedPatient}
       />
     </Layout>
   );
