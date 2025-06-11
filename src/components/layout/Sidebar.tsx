@@ -20,7 +20,8 @@ import {
   FileEdit,
   Users,
   DollarSign,
-  BarChart
+  BarChart,
+  CalendarDays
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -41,7 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   
   const adminNavItems: NavItem[] = [
     { label: 'Dashboard', href: '/admin', icon: Home },
-    { label: 'Scheduler', href: '/admin/calendar', icon: Calendar },
+    { label: 'Scheduler', href: '/admin/scheduler', icon: CalendarDays },
+    { label: 'Calendar', href: '/admin/calendar', icon: Calendar },
     { label: 'Caregivers', href: '/admin/caregivers', icon: Users },
     { label: 'Patients', href: '/admin/patients', icon: Heart },
     { label: 'Billing', href: '/admin/billing', icon: DollarSign },
@@ -167,4 +169,3 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
 };
 
 export default Sidebar;
-

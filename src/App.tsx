@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 // Admin Routes
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCalendar from "./pages/admin/AdminCalendar";
+import AdminScheduler from "./pages/admin/AdminScheduler";
 import AdminCaregivers from "./pages/admin/AdminCaregivers";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminBilling from "./pages/admin/AdminBilling";
@@ -65,6 +66,7 @@ const App = () => {
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/calendar" element={<AdminCalendar />} />
+            <Route path="/admin/scheduler" element={<AdminScheduler />} />
             <Route path="/admin/caregivers" element={<AdminCaregivers />} />
             <Route path="/admin/patients" element={<AdminPatients />} />
             <Route path="/admin/billing" element={<AdminBilling />} />
