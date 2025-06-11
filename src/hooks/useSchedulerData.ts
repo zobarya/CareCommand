@@ -6,23 +6,48 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   const [scheduledVisits, setScheduledVisits] = useState([]);
   const [unassignedVisits, setUnassignedVisits] = useState([]);
 
-  // Generate 100+ mock caregivers for testing
+  // Generate mock caregivers with at least 10 entries
   const generateMockCaregivers = () => {
     const regions = ['North', 'South', 'East', 'West', 'Central'];
     const roles = ['RN', 'LPN', 'CNA', 'PT', 'OT'];
-    const firstNames = ['Sarah', 'Michael', 'Emily', 'Robert', 'Lisa', 'David', 'Jennifer', 'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Anthony', 'Brittany', 'Joshua', 'Megan', 'Andrew', 'Samantha', 'Kevin'];
-    const lastNames = ['Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee'];
+    const caregiverNames = [
+      { first: 'Sarah', last: 'Johnson' },
+      { first: 'Michael', last: 'Williams' },
+      { first: 'Emily', last: 'Brown' },
+      { first: 'Robert', last: 'Jones' },
+      { first: 'Lisa', last: 'Garcia' },
+      { first: 'David', last: 'Miller' },
+      { first: 'Jennifer', last: 'Davis' },
+      { first: 'Christopher', last: 'Rodriguez' },
+      { first: 'Amanda', last: 'Martinez' },
+      { first: 'Daniel', last: 'Hernandez' },
+      { first: 'Jessica', last: 'Lopez' },
+      { first: 'Matthew', last: 'Gonzalez' },
+      { first: 'Ashley', last: 'Wilson' },
+      { first: 'Anthony', last: 'Anderson' },
+      { first: 'Brittany', last: 'Thomas' },
+      { first: 'Joshua', last: 'Taylor' },
+      { first: 'Megan', last: 'Moore' },
+      { first: 'Andrew', last: 'Jackson' },
+      { first: 'Samantha', last: 'Martin' },
+      { first: 'Kevin', last: 'Lee' },
+      { first: 'Nicole', last: 'Perez' },
+      { first: 'Ryan', last: 'White' },
+      { first: 'Rachel', last: 'Harris' },
+      { first: 'Brandon', last: 'Clark' },
+      { first: 'Lauren', last: 'Lewis' }
+    ];
     
     const caregivers = [];
-    for (let i = 1; i <= 120; i++) {
-      const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    for (let i = 1; i <= Math.max(25, caregiverNames.length); i++) {
+      const nameIndex = (i - 1) % caregiverNames.length;
+      const { first, last } = caregiverNames[nameIndex];
       const role = roles[Math.floor(Math.random() * roles.length)];
       const region = regions[Math.floor(Math.random() * regions.length)];
       
       caregivers.push({
         id: i.toString(),
-        name: `${firstName} ${lastName}`,
+        name: `${first} ${last}`,
         role: role,
         photo: '/placeholder.svg',
         region: region,
@@ -56,6 +81,16 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
       date: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
       startTime: '14:00',
       duration: 45,
+      status: 'scheduled' as const,
+    },
+    {
+      id: 'v3',
+      caregiverId: '3',
+      patientName: 'Robert Chen',
+      serviceType: 'Wound Care',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      startTime: '10:00',
+      duration: 30,
       status: 'scheduled' as const,
     },
   ];
