@@ -49,13 +49,13 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
     setDragOverSlot(null);
   };
 
-  const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date, time: string) => {
+  const handleDrop = (e: React.DragEvent, caregiverId: string, date: string, time: string) => {
     e.preventDefault();
     setDragOverSlot(null);
     
     const visitId = e.dataTransfer.getData('text/plain');
     if (visitId) {
-      onVisitDrop(visitId, caregiverId, date.toISOString().split('T')[0], time);
+      onVisitDrop(visitId, caregiverId, date, time);
     }
   };
 

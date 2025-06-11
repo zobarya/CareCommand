@@ -27,6 +27,11 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
     }
   };
 
+  const handleDrop = (e: React.DragEvent) => {
+    const dateString = day.toISOString().split('T')[0];
+    onDrop(e, caregiverId, dateString, time);
+  };
+
   return (
     <div
       className={`h-14 border border-border/50 cursor-pointer transition-all duration-200 flex items-center justify-center p-1 ${
@@ -39,7 +44,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
       onClick={handleClick}
       onDragOver={(e) => onDragOver(e, slotId)}
       onDragLeave={onDragLeave}
-      onDrop={(e) => onDrop(e, caregiverId, day, time)}
+      onDrop={handleDrop}
     >
       {visits.length > 0 ? (
         <div className="w-full text-center">
