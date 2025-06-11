@@ -31,16 +31,22 @@ const DayColumn: React.FC<DayColumnProps> = ({
   onDrop,
 }) => {
   const dayId = `${caregiverId}-${day.toISOString().split('T')[0]}`;
+  
+  // Fix: Filter by BOTH date AND caregiver ID
   const dayVisits = visits.filter(visit => {
     const visitDate = parseISO(visit.date);
-    return isSameDay(visitDate, day);
+    const isCorrectDate = isSameDay(visitDate, day);
+    const isCorrectCaregiver = visit.caregiverId === caregiverId;
+    return isCorrectDate && isCorrectCaregiver;
   }).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   console.log('DayColumn render:', { 
     caregiverId, 
+    caregiverName,
     day: format(day, 'yyyy-MM-dd'), 
     totalVisits: visits.length, 
-    dayVisits: dayVisits.length 
+    dayVisits: dayVisits.length,
+    dayVisitsDetails: dayVisits.map(v => ({ id: v.id, caregiverId: v.caregiverId, patient: v.patientName }))
   });
 
   const handleColumnClick = () => {
@@ -49,7 +55,7 @@ const DayColumn: React.FC<DayColumnProps> = ({
       ? Math.max(...dayVisits.map(v => parseInt(v.startTime.split(':')[0]))) + 1
       : 9; // Default to 9 AM
     const suggestedTime = `${nextHour.toString().padStart(2, '0')}:00`;
-    console.log('DayColumn: Column clicked, suggesting time:', suggestedTime);
+    console.log('DayColumn: Column clicked, suggesting time:', suggestedTime, 'for caregiver:', caregiverId);
     onSlotClick(caregiverId, caregiverName, day.toISOString().split('T')[0], suggestedTime);
   };
 
@@ -67,7 +73,7 @@ const DayColumn: React.FC<DayColumnProps> = ({
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    console.log('DayColumn: Drop event:', dayId);
+    console.log('DayColumn: Drop event for caregiver:', caregiverId, 'on day:', format(day, 'yyyy-MM-dd'));
     const visitId = e.dataTransfer.getData('text/plain');
     console.log('DayColumn: Dropped visit ID:', visitId);
     
@@ -115,7 +121,7 @@ const DayColumn: React.FC<DayColumnProps> = ({
             onClick={(e) => handleVisitClick(visit, e)}
             draggable
             onDragStart={(e) => {
-              console.log('DayColumn: Starting drag for visit:', visit.id);
+              console.log('DayColumn: Starting drag for visit:', visit.id, 'from caregiver:', caregiverId);
               e.dataTransfer.setData('text/plain', visit.id);
             }}
           >

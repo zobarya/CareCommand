@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 // Get current week dates for better demo experience
@@ -130,7 +131,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   const [unassignedVisits, setUnassignedVisits] = useState(mockUnassignedVisits);
 
   const assignVisit = (visitId: string, caregiverId: string, timeSlot: string, targetDate?: string) => {
-    console.log('Assigning visit:', { visitId, caregiverId, timeSlot, targetDate });
+    console.log('useSchedulerData: Assigning visit:', { visitId, caregiverId, timeSlot, targetDate });
     
     const visit = unassignedVisits.find(v => v.id === visitId);
     if (!visit) {
@@ -154,6 +155,8 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       status: 'scheduled' as const
     };
     
+    console.log('useSchedulerData: Creating scheduled visit:', scheduledVisit);
+    
     setScheduledVisits(prev => {
       const updated = [...prev, scheduledVisit];
       console.log('Updated scheduled visits:', updated);
@@ -162,7 +165,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   };
 
   const moveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string, newDate?: string) => {
-    console.log('Moving visit:', { visitId, newCaregiverId, newTimeSlot, newDate });
+    console.log('useSchedulerData: Moving visit:', { visitId, newCaregiverId, newTimeSlot, newDate });
     
     setScheduledVisits(prev => {
       const updated = prev.map(visit => 
@@ -175,18 +178,18 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
             }
           : visit
       );
-      console.log('Moved visit, updated scheduled visits:', updated);
+      console.log('useSchedulerData: Moved visit, updated scheduled visits:', updated);
       return updated;
     });
   };
 
   const handleVisitDrop = (visitId: string, caregiverId: string, targetDate: string, timeSlot: string) => {
-    console.log('Handling visit drop:', { visitId, caregiverId, targetDate, timeSlot });
+    console.log('useSchedulerData: Handling visit drop:', { visitId, caregiverId, targetDate, timeSlot });
     
     // Check if it's an unassigned visit
     const unassignedVisit = unassignedVisits.find(v => v.id === visitId);
     if (unassignedVisit) {
-      console.log('Assigning unassigned visit');
+      console.log('useSchedulerData: Assigning unassigned visit to caregiver:', caregiverId);
       assignVisit(visitId, caregiverId, timeSlot, targetDate);
       return;
     }
@@ -194,7 +197,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     // Check if it's a scheduled visit
     const scheduledVisit = scheduledVisits.find(v => v.id === visitId);
     if (scheduledVisit) {
-      console.log('Moving scheduled visit');
+      console.log('useSchedulerData: Moving scheduled visit to caregiver:', caregiverId);
       moveVisit(visitId, caregiverId, timeSlot, targetDate);
       return;
     }
@@ -203,7 +206,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   };
 
   const addUnassignedVisit = (visitData: any) => {
-    console.log('Adding unassigned visit:', visitData);
+    console.log('useSchedulerData: Adding unassigned visit:', visitData);
     
     const newVisit = {
       id: Date.now().toString(),
@@ -220,7 +223,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   };
 
   const addScheduledVisit = (visitData: any) => {
-    console.log('Adding scheduled visit:', visitData);
+    console.log('useSchedulerData: Adding scheduled visit:', visitData);
     
     const newVisit = {
       id: Date.now().toString(),
@@ -228,15 +231,17 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       status: 'scheduled' as const
     };
     
+    console.log('useSchedulerData: Creating new scheduled visit:', newVisit);
+    
     setScheduledVisits(prev => {
       const updated = [...prev, newVisit];
-      console.log('Updated scheduled visits:', updated);
+      console.log('useSchedulerData: Updated scheduled visits after add:', updated);
       return updated;
     });
   };
 
   const refreshData = () => {
-    console.log('Refreshing scheduler data...');
+    console.log('useSchedulerData: Refreshing scheduler data...');
     // Force re-render by updating state
     setScheduledVisits(prev => [...prev]);
     setUnassignedVisits(prev => [...prev]);
