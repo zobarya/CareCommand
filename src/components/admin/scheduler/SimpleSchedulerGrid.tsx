@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format, addDays, startOfWeek, parseISO, isSameDay } from 'date-fns';
 import { Clock, User, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ interface SimpleSchedulerGridProps {
   selectedWeek: Date;
   onSlotClick: (caregiverId: string, caregiverName: string, date: string, time: string) => void;
   onVisitClick: (visit: any) => void;
+  onVisitDrop?: (visitId: string, caregiverId: string, date: string, time: string) => void;
 }
 
 const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
@@ -19,7 +20,10 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
   selectedWeek,
   onSlotClick,
   onVisitClick,
+  onVisitDrop,
 }) => {
+  const [dragOverSlot, setDragOverSlot] = useState<string | null>(null);
+  
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
   const timeSlots = [
@@ -36,6 +40,29 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
     });
   };
 
+  const handleDragOver = (e: React.DragEvent, slotId: string) => {
+    if (!onVisitDrop) return;
+    e.preventDefault();
+    setDragOverSlot(slotId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverSlot(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date, time: string) => {
+    if (!onVisitDrop) return;
+    e.preventDefault();
+    setDragOverSlot(null);
+    
+    const visitId = e.dataTransfer.getData('text/plain');
+    if (visitId) {
+      // Use date-fns format to avoid timezone issues
+      const dateString = format(date, 'yyyy-MM-dd');
+      onVisitDrop(visitId, caregiverId, dateString, time);
+    }
+  };
+
   const TimeSlot = ({ caregiverId, caregiverName, day, time, visits }: {
     caregiverId: string;
     caregiverName: string;
@@ -43,11 +70,16 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
     time: string;
     visits: any[];
   }) => {
+    const slotId = `${caregiverId}-${format(day, 'yyyy-MM-dd')}-${time}`;
+    const isDragOver = dragOverSlot === slotId;
+
     const handleClick = () => {
       if (visits.length > 0) {
         onVisitClick(visits[0]);
       } else {
-        onSlotClick(caregiverId, caregiverName, day.toISOString().split('T')[0], time);
+        // Use date-fns format to avoid timezone issues
+        const dateString = format(day, 'yyyy-MM-dd');
+        onSlotClick(caregiverId, caregiverName, dateString, time);
       }
     };
 
@@ -56,14 +88,31 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
         className={`h-20 border border-border/30 cursor-pointer transition-all duration-200 ${
           visits.length > 0
             ? 'bg-primary/10 hover:bg-primary/20 border-primary/40'
+            : isDragOver
+            ? 'bg-primary/20 border-primary/50'
             : 'hover:bg-muted/60 hover:border-primary/30'
         }`}
         onClick={handleClick}
+        onDragOver={(e) => handleDragOver(e, slotId)}
+        onDragLeave={handleDragLeave}
+        onDrop={(e) => handleDrop(e, caregiverId, day, time)}
       >
         {visits.length > 0 ? (
           <div className="p-2 h-full">
             {visits.map((visit) => (
-              <div key={visit.id} className="bg-background/90 rounded p-1 mb-1 text-xs">
+              <div 
+                key={visit.id} 
+                className="bg-background/90 rounded p-1 mb-1 text-xs cursor-pointer hover:shadow-md transition-shadow"
+                draggable
+                onDragStart={(e) => {
+                  e.stopPropagation();
+                  e.dataTransfer.setData('text/plain', visit.id);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onVisitClick(visit);
+                }}
+              >
                 <div className="flex items-center gap-1 mb-1">
                   <User className="w-3 h-3 text-primary" />
                   <span className="font-medium truncate">{visit.patientName}</span>
@@ -91,7 +140,7 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="w-5 h-5" />
-          Weekly Schedule
+          Weekly Schedule - {format(weekStart, 'MMM d, yyyy')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">

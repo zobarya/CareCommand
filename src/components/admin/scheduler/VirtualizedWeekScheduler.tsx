@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { VirtualizedWeekSchedulerProps } from './types';
-import SchedulerGrid from './SchedulerGrid';
+import SimpleSchedulerGrid from './SimpleSchedulerGrid';
 
 interface ExtendedVirtualizedWeekSchedulerProps extends VirtualizedWeekSchedulerProps {
   searchTerm: string;
@@ -37,14 +37,10 @@ const VirtualizedWeekScheduler: React.FC<ExtendedVirtualizedWeekSchedulerProps> 
 
   return (
     <div className="h-full">
-      <SchedulerGrid
+      <SimpleSchedulerGrid
         caregivers={caregivers}
         scheduledVisits={scheduledVisits}
         selectedWeek={selectedWeek}
-        searchTerm={searchTerm}
-        regionFilter={regionFilter}
-        roleFilter={roleFilter}
-        groupByRegion={groupByRegion}
         onSlotClick={handleSlotClick}
         onVisitClick={handleVisitClick}
         onVisitDrop={handleVisitDrop}
