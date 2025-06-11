@@ -7,16 +7,38 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import CaregiverGroupHeader from './CaregiverGroupHeader';
 
+interface Caregiver {
+  id: string;
+  name: string;
+  role: string;
+  region: string;
+  assignedHours: number;
+  maxHours: number;
+  specializations: string[];
+}
+
+interface Visit {
+  id: string;
+  caregiverId: string;
+  patientName: string;
+  serviceType: string;
+  date: string;
+  startTime: string;
+  duration: number;
+  status: string;
+  notes?: string;
+}
+
 interface SchedulerGridProps {
-  caregivers: any[];
-  scheduledVisits: any[];
+  caregivers: Caregiver[];
+  scheduledVisits: Visit[];
   selectedWeek: Date;
   searchTerm: string;
   regionFilter: string;
   roleFilter: string;
   groupByRegion: boolean;
   onSlotClick: (caregiverId: string, caregiverName: string, date: string, time: string) => void;
-  onVisitClick: (visit: any) => void;
+  onVisitClick: (visit: Visit) => void;
   onVisitDrop: (visitId: string, caregiverId: string, date: string, time: string) => void;
 }
 
@@ -51,13 +73,13 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
   });
 
   // Group caregivers by region if needed
-  const caregiverGroups = groupByRegion 
+  const caregiverGroups: Record<string, Caregiver[]> = groupByRegion 
     ? filteredCaregivers.reduce((groups, caregiver) => {
         const region = caregiver.region;
         if (!groups[region]) groups[region] = [];
         groups[region].push(caregiver);
         return groups;
-      }, {} as Record<string, any[]>)
+      }, {} as Record<string, Caregiver[]>)
     : { 'All': filteredCaregivers };
 
   const getVisitsForSlot = (caregiverId: string, date: Date, time: string) => {
@@ -103,7 +125,7 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
     caregiverName: string;
     day: Date;
     time: string;
-    visits: any[];
+    visits: Visit[];
   }) => {
     const slotId = `${caregiverId}-${day.toISOString().split('T')[0]}-${time}`;
     const isDragOver = dragOverSlot === slotId;
@@ -184,7 +206,7 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
             </div>
 
             {/* Caregiver sections */}
-            {Object.entries(caregiverGroups).map(([regionName, regionCaregivers]) => (
+            {Object.entries(caregiverGroups).map(([regionName, regionCaregivers]: [string, Caregiver[]]) => (
               <div key={regionName}>
                 {groupByRegion && (
                   <CaregiverGroupHeader
