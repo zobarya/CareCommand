@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback } from 'react';
 import { addDays, startOfWeek } from 'date-fns';
 import { VariableSizeList as List } from 'react-window';
@@ -18,6 +17,9 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   onVisitAssign,
   onSlotClick,
 }) => {
+  console.log('VirtualizedWeekScheduler received caregivers:', caregivers);
+  console.log('VirtualizedWeekScheduler received scheduledVisits:', scheduledVisits);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -33,12 +35,15 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   ];
 
   const filteredCaregivers = useMemo(() => {
-    return caregivers.filter(caregiver => {
+    console.log('Filtering caregivers from:', caregivers);
+    const filtered = caregivers.filter(caregiver => {
       const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRegion = regionFilter === 'all' || caregiver.region === regionFilter;
       const matchesRole = roleFilter === 'all' || caregiver.role === roleFilter;
       return matchesSearch && matchesRegion && matchesRole;
     });
+    console.log('Filtered caregivers:', filtered);
+    return filtered;
   }, [caregivers, searchTerm, regionFilter, roleFilter]);
 
   const groupedCaregivers = useMemo(() => {
@@ -74,6 +79,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
       });
     }
     
+    console.log('Flattened data for rendering:', data);
     return data;
   }, [groupedCaregivers, groupByRegion, expandedRegions, filteredCaregivers]);
 
@@ -115,6 +121,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
   const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const item = flattenedData[index];
+    console.log('Rendering row for item:', item, 'at index:', index);
     
     return (
       <SchedulerRow

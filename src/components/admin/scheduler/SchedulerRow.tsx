@@ -27,6 +27,8 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
   onSlotClick,
   onVisitClick,
 }) => {
+  console.log('SchedulerRow rendering item:', item, 'index:', index);
+
   const getVisitsForSlot = (caregiverId: string, date: Date, time: string) => {
     return scheduledVisits.filter(visit => {
       const visitDate = parseISO(visit.date);
@@ -66,7 +68,14 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
     );
   }
 
+  if (!item.caregiver) {
+    console.error('No caregiver data in item:', item);
+    return <div style={style} className="p-4 text-red-500">Error: No caregiver data</div>;
+  }
+
   const { caregiver } = item;
+  console.log('Rendering caregiver:', caregiver);
+  
   const hasVisits = scheduledVisits.some(visit => visit.caregiverId === caregiver.id);
   const workload = getCaregiverWorkload(caregiver.id);
   
@@ -74,21 +83,21 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
     <div style={style} className="hover:bg-muted/20 transition-colors group border-b border-border/50">
       <div className="grid grid-cols-8 min-h-[120px]">
         {/* Caregiver Info Column */}
-        <div className="p-3 border-r bg-card flex flex-col justify-center min-w-0">
-          <div className="flex items-start gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-semibold text-primary">
-                {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
+        <div className="p-4 border-r bg-card flex flex-col justify-center">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-semibold text-primary">
+                {caregiver.name ? caregiver.name.split(' ').map((n: string) => n[0]).join('') : '??'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-foreground leading-tight mb-1">
-                {caregiver.name}
+              <div className="font-semibold text-base text-foreground mb-1">
+                {caregiver.name || 'Unknown Caregiver'}
               </div>
-              <div className="text-xs text-muted-foreground mb-2 leading-tight">
-                {caregiver.role} • {caregiver.region}
+              <div className="text-sm text-muted-foreground mb-2">
+                {caregiver.role || 'Unknown Role'} • {caregiver.region || 'Unknown Region'}
               </div>
-              <Badge variant="outline" className="text-xs px-1 py-0">
+              <Badge variant="outline" className="text-xs">
                 {workload.assignedHours}/{workload.maxHours} hrs
               </Badge>
             </div>
