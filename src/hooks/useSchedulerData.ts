@@ -68,7 +68,7 @@ const mockScheduledVisits = [
     date: '2024-01-15',
     startTime: '09:00',
     duration: 60,
-    status: 'scheduled'
+    status: 'scheduled' as const
   },
   {
     id: '2',
@@ -78,7 +78,7 @@ const mockScheduledVisits = [
     date: '2024-01-15',
     startTime: '10:00',
     duration: 90,
-    status: 'scheduled'
+    status: 'scheduled' as const
   }
 ];
 
@@ -90,8 +90,8 @@ const mockUnassignedVisits = [
     date: '2024-01-16',
     startTime: '14:00',
     duration: 30,
-    status: 'unassigned',
-    priority: 'high'
+    status: 'unassigned' as const,
+    priority: 'high' as const
   },
   {
     id: '4',
@@ -100,8 +100,8 @@ const mockUnassignedVisits = [
     date: '2024-01-17',
     startTime: '11:00',
     duration: 120,
-    status: 'unassigned',
-    priority: 'medium'
+    status: 'unassigned' as const,
+    priority: 'medium' as const
   }
 ];
 
@@ -122,7 +122,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       ...visit,
       caregiverId,
       startTime: timeSlot,
-      status: 'scheduled'
+      status: 'scheduled' as const
     };
     setScheduledVisits(prev => [...prev, scheduledVisit]);
   };
@@ -139,8 +139,8 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     const newVisit = {
       id: Date.now().toString(),
       ...visitData,
-      status: 'unassigned',
-      priority: visitData.priority || 'medium'
+      status: 'unassigned' as const,
+      priority: visitData.priority || 'medium' as const
     };
     setUnassignedVisits(prev => [...prev, newVisit]);
   };
@@ -149,7 +149,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     const newVisit = {
       id: Date.now().toString(),
       ...visitData,
-      status: 'scheduled'
+      status: 'scheduled' as const
     };
     setScheduledVisits(prev => [...prev, newVisit]);
   };
