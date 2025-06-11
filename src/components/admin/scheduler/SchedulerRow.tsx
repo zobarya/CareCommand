@@ -71,66 +71,64 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
   const workload = getCaregiverWorkload(caregiver.id);
   
   return (
-    <div style={style} className="hover:bg-muted/20 transition-colors group">
-      <Card className="mx-2 my-1 shadow-sm border border-border/50">
-        <div className="grid grid-cols-8 min-h-[120px]">
-          {/* Caregiver Info Column */}
-          <div className="p-4 border-r bg-card flex flex-col justify-center">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-semibold text-primary">
-                  {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
-                </span>
+    <div style={style} className="hover:bg-muted/20 transition-colors group border-b border-border/50">
+      <div className="grid grid-cols-8 min-h-[120px]">
+        {/* Caregiver Info Column */}
+        <div className="p-4 border-r bg-card flex flex-col justify-center">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-semibold text-primary">
+                {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm text-foreground truncate">
+                {caregiver.name}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm text-foreground truncate">
-                  {caregiver.name}
-                </div>
-                <div className="text-xs text-muted-foreground mb-2">
-                  {caregiver.role} • {caregiver.region}
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  {workload.assignedHours}/{workload.maxHours} hrs
-                </Badge>
+              <div className="text-xs text-muted-foreground mb-2">
+                {caregiver.role} • {caregiver.region}
               </div>
-              {!hasVisits && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onToggleCaregiverCollapse(caregiver.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <ChevronDown className="w-3 h-3" />
-                </Button>
-              )}
+              <Badge variant="outline" className="text-xs">
+                {workload.assignedHours}/{workload.maxHours} hrs
+              </Badge>
+            </div>
+            {!hasVisits && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggleCaregiverCollapse(caregiver.id)}
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <ChevronDown className="w-3 h-3" />
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {/* Time Slots Columns */}
+        {weekDays.map((day) => (
+          <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
+            <div className="p-2 space-y-2">
+              {timeSlots.map((time) => {
+                const visits = getVisitsForSlot(caregiver.id, day, time);
+                
+                return (
+                  <SchedulerTimeSlot
+                    key={time}
+                    caregiverId={caregiver.id}
+                    caregiverName={caregiver.name}
+                    day={day}
+                    time={time}
+                    visits={visits}
+                    onSlotClick={onSlotClick}
+                    onVisitClick={onVisitClick}
+                  />
+                );
+              })}
             </div>
           </div>
-          
-          {/* Time Slots Columns */}
-          {weekDays.map((day) => (
-            <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
-              <div className="p-2 space-y-2">
-                {timeSlots.map((time) => {
-                  const visits = getVisitsForSlot(caregiver.id, day, time);
-                  
-                  return (
-                    <SchedulerTimeSlot
-                      key={time}
-                      caregiverId={caregiver.id}
-                      caregiverName={caregiver.name}
-                      day={day}
-                      time={time}
-                      visits={visits}
-                      onSlotClick={onSlotClick}
-                      onVisitClick={onVisitClick}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+        ))}
+      </div>
     </div>
   );
 };

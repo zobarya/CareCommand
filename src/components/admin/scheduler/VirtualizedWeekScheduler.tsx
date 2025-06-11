@@ -64,24 +64,18 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
         data.push({ type: 'region', region, count: regionCaregivers.length });
         if (expandedRegions.has(region)) {
           regionCaregivers.forEach(caregiver => {
-            const hasVisits = scheduledVisits.some(visit => visit.caregiverId === caregiver.id);
-            if (!collapsedCaregivers.has(caregiver.id) || hasVisits) {
-              data.push({ type: 'caregiver', caregiver });
-            }
+            data.push({ type: 'caregiver', caregiver });
           });
         }
       });
     } else {
       filteredCaregivers.forEach(caregiver => {
-        const hasVisits = scheduledVisits.some(visit => visit.caregiverId === caregiver.id);
-        if (!collapsedCaregivers.has(caregiver.id) || hasVisits) {
-          data.push({ type: 'caregiver', caregiver });
-        }
+        data.push({ type: 'caregiver', caregiver });
       });
     }
     
     return data;
-  }, [groupedCaregivers, groupByRegion, expandedRegions, collapsedCaregivers, scheduledVisits]);
+  }, [groupedCaregivers, groupByRegion, expandedRegions, filteredCaregivers]);
 
   const getItemSize = useCallback((index: number) => {
     const item = flattenedData[index];
