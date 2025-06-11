@@ -1,7 +1,6 @@
-
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { format, addDays, startOfWeek, isSameDay, parseISO } from 'date-fns';
-import { FixedSizeList as List } from 'react-window';
+import { VariableSizeList as List } from 'react-window';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -110,6 +109,12 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
     
     return data;
   }, [groupedCaregivers, groupByRegion, expandedRegions, collapsedCaregivers, scheduledVisits]);
+
+  // Function to get item size for VariableSizeList
+  const getItemSize = useCallback((index: number) => {
+    const item = flattenedData[index];
+    return item?.type === 'region' ? 70 : 140;
+  }, [flattenedData]);
 
   const getVisitsForSlot = (caregiverId: string, date: Date, time: string) => {
     return scheduledVisits.filter(visit => {
@@ -362,9 +367,9 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
             {/* Virtualized Rows */}
             <div className="bg-muted/5">
               <List
-                height={Math.min(700, Math.max(400, flattenedData.length * 140))}
+                height={Math.min(700, Math.max(400, flattenedData.length * 120))}
                 itemCount={flattenedData.length}
-                itemSize={(index) => flattenedData[index]?.type === 'region' ? 70 : 140}
+                itemSize={getItemSize}
                 width="100%"
                 overscanCount={5}
               >
