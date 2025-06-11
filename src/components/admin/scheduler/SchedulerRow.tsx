@@ -71,8 +71,6 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
   }
 
   const { caregiver } = item;
-  
-  const hasVisits = scheduledVisits.some(visit => visit.caregiverId === caregiver.id);
   const workload = getCaregiverWorkload(caregiver.id);
   
   return (
@@ -97,20 +95,10 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
                 {workload.assignedHours}/{workload.maxHours} hrs
               </Badge>
             </div>
-            {!hasVisits && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onToggleCaregiverCollapse(caregiver.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
-              >
-                <ChevronDown className="w-3 h-3" />
-              </Button>
-            )}
           </div>
         </div>
         
-        {/* Time Slots Columns */}
+        {/* Time Slots Columns - Show ALL slots for each day */}
         {weekDays.map((day) => (
           <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
             <div className="p-2 space-y-2">

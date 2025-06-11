@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { addDays, startOfWeek } from 'date-fns';
 import { VariableSizeList as List } from 'react-window';
@@ -17,9 +18,6 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   onVisitAssign,
   onSlotClick,
 }) => {
-  console.log('VirtualizedWeekScheduler received caregivers:', caregivers);
-  console.log('VirtualizedWeekScheduler received scheduledVisits:', scheduledVisits);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -35,14 +33,12 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   ];
 
   const filteredCaregivers = useMemo(() => {
-    console.log('Filtering caregivers from:', caregivers);
     const filtered = caregivers.filter(caregiver => {
       const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRegion = regionFilter === 'all' || caregiver.region === regionFilter;
       const matchesRole = roleFilter === 'all' || caregiver.role === roleFilter;
       return matchesSearch && matchesRegion && matchesRole;
     });
-    console.log('Filtered caregivers:', filtered);
     return filtered;
   }, [caregivers, searchTerm, regionFilter, roleFilter]);
 
@@ -74,18 +70,19 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
         }
       });
     } else {
+      // Show ALL caregivers with their complete time slot grid
       filteredCaregivers.forEach(caregiver => {
         data.push({ type: 'caregiver', caregiver });
       });
     }
     
-    console.log('Flattened data for rendering:', data);
     return data;
   }, [groupedCaregivers, groupByRegion, expandedRegions, filteredCaregivers]);
 
   const getItemSize = useCallback((index: number) => {
     const item = flattenedData[index];
-    return item?.type === 'region' ? 70 : 140;
+    // Increased height to accommodate all time slots properly
+    return item?.type === 'region' ? 70 : 160;
   }, [flattenedData]);
 
   const handleSlotClick = (caregiverId: string, caregiverName: string, date: Date, time: string) => {
@@ -121,7 +118,6 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
   const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const item = flattenedData[index];
-    console.log('Rendering row for item:', item, 'at index:', index);
     
     return (
       <SchedulerRow
@@ -175,7 +171,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
             <div className="bg-muted/5">
               <List
-                height={Math.min(700, Math.max(400, flattenedData.length * 120))}
+                height={Math.min(700, Math.max(400, flattenedData.length * 160))}
                 itemCount={flattenedData.length}
                 itemSize={getItemSize}
                 width="100%"
