@@ -65,7 +65,7 @@ export interface SchedulerWeekHeaderProps {
 export interface CaregiverRowProps {
   caregiver: Caregiver;
   weekDays: Date[];
-  timeSlots: string[];
+  timeSlots: string[]; // Keep for backward compatibility, but not used
   visits: Visit[];
   dragOverSlot: string | null;
   onSlotClick: (caregiverId: string, caregiverName: string, date: string, time: string) => void;

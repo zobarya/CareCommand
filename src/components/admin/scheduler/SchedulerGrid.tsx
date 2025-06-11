@@ -24,10 +24,6 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
 }) => {
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
-  const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00',
-    '13:00', '14:00', '15:00', '16:00', '17:00'
-  ];
 
   const [expandedRegions, setExpandedRegions] = useState<Set<string>>(
     new Set(['North', 'Central', 'South', 'East', 'West'])
@@ -146,7 +142,7 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
                         key={caregiver.id}
                         caregiver={caregiver}
                         weekDays={weekDays}
-                        timeSlots={timeSlots}
+                        timeSlots={[]} // No longer needed
                         visits={scheduledVisits}
                         dragOverSlot={dragOverSlot}
                         onSlotClick={onSlotClick}
