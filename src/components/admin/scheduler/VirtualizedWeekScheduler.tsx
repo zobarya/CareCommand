@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { VirtualizedWeekSchedulerProps } from './types';
-import SimpleSchedulerGrid from './SimpleSchedulerGrid';
+import SchedulerGrid from './SchedulerGrid';
 
 const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   caregivers,
@@ -20,7 +20,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
   return (
     <div className="flex-1 overflow-hidden">
-      <SimpleSchedulerGrid
+      <SchedulerGrid
         caregivers={caregivers}
         scheduledVisits={scheduledVisits}
         selectedWeek={selectedWeek}
