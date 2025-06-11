@@ -48,20 +48,34 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    e.currentTarget.classList.add('bg-blue-100', 'border-blue-300');
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only remove highlight if we're actually leaving this element
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      e.currentTarget.classList.remove('bg-blue-100', 'border-blue-300');
+    }
   };
 
   const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date) => {
     e.preventDefault();
     e.stopPropagation();
     
+    // Remove visual feedback
+    e.currentTarget.classList.remove('bg-blue-100', 'border-blue-300');
+    
     const visitId = e.dataTransfer.getData('text/plain');
-    if (visitId) {
-      const timeSlot = '09:00'; // Default time slot, could be made dynamic
+    if (visitId && caregiverId) {
+      const timeSlot = '09:00'; // Default time slot
       const dateString = format(date, 'yyyy-MM-dd');
       console.log('Dropping visit:', visitId, 'to caregiver:', caregiverId, 'on date:', dateString);
       onVisitMove(visitId, caregiverId, timeSlot);
@@ -83,24 +97,26 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
                 
                 return (
                   <div 
-                    key={caregiver.id} 
-                    className="border-l-4 border-primary pl-3 min-h-[60px] rounded-r-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    key={`${caregiver.id}-${day.toISOString()}`}
+                    className="border-l-4 border-primary pl-3 min-h-[80px] rounded-r-lg bg-gray-50 hover:bg-gray-100 transition-all duration-200 border-2 border-dashed border-transparent"
                     onDragOver={handleDragOver}
                     onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, caregiver.id, day)}
                   >
                     <p className="font-medium text-sm">{caregiver.name}</p>
                     {dayVisits.length === 0 && (
                       <p className="text-xs text-gray-500 mt-1">Drop visits here</p>
                     )}
-                    {dayVisits.map((visit) => (
-                      <VisitCard
-                        key={visit.id}
-                        visit={visit}
-                        onClick={() => onVisitSelect(visit)}
-                        className="mt-2"
-                      />
-                    ))}
+                    <div className="space-y-2 mt-2">
+                      {dayVisits.map((visit) => (
+                        <VisitCard
+                          key={visit.id}
+                          visit={visit}
+                          onClick={() => onVisitSelect(visit)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 );
               })}
@@ -128,7 +144,7 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
           
           {/* Caregiver Rows */}
           {caregivers.map((caregiver) => (
-            <div key={caregiver.id} className="grid grid-cols-8 border-b min-h-[100px]">
+            <div key={caregiver.id} className="grid grid-cols-8 border-b min-h-[120px]">
               <div className="p-3 border-r bg-gray-50 flex items-center">
                 <div className="flex items-center space-x-2">
                   <img
@@ -151,27 +167,28 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
                 
                 return (
                   <div
-                    key={day.toISOString()}
-                    className="p-2 border-r relative min-h-[100px] hover:bg-blue-50 transition-colors border-2 border-dashed border-transparent hover:border-blue-200"
+                    key={`${caregiver.id}-${day.toISOString()}`}
+                    className="p-2 border-r relative min-h-[120px] transition-all duration-200 border-2 border-dashed border-transparent hover:bg-blue-50"
                     onDragOver={handleDragOver}
                     onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, caregiver.id, day)}
+                    data-caregiver-id={caregiver.id}
+                    data-date={format(day, 'yyyy-MM-dd')}
                   >
                     {dayVisits.length === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 pointer-events-none">
-                        Drop here
+                        <div className="text-center">
+                          <div>Drop visit here</div>
+                        </div>
                       </div>
                     )}
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative z-10">
                       {dayVisits.map((visit) => (
                         <VisitCard
                           key={visit.id}
                           visit={visit}
                           onClick={() => onVisitSelect(visit)}
-                          isDraggable
-                          onDragEnd={(newCaregiverId, newTimeSlot) => 
-                            onVisitMove(visit.id, newCaregiverId, newTimeSlot)
-                          }
                         />
                       ))}
                     </div>
