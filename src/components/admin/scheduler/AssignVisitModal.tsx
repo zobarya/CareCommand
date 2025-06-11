@@ -1,12 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { format } from 'date-fns';
-import { X, Clock, MapPin, User, Calendar, FileText, Users, Brain, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Dialog,
   DialogContent,
@@ -14,27 +8,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useIsMobile } from '@/hooks/use-mobile';
-import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import AssignVisitModalContent from './AssignVisitModalContent';
 
 interface AssignVisitModalProps {
   open: boolean;
@@ -87,73 +66,9 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     { id: 'p3', name: 'Robert Brown', photo: '/placeholder.svg', region: 'South' },
   ];
 
-  const mockCaregivers = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      role: 'RN',
-      photo: '/placeholder.svg',
-      assignedHours: 28,
-      maxHours: 40,
-      matchScore: 92,
-      matchQuality: 'high',
-      tags: ['Region Match', 'Specialization', 'Available'],
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      role: 'LPN',
-      photo: '/placeholder.svg',
-      assignedHours: 35,
-      maxHours: 40,
-      matchScore: 76,
-      matchQuality: 'good',
-      tags: ['Specialization', 'Near Full Capacity'],
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      role: 'CNA',
-      photo: '/placeholder.svg',
-      assignedHours: 38,
-      maxHours: 40,
-      matchScore: 45,
-      matchQuality: 'low',
-      tags: ['Available', 'Different Region'],
-    },
-  ];
-
-  // Memoized handlers to prevent re-renders and focus issues
-  const handlePatientChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, patient: value }));
-  }, []);
-
-  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, date: e.target.value }));
-  }, []);
-
-  const handleStartTimeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, startTime: e.target.value }));
-  }, []);
-
-  const handleDurationChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, duration: value }));
-  }, []);
-
-  const handleServiceTypeChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, serviceType: value }));
-  }, []);
-
-  const handleRegionChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, region: value }));
-  }, []);
-
-  const handleInstructionsChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, instructions: e.target.value }));
-  }, []);
-
-  const handleCaregiverSelect = useCallback((caregiverId: string) => {
-    setFormData(prev => ({ ...prev, caregiverId }));
+  // Optimized form data update handler
+  const handleFormDataChange = useCallback((updates: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,271 +90,9 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     onOpenChange(false);
   };
 
-  const getMatchQualityBadge = (quality: string, score: number) => {
-    const variants = {
-      high: { color: 'bg-green-500 text-white', label: 'High Match' },
-      good: { color: 'bg-yellow-500 text-white', label: 'Good Match' },
-      low: { color: 'bg-red-500 text-white', label: 'Low Match' },
-    };
-    
-    const variant = variants[quality as keyof typeof variants] || variants.good;
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger>
-            <Badge className={variant.color}>
-              {variant.label} ({score}%)
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Match based on specialization, location, and availability</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  };
-
-  const ModalContent = () => (
-    <div className="space-y-6 font-['Inter']">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Patient Information Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Patient Information</h3>
-          
-          <div className="space-y-3">
-            <Label htmlFor="patient" className="flex items-center gap-2 text-sm font-medium mb-2">
-              <User className="w-4 h-4" />
-              Patient *
-            </Label>
-            <Select value={formData.patient} onValueChange={handlePatientChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select patient" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockPatients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src={patient.photo} alt={patient.name} />
-                        <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      {patient.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="region" className="flex items-center gap-2 text-sm font-medium mb-2">
-              <MapPin className="w-4 h-4" />
-              Region
-            </Label>
-            <Select value={formData.region} onValueChange={handleRegionChange}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="north">North</SelectItem>
-                <SelectItem value="central">Central</SelectItem>
-                <SelectItem value="south">South</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Visit Details Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Visit Details</h3>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <Label htmlFor="date" className="flex items-center gap-2 text-sm font-medium mb-2">
-                <Calendar className="w-4 h-4" />
-                Visit Date *
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={handleDateChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="startTime" className="flex items-center gap-2 text-sm font-medium mb-2">
-                <Clock className="w-4 h-4" />
-                Start Time *
-              </Label>
-              <Input
-                id="startTime"
-                type="time"
-                value={formData.startTime}
-                onChange={handleStartTimeChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <Label htmlFor="duration" className="text-sm font-medium mb-2 block">Duration</Label>
-              <Select value={formData.duration} onValueChange={handleDurationChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="30">30 minutes</SelectItem>
-                  <SelectItem value="60">1 hour</SelectItem>
-                  <SelectItem value="90">1.5 hours</SelectItem>
-                  <SelectItem value="120">2 hours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="serviceType" className="text-sm font-medium mb-2 block">Service Type *</Label>
-              <Select value={formData.serviceType} onValueChange={handleServiceTypeChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select service type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wound-care">Wound Care</SelectItem>
-                  <SelectItem value="medication-management">Medication Management</SelectItem>
-                  <SelectItem value="personal-care">Personal Care</SelectItem>
-                  <SelectItem value="companionship">Companionship</SelectItem>
-                  <SelectItem value="physical-therapy">Physical Therapy</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Special Instructions Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Additional Information</h3>
-          
-          <div className="space-y-3">
-            <Label htmlFor="instructions" className="flex items-center gap-2 text-sm font-medium mb-2">
-              <FileText className="w-4 h-4" />
-              Special Instructions
-            </Label>
-            <Textarea
-              id="instructions"
-              placeholder="Enter any special instructions..."
-              value={formData.instructions}
-              onChange={handleInstructionsChange}
-              rows={4}
-              className="resize-none"
-            />
-          </div>
-        </div>
-
-        {/* Caregiver Assignment Section - Moved to Bottom */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h3 className="text-lg font-semibold text-foreground">Caregiver Assignment</h3>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="assign-caregiver"
-                checked={showCaregiverSuggestions}
-                onCheckedChange={setShowCaregiverSuggestions}
-              />
-              <Label htmlFor="assign-caregiver" className="flex items-center gap-2 text-sm font-medium">
-                <Users className="w-4 h-4" />
-                Assign Caregiver?
-              </Label>
-            </div>
-          </div>
-
-          {showCaregiverSuggestions && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg">
-                <Brain className="w-5 h-5 text-primary" />
-                <h4 className="font-medium text-sm">
-                  Looking for: {formData.serviceType || 'Service'} in {formData.region}
-                </h4>
-              </div>
-              
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {mockCaregivers.map((caregiver) => (
-                  <div
-                    key={caregiver.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                      formData.caregiverId === caregiver.id ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-muted/30'
-                    }`}
-                    onClick={() => handleCaregiverSelect(caregiver.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-12 h-12 flex-shrink-0">
-                        <AvatarImage src={caregiver.photo} alt={caregiver.name} />
-                        <AvatarFallback>{caregiver.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="font-medium text-sm">{caregiver.name}</p>
-                            <p className="text-xs text-muted-foreground">{caregiver.role}</p>
-                          </div>
-                          {getMatchQualityBadge(caregiver.matchQuality, caregiver.matchScore)}
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {caregiver.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{caregiver.assignedHours}/{caregiver.maxHours} hours</span>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span>4.8</span>
-                          </div>
-                        </div>
-                        
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="w-full mt-3"
-                          variant={formData.caregiverId === caregiver.id ? 'default' : 'outline'}
-                        >
-                          {formData.caregiverId === caregiver.id ? 'Selected' : 'Assign Caregiver'}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="w-full sm:flex-1"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading || !formData.patient || !formData.serviceType}
-            className="w-full sm:flex-1"
-          >
-            {isLoading ? 'Creating Visit...' : 'Create Visit'}
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
+  const handleCancel = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
 
   if (isMobile) {
     return (
@@ -451,7 +104,15 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
             </DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-6 overflow-y-auto">
-            <ModalContent />
+            <AssignVisitModalContent
+              formData={formData}
+              isLoading={isLoading}
+              showCaregiverSuggestions={showCaregiverSuggestions}
+              onFormDataChange={handleFormDataChange}
+              onShowCaregiverSuggestionsChange={setShowCaregiverSuggestions}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
           </div>
         </DrawerContent>
       </Drawer>
@@ -466,7 +127,15 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
             Assign Visit {preFilledData.caregiverName && `- ${preFilledData.caregiverName}`}
           </DialogTitle>
         </DialogHeader>
-        <ModalContent />
+        <AssignVisitModalContent
+          formData={formData}
+          isLoading={isLoading}
+          showCaregiverSuggestions={showCaregiverSuggestions}
+          onFormDataChange={handleFormDataChange}
+          onShowCaregiverSuggestionsChange={setShowCaregiverSuggestions}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+        />
       </DialogContent>
     </Dialog>
   );
