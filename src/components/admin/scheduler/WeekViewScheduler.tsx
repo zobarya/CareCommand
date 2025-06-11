@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import VisitCard from '@/components/admin/scheduler/VisitCard';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Caregiver {
   id: string;
@@ -41,7 +40,7 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
   onVisitMove,
   onVisitSelect,
 }) => {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const weekStart = startOfWeek(selectedWeek);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const timeSlots = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM

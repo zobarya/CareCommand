@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Filter, ToggleLeft, ToggleRight } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import VisitCard from '@/components/ui/visit-card';
 import { Button } from '@/components/ui/button';
-import { format, addDays, startOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { format, addDays, startOfWeek, addWeeks, subWeeks, subDays } from 'date-fns';
 
 const CaregiverSchedule: React.FC = () => {
   const [viewMode, setViewMode] = useState<'day' | 'week'>('week');
