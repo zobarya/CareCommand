@@ -5,7 +5,6 @@ import SchedulerFilters from '@/components/admin/scheduler/SchedulerFilters';
 import WeekViewScheduler from '@/components/admin/scheduler/WeekViewScheduler';
 import UnassignedVisitsSidebar from '@/components/admin/scheduler/UnassignedVisitsSidebar';
 import CaregiverSuggestionsModal from '@/components/admin/scheduler/CaregiverSuggestionsModal';
-import AddVisitDialog from '@/components/admin/AddVisitDialog';
 import { useSchedulerData } from '@/hooks/useSchedulerData';
 
 const AdminScheduler: React.FC = () => {
@@ -14,7 +13,6 @@ const AdminScheduler: React.FC = () => {
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const [selectedVisit, setSelectedVisit] = useState<any>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showAddVisit, setShowAddVisit] = useState(false);
 
   const {
     caregivers,
@@ -36,14 +34,13 @@ const AdminScheduler: React.FC = () => {
     setShowSuggestions(true);
   };
 
-  const handleAddNewVisit = () => {
-    setShowAddVisit(true);
-  };
-
-  const handleAddVisit = (visitData: any) => {
+  const handleVisitAssignFromCalendar = (visitData: any) => {
+    // Add the new visit to scheduled visits or unassigned based on assignment status
+    console.log('Adding visit from calendar click:', visitData);
+    
     // In a real app, this would make an API call
-    console.log('Adding new visit:', visitData);
-    refreshData(); // Refresh the data to show the new visit
+    // For now, we'll just refresh the data to simulate the update
+    refreshData();
   };
 
   return (
@@ -57,7 +54,7 @@ const AdminScheduler: React.FC = () => {
           onRegionChange={setSelectedRegion}
           onSpecializationChange={setSelectedSpecialization}
           onRefresh={refreshData}
-          onAddVisit={handleAddNewVisit}
+          showAddButton={false}
         />
         
         <div className="flex flex-1 gap-4 overflow-hidden">
@@ -68,13 +65,14 @@ const AdminScheduler: React.FC = () => {
               selectedWeek={selectedWeek}
               onVisitMove={moveVisit}
               onVisitSelect={handleVisitSelect}
+              onVisitAssign={handleVisitAssignFromCalendar}
             />
           </div>
           
           <UnassignedVisitsSidebar
             visits={unassignedVisits}
             onVisitSelect={handleVisitSelect}
-            onAddNewVisit={handleAddNewVisit}
+            showAddButton={false}
           />
         </div>
       </div>
@@ -84,12 +82,6 @@ const AdminScheduler: React.FC = () => {
         onClose={() => setShowSuggestions(false)}
         visit={selectedVisit}
         onAssign={handleAssignVisit}
-      />
-
-      <AddVisitDialog
-        open={showAddVisit}
-        onOpenChange={setShowAddVisit}
-        onAdd={handleAddVisit}
       />
     </Layout>
   );
