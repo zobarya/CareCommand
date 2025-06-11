@@ -105,13 +105,15 @@ const AdminScheduler: React.FC = () => {
       />
 
       <AssignVisitModal
-        isOpen={showAssignModal}
-        onClose={() => {
-          setShowAssignModal(false);
-          setSelectedSlot(null);
+        open={showAssignModal}
+        onOpenChange={setShowAssignModal}
+        preFilledData={{
+          caregiverId: selectedSlot?.caregiverId || '',
+          caregiverName: selectedSlot?.caregiverName || '',
+          date: selectedSlot?.date || '',
+          startTime: selectedSlot?.time || ''
         }}
-        selectedSlot={selectedSlot}
-        onCreateVisit={handleCreateVisit}
+        onAssign={handleCreateVisit}
       />
     </Layout>
   );
