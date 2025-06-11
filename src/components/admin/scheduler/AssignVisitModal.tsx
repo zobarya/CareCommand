@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { X, Clock, MapPin, User, Calendar, FileText, Users } from 'lucide-react';
+import { X, Clock, MapPin, User, Calendar, FileText, Users, Brain, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +29,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface AssignVisitModalProps {
   open: boolean;
@@ -50,7 +56,7 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
-  const [showCaregiverSuggestions, setShowCaregiverSuggestions] = useState(true);
+  const [showCaregiverSuggestions, setShowCaregiverSuggestions] = useState(false);
   const [formData, setFormData] = useState({
     patient: '',
     date: preFilledData.date,
@@ -72,29 +78,35 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     {
       id: '1',
       name: 'Sarah Johnson',
+      role: 'RN',
       photo: '/placeholder.svg',
-      specializations: ['RN', 'Wound Care'],
       assignedHours: 28,
       maxHours: 40,
-      matchScore: 'high',
+      matchScore: 92,
+      matchQuality: 'high',
+      tags: ['Region Match', 'Specialization', 'Available'],
     },
     {
       id: '2',
       name: 'Michael Chen',
+      role: 'LPN',
       photo: '/placeholder.svg',
-      specializations: ['LPN', 'Physical Therapy'],
       assignedHours: 35,
       maxHours: 40,
-      matchScore: 'medium',
+      matchScore: 76,
+      matchQuality: 'good',
+      tags: ['Specialization', 'Near Full Capacity'],
     },
     {
       id: '3',
       name: 'Emily Rodriguez',
+      role: 'CNA',
       photo: '/placeholder.svg',
-      specializations: ['CNA', 'Personal Care'],
-      assignedHours: 20,
+      assignedHours: 38,
       maxHours: 40,
-      matchScore: 'high',
+      matchScore: 45,
+      matchQuality: 'low',
+      tags: ['Available', 'Different Region'],
     },
   ];
 
@@ -109,7 +121,7 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
       ...formData,
       id: `visit-${Date.now()}`,
       patientName: mockPatients.find(p => p.id === formData.patient)?.name || 'Unknown Patient',
-      status: showCaregiverSuggestions ? 'scheduled' : 'unassigned',
+      status: showCaregiverSuggestions && formData.caregiverId ? 'scheduled' : 'unassigned',
     };
 
     onAssign(visitData);
@@ -117,23 +129,32 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     onOpenChange(false);
   };
 
-  const getMatchScoreBadge = (score: string) => {
+  const getMatchQualityBadge = (quality: string, score: number) => {
     const variants = {
-      high: { color: 'bg-green-500', label: 'High Match' },
-      medium: { color: 'bg-yellow-500', label: 'Good Match' },
-      low: { color: 'bg-red-500', label: 'Low Match' },
+      high: { color: 'bg-green-500 text-white', label: 'High Match' },
+      good: { color: 'bg-yellow-500 text-white', label: 'Good Match' },
+      low: { color: 'bg-red-500 text-white', label: 'Low Match' },
     };
     
-    const variant = variants[score as keyof typeof variants] || variants.medium;
+    const variant = variants[quality as keyof typeof variants] || variants.good;
     return (
-      <Badge className={`${variant.color} text-white`}>
-        {variant.label}
-      </Badge>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge className={variant.color}>
+              {variant.label} ({score}%)
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Match based on specialization, location, and availability</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
   const ModalContent = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 font-['Inter']">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Column */}
@@ -239,10 +260,7 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div className="space-y-4">
             <div>
               <Label htmlFor="instructions" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
@@ -256,64 +274,90 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
                 rows={4}
               />
             </div>
+          </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="assign-caregiver"
-                  checked={showCaregiverSuggestions}
-                  onCheckedChange={setShowCaregiverSuggestions}
-                />
-                <Label htmlFor="assign-caregiver" className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Assign Caregiver?
-                </Label>
-              </div>
+          {/* Right Column - AI Suggestions */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="assign-caregiver"
+                checked={showCaregiverSuggestions}
+                onCheckedChange={setShowCaregiverSuggestions}
+              />
+              <Label htmlFor="assign-caregiver" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Assign Caregiver?
+              </Label>
+            </div>
 
-              {showCaregiverSuggestions && (
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">AI Suggested Caregivers</h4>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {mockCaregivers.map((caregiver) => (
-                      <div
-                        key={caregiver.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                          formData.caregiverId === caregiver.id ? 'border-primary bg-primary/5' : 'hover:bg-gray-50'
-                        }`}
-                        onClick={() => setFormData(prev => ({ ...prev, caregiverId: caregiver.id }))}
-                      >
-                        <div className="flex items-start gap-3">
-                          <Avatar className="w-10 h-10">
-                            <AvatarImage src={caregiver.photo} alt={caregiver.name} />
-                            <AvatarFallback>{caregiver.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
+            {showCaregiverSuggestions && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-primary" />
+                  <h4 className="font-medium text-sm">
+                    Looking for: {formData.serviceType || 'Service'} in {formData.region}
+                  </h4>
+                </div>
+                
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {mockCaregivers.map((caregiver) => (
+                    <div
+                      key={caregiver.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                        formData.caregiverId === caregiver.id ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => setFormData(prev => ({ ...prev, caregiverId: caregiver.id }))}
+                      style={{ fontFamily: 'Inter', fontSize: '8pt' }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={caregiver.photo} alt={caregiver.name} />
+                          <AvatarFallback>{caregiver.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
                               <p className="font-medium text-sm">{caregiver.name}</p>
-                              {getMatchScoreBadge(caregiver.matchScore)}
+                              <p className="text-xs text-gray-600">{caregiver.role}</p>
                             </div>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {caregiver.specializations.map((spec) => (
-                                <Badge key={spec} variant="secondary" className="text-xs">
-                                  {spec}
-                                </Badge>
-                              ))}
-                            </div>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {caregiver.assignedHours}/{caregiver.maxHours} hours
-                            </p>
+                            {getMatchQualityBadge(caregiver.matchQuality, caregiver.matchScore)}
                           </div>
+                          
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {caregiver.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          
+                          <div className="flex items-center justify-between text-xs text-gray-600">
+                            <span>{caregiver.assignedHours}/{caregiver.maxHours} hours</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                              <span>4.8</span>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="w-full mt-3"
+                            variant={formData.caregiverId === caregiver.id ? 'default' : 'outline'}
+                          >
+                            {formData.caregiverId === caregiver.id ? 'Selected' : 'Assign Caregiver'}
+                          </Button>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-white">
           <Button
             type="button"
             variant="outline"
@@ -340,7 +384,7 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
         <DrawerContent className="max-h-[90vh]">
           <DrawerHeader>
             <DrawerTitle>
-              Assign Visit - {preFilledData.caregiverName}
+              Assign Visit {preFilledData.caregiverName && `- ${preFilledData.caregiverName}`}
             </DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-4 overflow-y-auto">
@@ -353,10 +397,10 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            Assign Visit - {preFilledData.caregiverName}
+            Assign Visit {preFilledData.caregiverName && `- ${preFilledData.caregiverName}`}
           </DialogTitle>
         </DialogHeader>
         <ModalContent />

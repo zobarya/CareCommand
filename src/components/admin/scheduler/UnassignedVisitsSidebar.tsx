@@ -2,7 +2,6 @@
 import React from 'react';
 import { AlertTriangle, Plus } from 'lucide-react';
 import VisitCard from './VisitCard';
-import { Button } from '@/components/ui/button';
 
 interface UnassignedVisit {
   id: string;
@@ -19,13 +18,11 @@ interface UnassignedVisit {
 interface UnassignedVisitsSidebarProps {
   visits: UnassignedVisit[];
   onVisitSelect: (visit: UnassignedVisit) => void;
-  onAddNewVisit?: () => void;
 }
 
 const UnassignedVisitsSidebar: React.FC<UnassignedVisitsSidebarProps> = ({
   visits,
   onVisitSelect,
-  onAddNewVisit,
 }) => {
   const highPriorityVisits = visits.filter(v => v.priority === 'high');
   const otherVisits = visits.filter(v => v.priority !== 'high');
@@ -83,17 +80,6 @@ const UnassignedVisitsSidebar: React.FC<UnassignedVisitsSidebarProps> = ({
             <p>No unassigned visits</p>
           </div>
         )}
-      </div>
-      
-      <div className="p-4 border-t">
-        <Button 
-          variant="outline" 
-          className="w-full" 
-          size="sm"
-          onClick={onAddNewVisit}
-        >
-          Add New Visit
-        </Button>
       </div>
     </div>
   );

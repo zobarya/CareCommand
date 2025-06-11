@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { format, addWeeks, subWeeks } from 'date-fns';
-import { ChevronLeft, ChevronRight, RefreshCw, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -19,8 +19,6 @@ interface SchedulerFiltersProps {
   onRegionChange: (region: string) => void;
   onSpecializationChange: (specialization: string) => void;
   onRefresh: () => void;
-  onAddVisit?: () => void;
-  showAddButton?: boolean;
 }
 
 const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
@@ -31,8 +29,6 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
   onRegionChange,
   onSpecializationChange,
   onRefresh,
-  onAddVisit,
-  showAddButton = true,
 }) => {
   return (
     <div className="bg-white border-b p-4">
@@ -88,17 +84,15 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Info className="w-4 h-4" />
+            <span>Click on any empty time slot to schedule a new visit</span>
+          </div>
           <Button variant="outline" size="sm" onClick={onRefresh}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
-          {showAddButton && onAddVisit && (
-            <Button size="sm" onClick={onAddVisit}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Visit
-            </Button>
-          )}
         </div>
       </div>
     </div>
