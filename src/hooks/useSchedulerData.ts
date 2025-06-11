@@ -6,56 +6,40 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   const [scheduledVisits, setScheduledVisits] = useState([]);
   const [unassignedVisits, setUnassignedVisits] = useState([]);
 
-  // Generate mock caregivers with at least 10 entries
+  // Generate only 3 mock caregivers for focused display
   const generateMockCaregivers = () => {
-    const regions = ['North', 'South', 'East', 'West', 'Central'];
-    const roles = ['RN', 'LPN', 'CNA', 'PT', 'OT'];
-    const caregiverNames = [
-      { first: 'Sarah', last: 'Johnson' },
-      { first: 'Michael', last: 'Williams' },
-      { first: 'Emily', last: 'Brown' },
-      { first: 'Robert', last: 'Jones' },
-      { first: 'Lisa', last: 'Garcia' },
-      { first: 'David', last: 'Miller' },
-      { first: 'Jennifer', last: 'Davis' },
-      { first: 'Christopher', last: 'Rodriguez' },
-      { first: 'Amanda', last: 'Martinez' },
-      { first: 'Daniel', last: 'Hernandez' },
-      { first: 'Jessica', last: 'Lopez' },
-      { first: 'Matthew', last: 'Gonzalez' },
-      { first: 'Ashley', last: 'Wilson' },
-      { first: 'Anthony', last: 'Anderson' },
-      { first: 'Brittany', last: 'Thomas' },
-      { first: 'Joshua', last: 'Taylor' },
-      { first: 'Megan', last: 'Moore' },
-      { first: 'Andrew', last: 'Jackson' },
-      { first: 'Samantha', last: 'Martin' },
-      { first: 'Kevin', last: 'Lee' },
-      { first: 'Nicole', last: 'Perez' },
-      { first: 'Ryan', last: 'White' },
-      { first: 'Rachel', last: 'Harris' },
-      { first: 'Brandon', last: 'Clark' },
-      { first: 'Lauren', last: 'Lewis' }
-    ];
-    
-    const caregivers = [];
-    for (let i = 1; i <= Math.max(25, caregiverNames.length); i++) {
-      const nameIndex = (i - 1) % caregiverNames.length;
-      const { first, last } = caregiverNames[nameIndex];
-      const role = roles[Math.floor(Math.random() * roles.length)];
-      const region = regions[Math.floor(Math.random() * regions.length)];
-      
-      caregivers.push({
-        id: i.toString(),
-        name: `${first} ${last}`,
-        role: role,
+    const caregivers = [
+      {
+        id: '1',
+        name: 'Sarah Johnson',
+        role: 'RN',
         photo: '/placeholder.svg',
-        region: region,
-        assignedHours: Math.floor(Math.random() * 35) + 5,
+        region: 'North',
+        assignedHours: 32,
         maxHours: 40,
-        specializations: [role, 'General Care']
-      });
-    }
+        specializations: ['RN', 'General Care']
+      },
+      {
+        id: '2',
+        name: 'Michael Williams',
+        role: 'LPN',
+        photo: '/placeholder.svg',
+        region: 'South',
+        assignedHours: 28,
+        maxHours: 40,
+        specializations: ['LPN', 'General Care']
+      },
+      {
+        id: '3',
+        name: 'Emily Brown',
+        role: 'CNA',
+        photo: '/placeholder.svg',
+        region: 'East',
+        assignedHours: 35,
+        maxHours: 40,
+        specializations: ['CNA', 'General Care']
+      }
+    ];
     return caregivers;
   };
 
@@ -93,6 +77,26 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
       duration: 30,
       status: 'scheduled' as const,
     },
+    {
+      id: 'v4',
+      caregiverId: '1',
+      patientName: 'Mary Davis',
+      serviceType: 'Personal Care',
+      date: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+      startTime: '11:00',
+      duration: 90,
+      status: 'scheduled' as const,
+    },
+    {
+      id: 'v5',
+      caregiverId: '2',
+      patientName: 'James Wilson',
+      serviceType: 'Companionship',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      startTime: '15:00',
+      duration: 120,
+      status: 'scheduled' as const,
+    }
   ];
 
   const mockUnassignedVisits = [
@@ -120,20 +124,8 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   ];
 
   useEffect(() => {
-    // Simulate API call with filters
-    let filteredCaregivers = mockCaregivers;
-    
-    if (region !== 'all') {
-      filteredCaregivers = filteredCaregivers.filter(c => c.region.toLowerCase() === region);
-    }
-    
-    if (specialization !== 'all') {
-      filteredCaregivers = filteredCaregivers.filter(c => 
-        c.specializations.some(s => s.toLowerCase() === specialization)
-      );
-    }
-    
-    setCaregivers(filteredCaregivers);
+    // Always show all 3 caregivers regardless of filters for this focused design
+    setCaregivers(mockCaregivers);
     setScheduledVisits(mockScheduledVisits);
     setUnassignedVisits(mockUnassignedVisits);
   }, [selectedWeek, region, specialization]);

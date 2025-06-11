@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Clock } from 'lucide-react';
+import { Clock, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SchedulerTimeSlotProps } from './types';
 
@@ -26,33 +26,42 @@ const SchedulerTimeSlot: React.FC<SchedulerTimeSlotProps> = ({
 
   return (
     <div
-      className={`min-h-[28px] rounded-md p-1.5 text-xs cursor-pointer transition-all duration-200 border ${
+      className={`min-h-[32px] rounded-lg p-2 text-xs cursor-pointer transition-all duration-300 border-2 shadow-sm ${
         visits.length > 0
-          ? 'bg-primary/10 hover:bg-primary/20 border-primary/30 shadow-sm'
-          : 'hover:bg-muted/60 border-dashed border-muted-foreground/30 bg-muted/5 hover:border-muted-foreground/50'
+          ? 'bg-gradient-to-r from-primary/15 to-primary/10 hover:from-primary/25 hover:to-primary/20 border-primary/40 shadow-md hover:shadow-lg'
+          : 'hover:bg-muted/60 border-dashed border-muted-foreground/40 bg-card hover:border-primary/30 hover:shadow-md'
       }`}
       onClick={handleClick}
     >
       {visits.length > 0 ? (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {visits.map((visit) => (
-            <div key={visit.id} className="bg-background rounded-sm p-1 shadow-sm border border-border/20">
-              <div className="font-medium truncate text-xs text-foreground">
-                {visit.patientName}
+            <div key={visit.id} className="bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-sm border border-border/30">
+              <div className="flex items-start justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3 h-3 text-primary" />
+                  <div className="font-semibold truncate text-xs text-foreground">
+                    {visit.patientName}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-muted-foreground text-xs">
-                <Clock className="w-3 h-3" />
-                <span>{visit.startTime}</span>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Clock className="w-3 h-3 text-muted-foreground" />
+                <span className="text-muted-foreground text-xs">{visit.startTime}</span>
+                <span className="text-muted-foreground text-xs">({visit.duration || 60}min)</span>
               </div>
-              <Badge variant="secondary" className="text-xs mt-1">
+              <Badge variant="secondary" className="text-xs font-medium">
                 {visit.serviceType}
               </Badge>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-muted-foreground/60 text-center text-xs font-medium py-1">
-          {time}
+        <div className="flex items-center justify-center h-full">
+          <div className="text-muted-foreground/70 text-center text-xs font-medium py-2">
+            <Clock className="w-3 h-3 mx-auto mb-1 opacity-60" />
+            {time}
+          </div>
         </div>
       )}
     </div>

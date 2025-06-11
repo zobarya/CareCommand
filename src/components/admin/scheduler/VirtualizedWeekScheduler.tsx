@@ -3,7 +3,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { addDays, startOfWeek } from 'date-fns';
 import { VariableSizeList as List } from 'react-window';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
+import { Clock, Users, Calendar } from 'lucide-react';
 import { VirtualizedWeekSchedulerProps } from './types';
 import SchedulerHeader from './SchedulerHeader';
 import SchedulerWeekHeader from './SchedulerWeekHeader';
@@ -32,15 +32,10 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
     '13:00', '14:00', '15:00', '16:00', '17:00'
   ];
 
+  // Always show all 3 caregivers for this focused design
   const filteredCaregivers = useMemo(() => {
-    const filtered = caregivers.filter(caregiver => {
-      const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesRegion = regionFilter === 'all' || caregiver.region === regionFilter;
-      const matchesRole = roleFilter === 'all' || caregiver.role === roleFilter;
-      return matchesSearch && matchesRegion && matchesRole;
-    });
-    return filtered;
-  }, [caregivers, searchTerm, regionFilter, roleFilter]);
+    return caregivers; // Show all 3 caregivers regardless of filters
+  }, [caregivers]);
 
   const groupedCaregivers = useMemo(() => {
     if (!groupByRegion) {
@@ -70,7 +65,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
         }
       });
     } else {
-      // Show ALL caregivers with their complete time slot grid
+      // Show all 3 caregivers in a clean grid layout
       filteredCaregivers.forEach(caregiver => {
         data.push({ type: 'caregiver', caregiver });
       });
@@ -81,8 +76,8 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
   const getItemSize = useCallback((index: number) => {
     const item = flattenedData[index];
-    // Increased height to accommodate all time slots properly
-    return item?.type === 'region' ? 70 : 160;
+    // Increased height for better visual spacing and readability
+    return item?.type === 'region' ? 70 : 200;
   }, [flattenedData]);
 
   const handleSlotClick = (caregiverId: string, caregiverName: string, date: Date, time: string) => {
@@ -139,11 +134,24 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   };
 
   return (
-    <Card className="flex-1 overflow-hidden">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Clock className="w-5 h-5" />
-          Enhanced Week Scheduler
+    <Card className="flex-1 overflow-hidden shadow-lg">
+      <CardHeader className="pb-4 bg-gradient-to-r from-background to-muted/20 border-b">
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Calendar className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <div className="font-bold">Enhanced Scheduler</div>
+            <div className="text-sm font-normal text-muted-foreground">
+              Focused view with 3 caregivers
+            </div>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Users className="w-4 h-4" />
+              <span>{flattenedData.filter(item => item.type === 'caregiver').length} caregivers</span>
+            </div>
+          </div>
         </CardTitle>
         
         <SchedulerHeader
@@ -162,20 +170,21 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
       </CardHeader>
       
       <CardContent className="p-0">
-        <div className="overflow-hidden max-h-[calc(100vh-300px)]">
-          <div className="min-w-[900px]">
+        <div className="overflow-hidden">
+          <div className="min-w-[1000px]">
             <SchedulerWeekHeader
               weekDays={weekDays}
               caregiverCount={flattenedData.filter(item => item.type === 'caregiver').length}
             />
 
-            <div className="bg-muted/5">
+            <div className="bg-gradient-to-b from-background to-muted/10">
               <List
-                height={Math.min(700, Math.max(400, flattenedData.length * 160))}
+                height={Math.min(800, Math.max(600, flattenedData.length * 200))}
                 itemCount={flattenedData.length}
                 itemSize={getItemSize}
                 width="100%"
-                overscanCount={5}
+                overscanCount={2}
+                className="rounded-b-lg"
               >
                 {Row}
               </List>

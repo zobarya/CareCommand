@@ -74,51 +74,61 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
   const workload = getCaregiverWorkload(caregiver.id);
   
   return (
-    <div style={style} className="hover:bg-muted/20 transition-colors group border-b border-border/50">
-      <div className="grid grid-cols-8 h-full">
-        {/* Caregiver Info Column - Vertically Centered */}
-        <div className="p-4 border-r bg-background flex items-center justify-center relative z-10">
-          <div className="flex items-center gap-3 w-full">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-sm font-semibold text-primary">
+    <div style={style} className="hover:bg-muted/10 transition-colors group border-b border-border/30 bg-background/50">
+      <div className="grid grid-cols-8 h-full min-h-[180px]">
+        {/* Enhanced Caregiver Info Column */}
+        <div className="p-6 border-r border-border/50 bg-card flex items-center justify-center relative">
+          <div className="text-center w-full">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto mb-3 shadow-sm">
+              <span className="text-lg font-bold text-primary">
                 {caregiver.name ? caregiver.name.split(' ').map((n: string) => n[0]).join('') : '??'}
               </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-base text-foreground mb-1 break-words">
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg text-foreground leading-tight">
                 {caregiver.name || 'Unknown Caregiver'}
+              </h3>
+              <div className="space-y-1">
+                <Badge variant="outline" className="text-xs font-medium">
+                  {caregiver.role || 'Unknown Role'}
+                </Badge>
+                <div className="text-sm text-muted-foreground">
+                  {caregiver.region || 'Unknown Region'}
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground mb-2 break-words">
-                {caregiver.role || 'Unknown Role'} • {caregiver.region || 'Unknown Region'}
+              <div className="mt-3 p-2 bg-muted/30 rounded-md">
+                <div className="text-xs text-muted-foreground mb-1">Workload</div>
+                <Badge variant={workload.assignedHours > workload.maxHours ? "destructive" : "secondary"} className="text-xs">
+                  {workload.assignedHours}/{workload.maxHours} hrs
+                </Badge>
               </div>
-              <Badge variant="outline" className="text-xs">
-                {workload.assignedHours}/{workload.maxHours} hrs
-              </Badge>
             </div>
           </div>
         </div>
         
-        {/* Time Slots Columns - Show ALL slots for each day with clear separation */}
-        {weekDays.map((day) => (
-          <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
-            <div className="p-2 space-y-1 h-full flex flex-col">
-              {timeSlots.map((time) => {
-                const visits = getVisitsForSlot(caregiver.id, day, time);
-                
-                return (
-                  <div key={time} className="border-b border-border/20 pb-1 last:border-b-0">
-                    <SchedulerTimeSlot
-                      caregiverId={caregiver.id}
-                      caregiverName={caregiver.name}
-                      day={day}
-                      time={time}
-                      visits={visits}
-                      onSlotClick={onSlotClick}
-                      onVisitClick={onVisitClick}
-                    />
-                  </div>
-                );
-              })}
+        {/* Enhanced Time Slots Grid */}
+        {weekDays.map((day, dayIndex) => (
+          <div key={day.toISOString()} className={`border-r border-border/30 last:border-r-0 hover:bg-muted/5 transition-colors ${dayIndex % 2 === 0 ? 'bg-muted/5' : 'bg-background'}`}>
+            <div className="p-3 h-full">
+              <div className="grid gap-2 h-full">
+                {timeSlots.map((time, timeIndex) => {
+                  const visits = getVisitsForSlot(caregiver.id, day, time);
+                  
+                  return (
+                    <div key={time} className="relative">
+                      <SchedulerTimeSlot
+                        caregiverId={caregiver.id}
+                        caregiverName={caregiver.name}
+                        day={day}
+                        time={time}
+                        visits={visits}
+                        onSlotClick={onSlotClick}
+                        onVisitClick={onVisitClick}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         ))}
