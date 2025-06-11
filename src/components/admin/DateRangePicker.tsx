@@ -27,7 +27,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ dateRange, onUpdate }
 
     if (range.from && range.to) {
       onUpdate({ start: range.from, end: range.to });
-      setIsCalendarOpen(false);
+      // Don't close immediately for range selection - let user see their selection
+      setTimeout(() => setIsCalendarOpen(false), 100);
     } else if (range.from) {
       onUpdate({ start: range.from, end: range.from });
     }

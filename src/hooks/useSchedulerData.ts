@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 
@@ -109,8 +108,13 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   }, [selectedWeek, region, specialization]);
 
   const assignVisit = (visitId: string, caregiverId: string, timeSlot: string) => {
+    console.log('Assigning visit:', visitId, 'to caregiver:', caregiverId);
+    
     const visit = unassignedVisits.find(v => v.id === visitId);
-    if (!visit) return;
+    if (!visit) {
+      console.log('Visit not found in unassigned visits');
+      return;
+    }
 
     const newScheduledVisit = {
       ...visit,
@@ -119,11 +123,29 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
       status: 'scheduled' as const,
     };
 
-    setScheduledVisits(prev => [...prev, newScheduledVisit]);
-    setUnassignedVisits(prev => prev.filter(v => v.id !== visitId));
+    setScheduledVisits(prev => {
+      console.log('Adding to scheduled visits:', newScheduledVisit);
+      return [...prev, newScheduledVisit];
+    });
+    
+    setUnassignedVisits(prev => {
+      const updated = prev.filter(v => v.id !== visitId);
+      console.log('Remaining unassigned visits:', updated);
+      return updated;
+    });
   };
 
   const moveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
+    console.log('Moving visit:', visitId, 'to caregiver:', newCaregiverId);
+    
+    // Check if it's an unassigned visit being assigned
+    const unassignedVisit = unassignedVisits.find(v => v.id === visitId);
+    if (unassignedVisit) {
+      assignVisit(visitId, newCaregiverId, newTimeSlot);
+      return;
+    }
+    
+    // Otherwise, move between caregivers
     setScheduledVisits(prev => 
       prev.map(visit => 
         visit.id === visitId 
