@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 
@@ -6,7 +7,7 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   const [scheduledVisits, setScheduledVisits] = useState([]);
   const [unassignedVisits, setUnassignedVisits] = useState([]);
 
-  // Generate only 3 mock caregivers for focused display
+  // Generate mock caregivers with different regions
   const generateMockCaregivers = () => {
     const caregivers = [
       {
@@ -38,6 +39,36 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
         assignedHours: 35,
         maxHours: 40,
         specializations: ['CNA', 'General Care']
+      },
+      {
+        id: '4',
+        name: 'David Chen',
+        role: 'RN',
+        photo: '/placeholder.svg',
+        region: 'North',
+        assignedHours: 38,
+        maxHours: 40,
+        specializations: ['RN', 'Wound Care']
+      },
+      {
+        id: '5',
+        name: 'Maria Rodriguez',
+        role: 'LPN',
+        photo: '/placeholder.svg',
+        region: 'Central',
+        assignedHours: 30,
+        maxHours: 40,
+        specializations: ['LPN', 'Medication Management']
+      },
+      {
+        id: '6',
+        name: 'James Thompson',
+        role: 'CNA',
+        photo: '/placeholder.svg',
+        region: 'South',
+        assignedHours: 36,
+        maxHours: 40,
+        specializations: ['CNA', 'Personal Care']
       }
     ];
     return caregivers;
@@ -89,12 +120,22 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
     },
     {
       id: 'v5',
-      caregiverId: '2',
+      caregiverId: '4',
       patientName: 'James Wilson',
       serviceType: 'Companionship',
       date: format(new Date(), 'yyyy-MM-dd'),
       startTime: '15:00',
       duration: 120,
+      status: 'scheduled' as const,
+    },
+    {
+      id: 'v6',
+      caregiverId: '5',
+      patientName: 'Alice Cooper',
+      serviceType: 'Medication Management',
+      date: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+      startTime: '10:00',
+      duration: 30,
       status: 'scheduled' as const,
     }
   ];
@@ -121,11 +162,35 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
       status: 'unassigned' as const,
       priority: 'medium' as const,
     },
+    {
+      id: 'u3',
+      patientName: 'Thomas Lee',
+      serviceType: 'Physical Therapy',
+      date: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+      startTime: '13:00',
+      duration: 60,
+      status: 'unassigned' as const,
+      priority: 'low' as const,
+    },
   ];
 
   useEffect(() => {
-    // Always show all 3 caregivers regardless of filters for this focused design
-    setCaregivers(mockCaregivers);
+    // Filter caregivers based on region and specialization
+    let filteredCaregivers = mockCaregivers;
+    
+    if (region !== 'all') {
+      filteredCaregivers = filteredCaregivers.filter(c => 
+        c.region.toLowerCase() === region.toLowerCase()
+      );
+    }
+    
+    if (specialization !== 'all') {
+      filteredCaregivers = filteredCaregivers.filter(c => 
+        c.role.toLowerCase() === specialization.toLowerCase()
+      );
+    }
+
+    setCaregivers(filteredCaregivers);
     setScheduledVisits(mockScheduledVisits);
     setUnassignedVisits(mockUnassignedVisits);
   }, [selectedWeek, region, specialization]);
@@ -178,9 +243,20 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
     );
   };
 
+  const addUnassignedVisit = (visitData: any) => {
+    const newVisit = {
+      id: `u${Date.now()}`,
+      ...visitData,
+      status: 'unassigned' as const,
+      priority: 'medium' as const,
+    };
+    
+    setUnassignedVisits(prev => [...prev, newVisit]);
+  };
+
   const refreshData = () => {
-    // Simulate refresh
     console.log('Refreshing scheduler data...');
+    // Re-trigger the useEffect by updating a dependency or force refresh
   };
 
   return {
@@ -189,6 +265,7 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
     unassignedVisits,
     assignVisit,
     moveVisit,
+    addUnassignedVisit,
     refreshData,
   };
 };

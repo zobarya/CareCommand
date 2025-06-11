@@ -12,9 +12,12 @@ const AdminScheduler: React.FC = () => {
   const [selectedWeek, setSelectedWeek] = useState(new Date());
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [groupByRegion, setGroupByRegion] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState<any>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showAddVisitModal, setShowAddVisitModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{
     caregiverId: string;
     caregiverName: string;
@@ -28,6 +31,7 @@ const AdminScheduler: React.FC = () => {
     unassignedVisits,
     assignVisit,
     moveVisit,
+    addUnassignedVisit,
     refreshData
   } = useSchedulerData(selectedWeek, selectedRegion, selectedSpecialization);
 
@@ -43,11 +47,7 @@ const AdminScheduler: React.FC = () => {
   };
 
   const handleVisitAssignFromCalendar = (visitData: any) => {
-    // Add the new visit to scheduled visits or unassigned based on assignment status
     console.log('Adding visit from calendar click:', visitData);
-    
-    // In a real app, this would make an API call
-    // For now, we'll just refresh the data to simulate the update
     refreshData();
   };
 
@@ -58,10 +58,28 @@ const AdminScheduler: React.FC = () => {
 
   const handleCreateVisit = (visitData: any) => {
     console.log('Creating visit:', visitData);
-    // In a real app, this would make an API call
-    refreshData();
+    if (selectedSlot) {
+      // If created from a specific slot, assign it immediately
+      const newVisit = {
+        ...visitData,
+        caregiverId: selectedSlot.caregiverId,
+        date: selectedSlot.date,
+        startTime: selectedSlot.time,
+      };
+      // In real app, this would make an API call
+      refreshData();
+    } else {
+      // If created from add button, add to unassigned
+      addUnassignedVisit(visitData);
+    }
     setShowAssignModal(false);
+    setShowAddVisitModal(false);
     setSelectedSlot(null);
+  };
+
+  const handleAddVisit = () => {
+    setSelectedSlot(null);
+    setShowAddVisitModal(true);
   };
 
   return (
@@ -71,9 +89,13 @@ const AdminScheduler: React.FC = () => {
           selectedWeek={selectedWeek}
           selectedRegion={selectedRegion}
           selectedSpecialization={selectedSpecialization}
+          searchTerm={searchTerm}
+          groupByRegion={groupByRegion}
           onWeekChange={setSelectedWeek}
           onRegionChange={setSelectedRegion}
           onSpecializationChange={setSelectedSpecialization}
+          onSearchChange={setSearchTerm}
+          onGroupByRegionToggle={() => setGroupByRegion(!groupByRegion)}
           onRefresh={refreshData}
         />
         
@@ -93,6 +115,7 @@ const AdminScheduler: React.FC = () => {
           <UnassignedVisitsSidebar
             visits={unassignedVisits}
             onVisitSelect={handleVisitSelect}
+            onAddVisit={handleAddVisit}
           />
         </div>
       </div>
@@ -105,8 +128,12 @@ const AdminScheduler: React.FC = () => {
       />
 
       <AssignVisitModal
-        open={showAssignModal}
-        onOpenChange={setShowAssignModal}
+        open={showAssignModal || showAddVisitModal}
+        onOpenChange={(open) => {
+          setShowAssignModal(open);
+          setShowAddVisitModal(open);
+          if (!open) setSelectedSlot(null);
+        }}
         preFilledData={{
           caregiverId: selectedSlot?.caregiverId || '',
           caregiverName: selectedSlot?.caregiverName || '',
