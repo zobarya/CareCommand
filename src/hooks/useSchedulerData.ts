@@ -6,39 +6,35 @@ export const useSchedulerData = (selectedWeek: Date, region: string, specializat
   const [scheduledVisits, setScheduledVisits] = useState([]);
   const [unassignedVisits, setUnassignedVisits] = useState([]);
 
-  // Mock data - in real app this would come from API
-  const mockCaregivers = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      role: 'RN',
-      photo: '/placeholder.svg',
-      region: 'North',
-      assignedHours: 28,
-      maxHours: 40,
-      specializations: ['RN', 'Wound Care']
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      role: 'LPN',
-      photo: '/placeholder.svg',
-      region: 'North',
-      assignedHours: 35,
-      maxHours: 40,
-      specializations: ['LPN', 'Physical Therapy']
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      role: 'CNA',
-      photo: '/placeholder.svg',
-      region: 'Central',
-      assignedHours: 20,
-      maxHours: 40,
-      specializations: ['CNA', 'Personal Care']
-    },
-  ];
+  // Generate 100+ mock caregivers for testing
+  const generateMockCaregivers = () => {
+    const regions = ['North', 'South', 'East', 'West', 'Central'];
+    const roles = ['RN', 'LPN', 'CNA', 'PT', 'OT'];
+    const firstNames = ['Sarah', 'Michael', 'Emily', 'Robert', 'Lisa', 'David', 'Jennifer', 'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Anthony', 'Brittany', 'Joshua', 'Megan', 'Andrew', 'Samantha', 'Kevin'];
+    const lastNames = ['Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee'];
+    
+    const caregivers = [];
+    for (let i = 1; i <= 120; i++) {
+      const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const role = roles[Math.floor(Math.random() * roles.length)];
+      const region = regions[Math.floor(Math.random() * regions.length)];
+      
+      caregivers.push({
+        id: i.toString(),
+        name: `${firstName} ${lastName}`,
+        role: role,
+        photo: '/placeholder.svg',
+        region: region,
+        assignedHours: Math.floor(Math.random() * 35) + 5,
+        maxHours: 40,
+        specializations: [role, 'General Care']
+      });
+    }
+    return caregivers;
+  };
+
+  const mockCaregivers = generateMockCaregivers();
 
   const mockScheduledVisits = [
     {

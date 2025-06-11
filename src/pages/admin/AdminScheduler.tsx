@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import SchedulerFilters from '@/components/admin/scheduler/SchedulerFilters';
-import WeekViewScheduler from '@/components/admin/scheduler/WeekViewScheduler';
+import VirtualizedWeekScheduler from '@/components/admin/scheduler/VirtualizedWeekScheduler';
 import UnassignedVisitsSidebar from '@/components/admin/scheduler/UnassignedVisitsSidebar';
 import CaregiverSuggestionsModal from '@/components/admin/scheduler/CaregiverSuggestionsModal';
 import AssignVisitModal from '@/components/admin/scheduler/AssignVisitModal';
@@ -79,7 +79,7 @@ const AdminScheduler: React.FC = () => {
         
         <div className="flex flex-1 gap-4 overflow-hidden">
           <div className="flex-1">
-            <WeekViewScheduler
+            <VirtualizedWeekScheduler
               caregivers={caregivers}
               scheduledVisits={scheduledVisits}
               selectedWeek={selectedWeek}
