@@ -1,7 +1,17 @@
 
 import { useState, useEffect } from 'react';
 
-// Mock data for demonstration
+// Get current week dates for better demo experience
+const getCurrentWeekDate = (dayOffset: number) => {
+  const today = new Date();
+  const currentDay = today.getDay();
+  const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + mondayOffset + dayOffset);
+  return monday.toISOString().split('T')[0];
+};
+
+// Mock data for demonstration with current week dates
 const mockCaregivers = [
   {
     id: '1',
@@ -65,7 +75,7 @@ const mockScheduledVisits = [
     caregiverId: '1',
     patientName: 'John Doe',
     serviceType: 'Wound Care',
-    date: '2024-01-15',
+    date: getCurrentWeekDate(0), // Monday
     startTime: '09:00',
     duration: 60,
     status: 'scheduled' as const
@@ -75,29 +85,39 @@ const mockScheduledVisits = [
     caregiverId: '2',
     patientName: 'Jane Smith',
     serviceType: 'Physical Assistance',
-    date: '2024-01-15',
+    date: getCurrentWeekDate(1), // Tuesday
     startTime: '10:00',
     duration: 90,
+    status: 'scheduled' as const
+  },
+  {
+    id: '3',
+    caregiverId: '1',
+    patientName: 'Robert Brown',
+    serviceType: 'Medication Check',
+    date: getCurrentWeekDate(2), // Wednesday
+    startTime: '14:00',
+    duration: 30,
     status: 'scheduled' as const
   }
 ];
 
 const mockUnassignedVisits = [
   {
-    id: '3',
+    id: '4',
     patientName: 'Robert Johnson',
     serviceType: 'Medication Check',
-    date: '2024-01-16',
+    date: getCurrentWeekDate(3), // Thursday
     startTime: '14:00',
     duration: 30,
     status: 'unassigned' as const,
     priority: 'high' as const
   },
   {
-    id: '4',
+    id: '5',
     patientName: 'Mary Williams',
     serviceType: 'Companionship',
-    date: '2024-01-17',
+    date: getCurrentWeekDate(4), // Friday
     startTime: '11:00',
     duration: 120,
     status: 'unassigned' as const,
@@ -111,11 +131,20 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   const [unassignedVisits, setUnassignedVisits] = useState(mockUnassignedVisits);
 
   const assignVisit = (visitId: string, caregiverId: string, timeSlot: string) => {
+    console.log('Assigning visit:', { visitId, caregiverId, timeSlot });
+    
     const visit = unassignedVisits.find(v => v.id === visitId);
-    if (!visit) return;
+    if (!visit) {
+      console.error('Visit not found:', visitId);
+      return;
+    }
 
     // Remove from unassigned
-    setUnassignedVisits(prev => prev.filter(v => v.id !== visitId));
+    setUnassignedVisits(prev => {
+      const updated = prev.filter(v => v.id !== visitId);
+      console.log('Updated unassigned visits:', updated);
+      return updated;
+    });
     
     // Add to scheduled
     const scheduledVisit = {
@@ -124,39 +153,66 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       startTime: timeSlot,
       status: 'scheduled' as const
     };
-    setScheduledVisits(prev => [...prev, scheduledVisit]);
+    
+    setScheduledVisits(prev => {
+      const updated = [...prev, scheduledVisit];
+      console.log('Updated scheduled visits:', updated);
+      return updated;
+    });
   };
 
   const moveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
-    setScheduledVisits(prev => prev.map(visit => 
-      visit.id === visitId 
-        ? { ...visit, caregiverId: newCaregiverId, startTime: newTimeSlot }
-        : visit
-    ));
+    console.log('Moving visit:', { visitId, newCaregiverId, newTimeSlot });
+    
+    setScheduledVisits(prev => {
+      const updated = prev.map(visit => 
+        visit.id === visitId 
+          ? { ...visit, caregiverId: newCaregiverId, startTime: newTimeSlot }
+          : visit
+      );
+      console.log('Moved visit, updated scheduled visits:', updated);
+      return updated;
+    });
   };
 
   const addUnassignedVisit = (visitData: any) => {
+    console.log('Adding unassigned visit:', visitData);
+    
     const newVisit = {
       id: Date.now().toString(),
       ...visitData,
       status: 'unassigned' as const,
       priority: visitData.priority || 'medium' as const
     };
-    setUnassignedVisits(prev => [...prev, newVisit]);
+    
+    setUnassignedVisits(prev => {
+      const updated = [...prev, newVisit];
+      console.log('Updated unassigned visits:', updated);
+      return updated;
+    });
   };
 
   const addScheduledVisit = (visitData: any) => {
+    console.log('Adding scheduled visit:', visitData);
+    
     const newVisit = {
       id: Date.now().toString(),
       ...visitData,
       status: 'scheduled' as const
     };
-    setScheduledVisits(prev => [...prev, newVisit]);
+    
+    setScheduledVisits(prev => {
+      const updated = [...prev, newVisit];
+      console.log('Updated scheduled visits:', updated);
+      return updated;
+    });
   };
 
   const refreshData = () => {
-    // In a real app, this would refetch from the server
     console.log('Refreshing scheduler data...');
+    // Force re-render by updating state
+    setScheduledVisits(prev => [...prev]);
+    setUnassignedVisits(prev => [...prev]);
   };
 
   return {

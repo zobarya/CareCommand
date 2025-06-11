@@ -36,30 +36,60 @@ const DayColumn: React.FC<DayColumnProps> = ({
     return isSameDay(visitDate, day);
   }).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
+  console.log('DayColumn render:', { 
+    caregiverId, 
+    day: format(day, 'yyyy-MM-dd'), 
+    totalVisits: visits.length, 
+    dayVisits: dayVisits.length 
+  });
+
   const handleColumnClick = () => {
     // When clicking empty space, suggest next available time slot
     const nextHour = dayVisits.length > 0 
       ? Math.max(...dayVisits.map(v => parseInt(v.startTime.split(':')[0]))) + 1
       : 9; // Default to 9 AM
     const suggestedTime = `${nextHour.toString().padStart(2, '0')}:00`;
+    console.log('DayColumn: Column clicked, suggesting time:', suggestedTime);
     onSlotClick(caregiverId, caregiverName, day.toISOString().split('T')[0], suggestedTime);
   };
 
   const handleVisitClick = (visit: any, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('DayColumn: Visit clicked:', visit);
     onVisitClick(visit);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    console.log('DayColumn: Drag over:', dayId);
+    onDragOver(e, dayId);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    console.log('DayColumn: Drop event:', dayId);
+    const visitId = e.dataTransfer.getData('text/plain');
+    console.log('DayColumn: Dropped visit ID:', visitId);
+    
+    // Use a default time or the next available slot
+    const nextHour = dayVisits.length > 0 
+      ? Math.max(...dayVisits.map(v => parseInt(v.startTime.split(':')[0]))) + 1
+      : 9;
+    const dropTime = `${nextHour.toString().padStart(2, '0')}:00`;
+    
+    onDrop(e, caregiverId, day, dropTime);
   };
 
   return (
     <div
-      className={`min-h-[120px] border border-border/50 p-2 transition-all duration-200 ${
+      className={`min-h-[120px] border border-border/50 p-2 transition-all duration-200 cursor-pointer ${
         isDragOver
           ? 'bg-primary/20 border-primary/50'
           : 'hover:bg-muted/20 hover:border-primary/30'
       }`}
-      onDragOver={(e) => onDragOver(e, dayId)}
+      onDragOver={handleDragOver}
       onDragLeave={onDragLeave}
-      onDrop={(e) => onDrop(e, caregiverId, day, '09:00')}
+      onDrop={handleDrop}
       onClick={handleColumnClick}
     >
       {/* Day header */}
@@ -74,6 +104,11 @@ const DayColumn: React.FC<DayColumnProps> = ({
             key={visit.id} 
             className="p-2 cursor-pointer hover:shadow-md transition-shadow bg-primary/10 border-primary/30"
             onClick={(e) => handleVisitClick(visit, e)}
+            draggable
+            onDragStart={(e) => {
+              console.log('DayColumn: Starting drag for visit:', visit.id);
+              e.dataTransfer.setData('text/plain', visit.id);
+            }}
           >
             <div className="space-y-1">
               <div className="flex items-center justify-between">
@@ -98,7 +133,7 @@ const DayColumn: React.FC<DayColumnProps> = ({
           </Card>
         ))}
 
-        {/* Add visit button when empty or on hover */}
+        {/* Add visit button when empty */}
         {dayVisits.length === 0 && (
           <div className="flex items-center justify-center h-16 text-muted-foreground/60 border-2 border-dashed border-muted-foreground/20 rounded">
             <div className="text-center">

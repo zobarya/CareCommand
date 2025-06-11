@@ -40,6 +40,7 @@ const AdminScheduler: React.FC = () => {
   } = useSchedulerData(selectedWeek, selectedRegion, selectedSpecialization);
 
   const handleAssignVisit = (visitId: string, caregiverId: string, timeSlot: string) => {
+    console.log('AdminScheduler: Assigning visit', { visitId, caregiverId, timeSlot });
     assignVisit(visitId, caregiverId, timeSlot);
     setShowSuggestions(false);
     setSelectedVisit(null);
@@ -50,35 +51,38 @@ const AdminScheduler: React.FC = () => {
   };
 
   const handleVisitSelect = (visit: any) => {
+    console.log('AdminScheduler: Visit selected', visit);
     setSelectedVisit(visit);
     setShowSuggestions(true);
   };
 
   const handleVisitAssignFromCalendar = (visitData: any) => {
-    console.log('Adding visit from calendar click:', visitData);
+    console.log('AdminScheduler: Adding visit from calendar click:', visitData);
     refreshData();
   };
 
   const handleSlotClick = (caregiverId: string, caregiverName: string, date: string, time: string) => {
+    console.log('AdminScheduler: Slot clicked', { caregiverId, caregiverName, date, time });
     setSelectedSlot({ caregiverId, caregiverName, date, time });
     setShowAssignModal(true);
   };
 
   const handleCreateVisit = (visitData: any) => {
-    console.log('Creating visit:', visitData);
+    console.log('AdminScheduler: Creating visit:', visitData);
     
     if (selectedSlot) {
       // If created from a specific slot, assign it immediately
       const newVisit = {
-        id: Date.now().toString(),
-        ...visitData,
         caregiverId: selectedSlot.caregiverId,
+        patientName: visitData.patientName,
+        serviceType: visitData.serviceType,
         date: selectedSlot.date,
         startTime: selectedSlot.time,
-        status: 'scheduled'
+        duration: parseInt(visitData.duration) || 60,
+        notes: visitData.notes || ''
       };
       
-      // Add to scheduled visits for immediate UI update
+      console.log('AdminScheduler: Adding scheduled visit:', newVisit);
       addScheduledVisit(newVisit);
       
       toast({
@@ -88,11 +92,16 @@ const AdminScheduler: React.FC = () => {
     } else {
       // If created from add button, add to unassigned
       const newVisit = {
-        id: Date.now().toString(),
-        ...visitData,
-        status: 'unassigned'
+        patientName: visitData.patientName,
+        serviceType: visitData.serviceType,
+        date: visitData.date,
+        startTime: visitData.startTime || '09:00',
+        duration: parseInt(visitData.duration) || 60,
+        notes: visitData.notes || '',
+        priority: visitData.priority || 'medium'
       };
       
+      console.log('AdminScheduler: Adding unassigned visit:', newVisit);
       addUnassignedVisit(newVisit);
       
       toast({
@@ -107,11 +116,13 @@ const AdminScheduler: React.FC = () => {
   };
 
   const handleAddVisit = () => {
+    console.log('AdminScheduler: Add visit button clicked');
     setSelectedSlot(null);
     setShowAddVisitModal(true);
   };
 
   const handleMoveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
+    console.log('AdminScheduler: Moving visit', { visitId, newCaregiverId, newTimeSlot });
     moveVisit(visitId, newCaregiverId, newTimeSlot);
     toast({
       title: "Visit Moved",
@@ -129,6 +140,12 @@ const AdminScheduler: React.FC = () => {
       caregiver.role.toLowerCase().includes(selectedSpecialization.toLowerCase());
     
     return matchesSearch && matchesRegion && matchesSpecialization;
+  });
+
+  console.log('AdminScheduler: Current state', {
+    scheduledVisits: scheduledVisits.length,
+    unassignedVisits: unassignedVisits.length,
+    filteredCaregivers: filteredCaregivers.length
   });
 
   return (
