@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import VisitCard from '@/components/admin/scheduler/VisitCard';
@@ -43,7 +44,17 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
   const isMobile = useIsMobile();
   const weekStart = startOfWeek(selectedWeek);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  const timeSlots = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date) => {
+    e.preventDefault();
+    const visitId = e.dataTransfer.getData('text/plain');
+    const timeSlot = '09:00'; // Default time slot, could be made dynamic
+    onVisitMove(visitId, caregiverId, timeSlot);
+  };
 
   if (isMobile) {
     return (
@@ -123,6 +134,8 @@ const WeekViewScheduler: React.FC<WeekViewSchedulerProps> = ({
                   <div
                     key={day.toISOString()}
                     className="p-2 border-r relative min-h-[80px] hover:bg-gray-50"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, caregiver.id, day)}
                   >
                     <div className="space-y-1">
                       {dayVisits.map((visit) => (

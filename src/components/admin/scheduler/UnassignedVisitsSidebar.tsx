@@ -19,11 +19,13 @@ interface UnassignedVisit {
 interface UnassignedVisitsSidebarProps {
   visits: UnassignedVisit[];
   onVisitSelect: (visit: UnassignedVisit) => void;
+  onAddNewVisit?: () => void;
 }
 
 const UnassignedVisitsSidebar: React.FC<UnassignedVisitsSidebarProps> = ({
   visits,
   onVisitSelect,
+  onAddNewVisit,
 }) => {
   const highPriorityVisits = visits.filter(v => v.priority === 'high');
   const otherVisits = visits.filter(v => v.priority !== 'high');
@@ -84,7 +86,12 @@ const UnassignedVisitsSidebar: React.FC<UnassignedVisitsSidebarProps> = ({
       </div>
       
       <div className="p-4 border-t">
-        <Button variant="outline" className="w-full" size="sm">
+        <Button 
+          variant="outline" 
+          className="w-full" 
+          size="sm"
+          onClick={onAddNewVisit}
+        >
           Add New Visit
         </Button>
       </div>

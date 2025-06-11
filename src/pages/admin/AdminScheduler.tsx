@@ -5,6 +5,7 @@ import SchedulerFilters from '@/components/admin/scheduler/SchedulerFilters';
 import WeekViewScheduler from '@/components/admin/scheduler/WeekViewScheduler';
 import UnassignedVisitsSidebar from '@/components/admin/scheduler/UnassignedVisitsSidebar';
 import CaregiverSuggestionsModal from '@/components/admin/scheduler/CaregiverSuggestionsModal';
+import AddVisitDialog from '@/components/admin/AddVisitDialog';
 import { useSchedulerData } from '@/hooks/useSchedulerData';
 
 const AdminScheduler: React.FC = () => {
@@ -13,6 +14,7 @@ const AdminScheduler: React.FC = () => {
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const [selectedVisit, setSelectedVisit] = useState<any>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAddVisit, setShowAddVisit] = useState(false);
 
   const {
     caregivers,
@@ -32,6 +34,10 @@ const AdminScheduler: React.FC = () => {
   const handleVisitSelect = (visit: any) => {
     setSelectedVisit(visit);
     setShowSuggestions(true);
+  };
+
+  const handleAddNewVisit = () => {
+    setShowAddVisit(true);
   };
 
   return (
@@ -61,6 +67,7 @@ const AdminScheduler: React.FC = () => {
           <UnassignedVisitsSidebar
             visits={unassignedVisits}
             onVisitSelect={handleVisitSelect}
+            onAddNewVisit={handleAddNewVisit}
           />
         </div>
       </div>
@@ -70,6 +77,11 @@ const AdminScheduler: React.FC = () => {
         onClose={() => setShowSuggestions(false)}
         visit={selectedVisit}
         onAssign={handleAssignVisit}
+      />
+
+      <AddVisitDialog
+        open={showAddVisit}
+        onOpenChange={setShowAddVisit}
       />
     </Layout>
   );

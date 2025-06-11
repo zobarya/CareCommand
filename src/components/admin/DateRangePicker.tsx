@@ -21,28 +21,15 @@ interface DateRangePickerProps {
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({ dateRange, onUpdate }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>(dateRange);
 
-  const handleSelect = (date: Date | undefined) => {
-    if (!date) return;
+  const handleSelect = (range: { from?: Date; to?: Date } | undefined) => {
+    if (!range) return;
 
-    const newRange = !selectedRange.start || (selectedRange.start && selectedRange.end) ? 
-      { start: date, end: date } :
-      { start: selectedRange.start, end: date };
-
-    // Make sure end date is after start date
-    if (newRange.end < newRange.start) {
-      newRange.end = newRange.start;
-    }
-
-    setSelectedRange(newRange);
-    
-    if (newRange.start && newRange.end) {
-      onUpdate(newRange);
-      if (newRange.end !== newRange.start) {
-        // Close the calendar if a range is selected
-        setTimeout(() => setIsCalendarOpen(false), 300);
-      }
+    if (range.from && range.to) {
+      onUpdate({ start: range.from, end: range.to });
+      setIsCalendarOpen(false);
+    } else if (range.from) {
+      onUpdate({ start: range.from, end: range.from });
     }
   };
 
@@ -66,31 +53,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ dateRange, onUpdate }
         <Calendar
           mode="range"
           selected={{
-            from: selectedRange.start,
-            to: selectedRange.end,
+            from: dateRange.start,
+            to: dateRange.end,
           }}
-          onSelect={(range) => {
-            if (range) {
-              handleSelect(range.from);
-              handleSelect(range.to);
-            }
-          }}
+          onSelect={handleSelect}
           numberOfMonths={1}
           initialFocus
           className={cn("p-3 pointer-events-auto")}
         />
-        <div className="p-3 border-t border-border">
-          <Button
-            size="sm"
-            className="w-full"
-            onClick={() => {
-              onUpdate(selectedRange);
-              setIsCalendarOpen(false);
-            }}
-          >
-            Apply Range
-          </Button>
-        </div>
       </PopoverContent>
     </Popover>
   );
