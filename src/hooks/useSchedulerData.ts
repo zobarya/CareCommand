@@ -146,7 +146,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       return updated;
     });
     
-    // Add to scheduled with updated date if provided
+    // Add to scheduled with updated date and time
     const scheduledVisit = {
       ...visit,
       caregiverId,
@@ -189,7 +189,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     // Check if it's an unassigned visit
     const unassignedVisit = unassignedVisits.find(v => v.id === visitId);
     if (unassignedVisit) {
-      console.log('useSchedulerData: Assigning unassigned visit to caregiver:', caregiverId);
+      console.log('useSchedulerData: Assigning unassigned visit to caregiver:', caregiverId, 'at time:', timeSlot, 'on date:', targetDate);
       assignVisit(visitId, caregiverId, timeSlot, targetDate);
       return;
     }
@@ -197,7 +197,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     // Check if it's a scheduled visit
     const scheduledVisit = scheduledVisits.find(v => v.id === visitId);
     if (scheduledVisit) {
-      console.log('useSchedulerData: Moving scheduled visit to caregiver:', caregiverId);
+      console.log('useSchedulerData: Moving scheduled visit to caregiver:', caregiverId, 'at time:', timeSlot, 'on date:', targetDate);
       moveVisit(visitId, caregiverId, timeSlot, targetDate);
       return;
     }

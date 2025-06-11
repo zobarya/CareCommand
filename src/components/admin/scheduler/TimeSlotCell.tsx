@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { format } from 'date-fns';
 import { Clock, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TimeSlotCellProps } from './types';
@@ -17,19 +18,20 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   onDragLeave,
   onDrop,
 }) => {
-  const slotId = `${caregiverId}-${day.toISOString().split('T')[0]}-${time}`;
+  // Use date-fns format to avoid timezone issues
+  const dayString = format(day, 'yyyy-MM-dd');
+  const slotId = `${caregiverId}-${dayString}-${time}`;
 
   const handleClick = () => {
     if (visits.length > 0) {
       onVisitClick(visits[0]);
     } else {
-      onSlotClick(caregiverId, caregiverName, day.toISOString().split('T')[0], time);
+      onSlotClick(caregiverId, caregiverName, dayString, time);
     }
   };
 
   const handleDrop = (e: React.DragEvent) => {
-    const dateString = day.toISOString().split('T')[0];
-    onDrop(e, caregiverId, dateString, time);
+    onDrop(e, caregiverId, dayString, time);
   };
 
   return (
