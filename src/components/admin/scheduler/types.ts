@@ -25,7 +25,7 @@ export interface VirtualizedWeekSchedulerProps {
   caregivers: Caregiver[];
   scheduledVisits: Visit[];
   selectedWeek: Date;
-  onVisitMove: (visitId: string, newCaregiverId: string, newTimeSlot: string) => void;
+  onVisitMove: (visitId: string, newCaregiverId: string, newDate: string, newTimeSlot: string) => void;
   onVisitSelect: (visit: Visit) => void;
   onVisitAssign: (visitData: any) => void;
   onSlotClick: (caregiverId: string, caregiverName: string, date: string, time: string) => void;
@@ -55,7 +55,7 @@ export interface TimeSlotCellProps {
   onVisitClick: (visit: Visit) => void;
   onDragOver: (e: React.DragEvent, slotId: string) => void;
   onDragLeave: () => void;
-  onDrop: (e: React.DragEvent, caregiverId: string, date: Date, time: string) => void;
+  onDrop: (e: React.DragEvent, caregiverId: string, date: string, time: string) => void;
 }
 
 export interface SchedulerWeekHeaderProps {
@@ -72,7 +72,7 @@ export interface CaregiverRowProps {
   onVisitClick: (visit: Visit) => void;
   onDragOver: (e: React.DragEvent, slotId: string) => void;
   onDragLeave: () => void;
-  onDrop: (e: React.DragEvent, caregiverId: string, date: Date, time: string) => void;
+  onDrop: (e: React.DragEvent, caregiverId: string, date: string, time: string) => void;
 }
 
 export interface SchedulerRowProps {

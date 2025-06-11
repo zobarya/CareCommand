@@ -86,7 +86,7 @@ const DayColumn: React.FC<DayColumnProps> = ({
     const targetDate = day.toISOString().split('T')[0];
     console.log('DayColumn: Calling onDrop with:', { visitId, caregiverId, targetDate, dropTime });
     
-    onDrop(e, visitId, caregiverId, targetDate, dropTime);
+    onDrop(e, caregiverId, targetDate, dropTime);
   };
 
   return (
