@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { X, Clock, MapPin, User, Calendar, FileText, Users, Brain, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -67,6 +66,19 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     instructions: '',
     caregiverId: preFilledData.caregiverId,
   });
+
+  // Auto-select caregiver when modal opens with pre-filled caregiver data
+  useEffect(() => {
+    if (open && preFilledData.caregiverId) {
+      setShowCaregiverSuggestions(true);
+      setFormData(prev => ({
+        ...prev,
+        caregiverId: preFilledData.caregiverId,
+        date: preFilledData.date,
+        startTime: preFilledData.startTime,
+      }));
+    }
+  }, [open, preFilledData]);
 
   const mockPatients = [
     { id: 'p1', name: 'John Smith', photo: '/placeholder.svg', region: 'North' },
