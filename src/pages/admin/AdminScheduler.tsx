@@ -64,6 +64,17 @@ const AdminScheduler: React.FC = () => {
     setSelectedSlot(null);
   };
 
+  const handleAddNewVisit = () => {
+    // Open the assign modal without pre-filled data
+    setSelectedSlot({
+      caregiverId: '',
+      caregiverName: '',
+      date: '',
+      time: ''
+    });
+    setShowAssignModal(true);
+  };
+
   return (
     <Layout title="Enhanced Scheduler" role="admin">
       <div className="flex flex-col h-full">
@@ -93,6 +104,7 @@ const AdminScheduler: React.FC = () => {
           <UnassignedVisitsSidebar
             visits={unassignedVisits}
             onVisitSelect={handleVisitSelect}
+            onAddNewVisit={handleAddNewVisit}
           />
         </div>
       </div>
