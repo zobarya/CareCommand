@@ -26,17 +26,11 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
   
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
-  const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00',
-    '13:00', '14:00', '15:00', '16:00', '17:00'
-  ];
 
-  const getVisitsForSlot = (caregiverId: string, date: Date, time: string) => {
+  const getVisitsForDay = (caregiverId: string, date: Date) => {
     return scheduledVisits.filter(visit => {
       const visitDate = parseISO(visit.date);
-      return visit.caregiverId === caregiverId &&
-             isSameDay(visitDate, date) &&
-             visit.startTime === time;
+      return visit.caregiverId === caregiverId && isSameDay(visitDate, date);
     });
   };
 
@@ -50,42 +44,40 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
     setDragOverSlot(null);
   };
 
-  const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date, time: string) => {
+  const handleDrop = (e: React.DragEvent, caregiverId: string, date: Date) => {
     if (!onVisitDrop) return;
     e.preventDefault();
     setDragOverSlot(null);
     
     const visitId = e.dataTransfer.getData('text/plain');
     if (visitId) {
-      // Use date-fns format to avoid timezone issues
       const dateString = format(date, 'yyyy-MM-dd');
-      onVisitDrop(visitId, caregiverId, dateString, time);
+      // Use a default time when dropping on a day cell
+      onVisitDrop(visitId, caregiverId, dateString, '09:00');
     }
   };
 
-  const TimeSlot = ({ caregiverId, caregiverName, day, time, visits }: {
+  const DayCell = ({ caregiverId, caregiverName, day, visits }: {
     caregiverId: string;
     caregiverName: string;
     day: Date;
-    time: string;
     visits: any[];
   }) => {
-    const slotId = `${caregiverId}-${format(day, 'yyyy-MM-dd')}-${time}`;
+    const slotId = `${caregiverId}-${format(day, 'yyyy-MM-dd')}`;
     const isDragOver = dragOverSlot === slotId;
 
     const handleClick = () => {
       if (visits.length > 0) {
         onVisitClick(visits[0]);
       } else {
-        // Use date-fns format to avoid timezone issues
         const dateString = format(day, 'yyyy-MM-dd');
-        onSlotClick(caregiverId, caregiverName, dateString, time);
+        onSlotClick(caregiverId, caregiverName, dateString, '09:00');
       }
     };
 
     return (
       <div
-        className={`h-20 border border-border/30 cursor-pointer transition-all duration-200 ${
+        className={`h-24 border border-border/30 cursor-pointer transition-all duration-200 p-2 ${
           visits.length > 0
             ? 'bg-primary/10 hover:bg-primary/20 border-primary/40'
             : isDragOver
@@ -95,14 +87,14 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
         onClick={handleClick}
         onDragOver={(e) => handleDragOver(e, slotId)}
         onDragLeave={handleDragLeave}
-        onDrop={(e) => handleDrop(e, caregiverId, day, time)}
+        onDrop={(e) => handleDrop(e, caregiverId, day)}
       >
         {visits.length > 0 ? (
-          <div className="p-2 h-full">
+          <div className="space-y-1 h-full overflow-y-auto">
             {visits.map((visit) => (
               <div 
                 key={visit.id} 
-                className="bg-background/90 rounded p-1 mb-1 text-xs cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-background/90 rounded p-1 text-xs cursor-pointer hover:shadow-md transition-shadow"
                 draggable
                 onDragStart={(e) => {
                   e.stopPropagation();
@@ -114,8 +106,12 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
                 }}
               >
                 <div className="flex items-center gap-1 mb-1">
-                  <User className="w-3 h-3 text-primary" />
-                  <span className="font-medium truncate">{visit.patientName}</span>
+                  <Clock className="w-3 h-3 text-primary flex-shrink-0" />
+                  <span className="font-medium text-xs">{visit.startTime}</span>
+                </div>
+                <div className="flex items-center gap-1 mb-1">
+                  <User className="w-3 h-3 text-primary flex-shrink-0" />
+                  <span className="font-medium truncate text-xs">{visit.patientName}</span>
                 </div>
                 <Badge variant="secondary" className="text-xs">
                   {visit.serviceType}
@@ -125,9 +121,9 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <div className="text-muted-foreground/60 text-xs">
-              <Clock className="w-3 h-3 mx-auto mb-1" />
-              {time}
+            <div className="text-muted-foreground/60 text-xs text-center">
+              <Calendar className="w-4 h-4 mx-auto mb-1" />
+              <span>Add Visit</span>
             </div>
           </div>
         )}
@@ -159,52 +155,40 @@ const SimpleSchedulerGrid: React.FC<SimpleSchedulerGridProps> = ({
               ))}
             </div>
 
-            {/* Caregivers and their schedules */}
+            {/* Caregivers and their daily schedules */}
             {caregivers.map((caregiver) => (
-              <div key={caregiver.id} className="border-b border-border">
+              <div key={caregiver.id} className="grid grid-cols-8 border-b border-border">
                 {/* Caregiver info */}
-                <div className="grid grid-cols-8 bg-card">
-                  <div className="p-4 border-r border-border bg-muted/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">
-                          {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-semibold">{caregiver.name}</div>
-                        <div className="text-sm text-muted-foreground">{caregiver.role}</div>
-                      </div>
+                <div className="p-4 border-r border-border bg-muted/10 flex items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-primary">
+                        {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
+                      </span>
                     </div>
-                  </div>
-                  <div className="col-span-7 p-4 border-r border-border">
-                    <div className="text-sm text-muted-foreground">
-                      Region: {caregiver.region} | Workload: {caregiver.assignedHours}/{caregiver.maxHours} hrs
+                    <div className="min-w-0">
+                      <div className="font-semibold truncate">{caregiver.name}</div>
+                      <div className="text-sm text-muted-foreground">{caregiver.role}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {caregiver.region} | {caregiver.assignedHours}/{caregiver.maxHours}h
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Time slots for each day */}
-                {timeSlots.map((time) => (
-                  <div key={time} className="grid grid-cols-8 border-t border-border/30">
-                    <div className="p-2 border-r border-border bg-muted/5 flex items-center justify-center">
-                      <span className="text-sm font-medium">{time}</span>
-                    </div>
-                    {weekDays.map((day) => {
-                      const visits = getVisitsForSlot(caregiver.id, day, time);
-                      return (
-                        <TimeSlot
-                          key={`${caregiver.id}-${day.toISOString()}-${time}`}
-                          caregiverId={caregiver.id}
-                          caregiverName={caregiver.name}
-                          day={day}
-                          time={time}
-                          visits={visits}
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
+                {/* Day cells */}
+                {weekDays.map((day) => {
+                  const visits = getVisitsForDay(caregiver.id, day);
+                  return (
+                    <DayCell
+                      key={`${caregiver.id}-${day.toISOString()}`}
+                      caregiverId={caregiver.id}
+                      caregiverName={caregiver.name}
+                      day={day}
+                      visits={visits}
+                    />
+                  );
+                })}
               </div>
             ))}
           </div>
