@@ -74,21 +74,21 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
     <div style={style} className="hover:bg-muted/20 transition-colors group border-b border-border/50">
       <div className="grid grid-cols-8 min-h-[120px]">
         {/* Caregiver Info Column */}
-        <div className="p-4 border-r bg-card flex flex-col justify-center">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-sm font-semibold text-primary">
+        <div className="p-3 border-r bg-card flex flex-col justify-center min-w-0">
+          <div className="flex items-start gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-semibold text-primary">
                 {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm text-foreground truncate">
+              <div className="font-medium text-sm text-foreground leading-tight mb-1">
                 {caregiver.name}
               </div>
-              <div className="text-xs text-muted-foreground mb-2">
+              <div className="text-xs text-muted-foreground mb-2 leading-tight">
                 {caregiver.role} • {caregiver.region}
               </div>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs px-1 py-0">
                 {workload.assignedHours}/{workload.maxHours} hrs
               </Badge>
             </div>
@@ -97,7 +97,7 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onToggleCaregiverCollapse(caregiver.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
               >
                 <ChevronDown className="w-3 h-3" />
               </Button>
