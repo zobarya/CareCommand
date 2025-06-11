@@ -79,53 +79,60 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
   };
 
   return (
-    <Card className="w-full h-full flex flex-col">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="w-5 h-5" />
-          Caregiver Schedule - Week of {format(weekStart, 'MMM d, yyyy')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 flex-1 overflow-hidden">
-        <ScrollArea className="h-full w-full">
+    <div className="h-full flex flex-col">
+      <div className="flex-shrink-0 bg-background border-b">
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="w-5 h-5" />
+            <h2 className="text-lg font-semibold">
+              Caregiver Schedule - Week of {format(weekStart, 'MMM d, yyyy')}
+            </h2>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full">
           <div className="min-w-[1200px]">
             <SchedulerWeekHeader weekDays={weekDays} />
 
             {/* Caregiver sections */}
-            {Object.entries(caregiverGroups).map(([regionName, regionCaregivers]: [string, Caregiver[]]) => (
-              <div key={regionName}>
-                {groupByRegion && (
-                  <CaregiverGroupHeader
-                    region={regionName}
-                    caregiverCount={regionCaregivers.length}
-                    isExpanded={expandedRegions.has(regionName)}
-                    onToggle={() => toggleRegion(regionName)}
-                  />
-                )}
-                
-                {(!groupByRegion || expandedRegions.has(regionName)) && 
-                  regionCaregivers.map((caregiver) => (
-                    <CaregiverRow
-                      key={caregiver.id}
-                      caregiver={caregiver}
-                      weekDays={weekDays}
-                      timeSlots={timeSlots}
-                      visits={scheduledVisits}
-                      dragOverSlot={dragOverSlot}
-                      onSlotClick={onSlotClick}
-                      onVisitClick={onVisitClick}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
+            <div className="pb-4">
+              {Object.entries(caregiverGroups).map(([regionName, regionCaregivers]) => (
+                <div key={regionName}>
+                  {groupByRegion && (
+                    <CaregiverGroupHeader
+                      region={regionName}
+                      caregiverCount={regionCaregivers.length}
+                      isExpanded={expandedRegions.has(regionName)}
+                      onToggle={() => toggleRegion(regionName)}
                     />
-                  ))
-                }
-              </div>
-            ))}
+                  )}
+                  
+                  {(!groupByRegion || expandedRegions.has(regionName)) && 
+                    regionCaregivers.map((caregiver) => (
+                      <CaregiverRow
+                        key={caregiver.id}
+                        caregiver={caregiver}
+                        weekDays={weekDays}
+                        timeSlots={timeSlots}
+                        visits={scheduledVisits}
+                        dragOverSlot={dragOverSlot}
+                        onSlotClick={onSlotClick}
+                        onVisitClick={onVisitClick}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                      />
+                    ))
+                  }
+                </div>
+              ))}
+            </div>
           </div>
         </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { VirtualizedWeekSchedulerProps } from './types';
 import SchedulerGrid from './SchedulerGrid';
@@ -30,7 +29,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-hidden">
+    <div className="h-full">
       <SchedulerGrid
         caregivers={caregivers}
         scheduledVisits={scheduledVisits}

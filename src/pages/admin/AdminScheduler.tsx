@@ -84,23 +84,25 @@ const AdminScheduler: React.FC = () => {
 
   return (
     <Layout title="Enhanced Scheduler" role="admin">
-      <div className="flex flex-col h-full">
-        <SchedulerFilters
-          selectedWeek={selectedWeek}
-          selectedRegion={selectedRegion}
-          selectedSpecialization={selectedSpecialization}
-          searchTerm={searchTerm}
-          groupByRegion={groupByRegion}
-          onWeekChange={setSelectedWeek}
-          onRegionChange={setSelectedRegion}
-          onSpecializationChange={setSelectedSpecialization}
-          onSearchChange={setSearchTerm}
-          onGroupByRegionToggle={() => setGroupByRegion(!groupByRegion)}
-          onRefresh={refreshData}
-        />
+      <div className="flex flex-col h-screen">
+        <div className="flex-shrink-0">
+          <SchedulerFilters
+            selectedWeek={selectedWeek}
+            selectedRegion={selectedRegion}
+            selectedSpecialization={selectedSpecialization}
+            searchTerm={searchTerm}
+            groupByRegion={groupByRegion}
+            onWeekChange={setSelectedWeek}
+            onRegionChange={setSelectedRegion}
+            onSpecializationChange={setSelectedSpecialization}
+            onSearchChange={setSearchTerm}
+            onGroupByRegionToggle={() => setGroupByRegion(!groupByRegion)}
+            onRefresh={refreshData}
+          />
+        </div>
         
-        <div className="flex flex-1 gap-4 overflow-hidden">
-          <div className="flex-1">
+        <div className="flex flex-1 gap-4 overflow-hidden min-h-0">
+          <div className="flex-1 min-h-0">
             <VirtualizedWeekScheduler
               caregivers={caregivers}
               scheduledVisits={scheduledVisits}
@@ -112,11 +114,13 @@ const AdminScheduler: React.FC = () => {
             />
           </div>
           
-          <UnassignedVisitsSidebar
-            visits={unassignedVisits}
-            onVisitSelect={handleVisitSelect}
-            onAddVisit={handleAddVisit}
-          />
+          <div className="flex-shrink-0">
+            <UnassignedVisitsSidebar
+              visits={unassignedVisits}
+              onVisitSelect={handleVisitSelect}
+              onAddVisit={handleAddVisit}
+            />
+          </div>
         </div>
       </div>
 

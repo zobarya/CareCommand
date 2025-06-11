@@ -26,32 +26,37 @@ const CaregiverRow: React.FC<CaregiverRowProps> = ({
   };
 
   return (
-    <div key={caregiver.id} className="border-b-2 border-border">
+    <div className="border-b border-border">
       {/* Caregiver header row */}
-      <div className="grid grid-cols-8 bg-card border-b border-border/50">
-        <div className="p-3 border-r border-border bg-muted/10">
+      <div className="grid grid-cols-8 bg-card border-b border-border/50 min-h-[80px]">
+        <div className="p-3 border-r border-border bg-muted/10 flex items-center">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-xs font-bold text-primary">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-bold text-primary">
                 {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
               </span>
             </div>
-            <div>
-              <div className="font-semibold text-sm">{caregiver.name}</div>
-              <div className="text-xs text-muted-foreground">{caregiver.role} - {caregiver.region}</div>
+            <div className="min-w-0">
+              <div className="font-semibold text-sm truncate">{caregiver.name}</div>
+              <div className="text-xs text-muted-foreground truncate">
+                {caregiver.role} - {caregiver.region}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {caregiver.assignedHours}/{caregiver.maxHours} hrs
+              </div>
             </div>
           </div>
         </div>
         <div className="col-span-7 p-3 flex items-center">
           <div className="text-sm text-muted-foreground">
-            Workload: {caregiver.assignedHours}/{caregiver.maxHours} hrs
+            Weekly Schedule
           </div>
         </div>
       </div>
 
       {/* Time slots for this caregiver */}
       {timeSlots.map((time) => (
-        <div key={`${caregiver.id}-${time}`} className="grid grid-cols-8 border-b border-border/30">
+        <div key={`${caregiver.id}-${time}`} className="grid grid-cols-8 border-b border-border/30 min-h-[56px]">
           {/* Time column */}
           <div className="p-2 border-r border-border bg-muted/5 flex items-center justify-center">
             <span className="text-sm font-medium">{time}</span>
