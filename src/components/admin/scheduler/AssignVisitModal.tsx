@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { X, Clock, MapPin, User, Calendar, FileText, Users, Brain, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -122,6 +123,39 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
     },
   ];
 
+  // Memoized handlers to prevent re-renders and focus issues
+  const handlePatientChange = useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, patient: value }));
+  }, []);
+
+  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, date: e.target.value }));
+  }, []);
+
+  const handleStartTimeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, startTime: e.target.value }));
+  }, []);
+
+  const handleDurationChange = useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, duration: value }));
+  }, []);
+
+  const handleServiceTypeChange = useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, serviceType: value }));
+  }, []);
+
+  const handleRegionChange = useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, region: value }));
+  }, []);
+
+  const handleInstructionsChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, instructions: e.target.value }));
+  }, []);
+
+  const handleCaregiverSelect = useCallback((caregiverId: string) => {
+    setFormData(prev => ({ ...prev, caregiverId }));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -168,36 +202,60 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
   const ModalContent = () => (
     <div className="space-y-6 font-['Inter']">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="patient" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Patient *
-              </Label>
-              <Select value={formData.patient} onValueChange={(value) => setFormData(prev => ({ ...prev, patient: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select patient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockPatients.map((patient) => (
-                    <SelectItem key={patient.id} value={patient.id}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-6 h-6">
-                          <AvatarImage src={patient.photo} alt={patient.name} />
-                          <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        {patient.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Patient Information Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Patient Information</h3>
+          
+          <div className="space-y-3">
+            <Label htmlFor="patient" className="flex items-center gap-2 text-sm font-medium mb-2">
+              <User className="w-4 h-4" />
+              Patient *
+            </Label>
+            <Select value={formData.patient} onValueChange={handlePatientChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockPatients.map((patient) => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-6 h-6">
+                        <AvatarImage src={patient.photo} alt={patient.name} />
+                        <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      {patient.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div>
-              <Label htmlFor="date" className="flex items-center gap-2">
+          <div className="space-y-3">
+            <Label htmlFor="region" className="flex items-center gap-2 text-sm font-medium mb-2">
+              <MapPin className="w-4 h-4" />
+              Region
+            </Label>
+            <Select value={formData.region} onValueChange={handleRegionChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="north">North</SelectItem>
+                <SelectItem value="central">Central</SelectItem>
+                <SelectItem value="south">South</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Visit Details Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Visit Details</h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Label htmlFor="date" className="flex items-center gap-2 text-sm font-medium mb-2">
                 <Calendar className="w-4 h-4" />
                 Visit Date *
               </Label>
@@ -205,44 +263,45 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
                 id="date"
                 type="date"
                 value={formData.date}
-                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                onChange={handleDateChange}
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="startTime" className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Start Time *
-                </Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="duration">Duration</Label>
-                <Select value={formData.duration} onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 minutes</SelectItem>
-                    <SelectItem value="60">1 hour</SelectItem>
-                    <SelectItem value="90">1.5 hours</SelectItem>
-                    <SelectItem value="120">2 hours</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-3">
+              <Label htmlFor="startTime" className="flex items-center gap-2 text-sm font-medium mb-2">
+                <Clock className="w-4 h-4" />
+                Start Time *
+              </Label>
+              <Input
+                id="startTime"
+                type="time"
+                value={formData.startTime}
+                onChange={handleStartTimeChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Label htmlFor="duration" className="text-sm font-medium mb-2 block">Duration</Label>
+              <Select value={formData.duration} onValueChange={handleDurationChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="90">1.5 hours</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <Label htmlFor="serviceType">Service Type *</Label>
-              <Select value={formData.serviceType} onValueChange={(value) => setFormData(prev => ({ ...prev, serviceType: value }))}>
+            <div className="space-y-3">
+              <Label htmlFor="serviceType" className="text-sm font-medium mb-2 block">Service Type *</Label>
+              <Select value={formData.serviceType} onValueChange={handleServiceTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select service type" />
                 </SelectTrigger>
@@ -255,133 +314,125 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
                 </SelectContent>
               </Select>
             </div>
-
-            <div>
-              <Label htmlFor="region" className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                Region
-              </Label>
-              <Select value={formData.region} onValueChange={(value) => setFormData(prev => ({ ...prev, region: value }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="north">North</SelectItem>
-                  <SelectItem value="central">Central</SelectItem>
-                  <SelectItem value="south">South</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="instructions" className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Special Instructions
-              </Label>
-              <Textarea
-                id="instructions"
-                placeholder="Enter any special instructions..."
-                value={formData.instructions}
-                onChange={(e) => setFormData(prev => ({ ...prev, instructions: e.target.value }))}
-                rows={4}
-              />
-            </div>
           </div>
+        </div>
 
-          {/* Right Column - AI Suggestions */}
-          <div className="space-y-4">
+        {/* Special Instructions Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-foreground border-b pb-2">Additional Information</h3>
+          
+          <div className="space-y-3">
+            <Label htmlFor="instructions" className="flex items-center gap-2 text-sm font-medium mb-2">
+              <FileText className="w-4 h-4" />
+              Special Instructions
+            </Label>
+            <Textarea
+              id="instructions"
+              placeholder="Enter any special instructions..."
+              value={formData.instructions}
+              onChange={handleInstructionsChange}
+              rows={4}
+              className="resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Caregiver Assignment Section - Moved to Bottom */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between border-b pb-2">
+            <h3 className="text-lg font-semibold text-foreground">Caregiver Assignment</h3>
             <div className="flex items-center space-x-2">
               <Switch
                 id="assign-caregiver"
                 checked={showCaregiverSuggestions}
                 onCheckedChange={setShowCaregiverSuggestions}
               />
-              <Label htmlFor="assign-caregiver" className="flex items-center gap-2">
+              <Label htmlFor="assign-caregiver" className="flex items-center gap-2 text-sm font-medium">
                 <Users className="w-4 h-4" />
                 Assign Caregiver?
               </Label>
             </div>
+          </div>
 
-            {showCaregiverSuggestions && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-primary" />
-                  <h4 className="font-medium text-sm">
-                    Looking for: {formData.serviceType || 'Service'} in {formData.region}
-                  </h4>
-                </div>
-                
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {mockCaregivers.map((caregiver) => (
-                    <div
-                      key={caregiver.id}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        formData.caregiverId === caregiver.id ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setFormData(prev => ({ ...prev, caregiverId: caregiver.id }))}
-                      style={{ fontFamily: 'Inter', fontSize: '8pt' }}
-                    >
-                      <div className="flex items-start gap-3">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={caregiver.photo} alt={caregiver.name} />
-                          <AvatarFallback>{caregiver.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <p className="font-medium text-sm">{caregiver.name}</p>
-                              <p className="text-xs text-gray-600">{caregiver.role}</p>
-                            </div>
-                            {getMatchQualityBadge(caregiver.matchQuality, caregiver.matchScore)}
+          {showCaregiverSuggestions && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg">
+                <Brain className="w-5 h-5 text-primary" />
+                <h4 className="font-medium text-sm">
+                  Looking for: {formData.serviceType || 'Service'} in {formData.region}
+                </h4>
+              </div>
+              
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {mockCaregivers.map((caregiver) => (
+                  <div
+                    key={caregiver.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                      formData.caregiverId === caregiver.id ? 'border-primary bg-primary/5 shadow-md' : 'hover:bg-muted/30'
+                    }`}
+                    onClick={() => handleCaregiverSelect(caregiver.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="w-12 h-12 flex-shrink-0">
+                        <AvatarImage src={caregiver.photo} alt={caregiver.name} />
+                        <AvatarFallback>{caregiver.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="font-medium text-sm">{caregiver.name}</p>
+                            <p className="text-xs text-muted-foreground">{caregiver.role}</p>
                           </div>
-                          
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {caregiver.tags.map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                          
-                          <div className="flex items-center justify-between text-xs text-gray-600">
-                            <span>{caregiver.assignedHours}/{caregiver.maxHours} hours</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                              <span>4.8</span>
-                            </div>
-                          </div>
-                          
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="w-full mt-3"
-                            variant={formData.caregiverId === caregiver.id ? 'default' : 'outline'}
-                          >
-                            {formData.caregiverId === caregiver.id ? 'Selected' : 'Assign Caregiver'}
-                          </Button>
+                          {getMatchQualityBadge(caregiver.matchQuality, caregiver.matchScore)}
                         </div>
+                        
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {caregiver.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{caregiver.assignedHours}/{caregiver.maxHours} hours</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span>4.8</span>
+                          </div>
+                        </div>
+                        
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full mt-3"
+                          variant={formData.caregiverId === caregiver.id ? 'default' : 'outline'}
+                        >
+                          {formData.caregiverId === caregiver.id ? 'Selected' : 'Assign Caregiver'}
+                        </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-white">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={isLoading || !formData.patient || !formData.serviceType}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             {isLoading ? 'Creating Visit...' : 'Create Visit'}
           </Button>
@@ -393,13 +444,13 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90vh]">
-          <DrawerHeader>
+        <DrawerContent className="max-h-[95vh]">
+          <DrawerHeader className="text-left">
             <DrawerTitle>
               Assign Visit {preFilledData.caregiverName && `- ${preFilledData.caregiverName}`}
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-4 overflow-y-auto">
+          <div className="px-4 pb-6 overflow-y-auto">
             <ModalContent />
           </div>
         </DrawerContent>
@@ -409,7 +460,7 @@ const AssignVisitModal: React.FC<AssignVisitModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             Assign Visit {preFilledData.caregiverName && `- ${preFilledData.caregiverName}`}
