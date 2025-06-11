@@ -40,6 +40,12 @@ const AdminScheduler: React.FC = () => {
     setShowAddVisit(true);
   };
 
+  const handleAddVisit = (visitData: any) => {
+    // In a real app, this would make an API call
+    console.log('Adding new visit:', visitData);
+    refreshData(); // Refresh the data to show the new visit
+  };
+
   return (
     <Layout title="Enhanced Scheduler" role="admin">
       <div className="flex flex-col h-full">
@@ -51,6 +57,7 @@ const AdminScheduler: React.FC = () => {
           onRegionChange={setSelectedRegion}
           onSpecializationChange={setSelectedSpecialization}
           onRefresh={refreshData}
+          onAddVisit={handleAddNewVisit}
         />
         
         <div className="flex flex-1 gap-4 overflow-hidden">
@@ -82,6 +89,7 @@ const AdminScheduler: React.FC = () => {
       <AddVisitDialog
         open={showAddVisit}
         onOpenChange={setShowAddVisit}
+        onAdd={handleAddVisit}
       />
     </Layout>
   );
