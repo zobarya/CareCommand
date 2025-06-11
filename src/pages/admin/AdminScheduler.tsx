@@ -5,6 +5,7 @@ import SchedulerFilters from '@/components/admin/scheduler/SchedulerFilters';
 import WeekViewScheduler from '@/components/admin/scheduler/WeekViewScheduler';
 import UnassignedVisitsSidebar from '@/components/admin/scheduler/UnassignedVisitsSidebar';
 import CaregiverSuggestionsModal from '@/components/admin/scheduler/CaregiverSuggestionsModal';
+import AssignVisitModal from '@/components/admin/scheduler/AssignVisitModal';
 import { useSchedulerData } from '@/hooks/useSchedulerData';
 
 const AdminScheduler: React.FC = () => {
@@ -13,6 +14,13 @@ const AdminScheduler: React.FC = () => {
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const [selectedVisit, setSelectedVisit] = useState<any>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<{
+    caregiverId: string;
+    caregiverName: string;
+    date: string;
+    time: string;
+  } | null>(null);
 
   const {
     caregivers,
@@ -43,6 +51,19 @@ const AdminScheduler: React.FC = () => {
     refreshData();
   };
 
+  const handleSlotClick = (caregiverId: string, caregiverName: string, date: string, time: string) => {
+    setSelectedSlot({ caregiverId, caregiverName, date, time });
+    setShowAssignModal(true);
+  };
+
+  const handleCreateVisit = (visitData: any) => {
+    console.log('Creating visit:', visitData);
+    // In a real app, this would make an API call
+    refreshData();
+    setShowAssignModal(false);
+    setSelectedSlot(null);
+  };
+
   return (
     <Layout title="Enhanced Scheduler" role="admin">
       <div className="flex flex-col h-full">
@@ -54,7 +75,6 @@ const AdminScheduler: React.FC = () => {
           onRegionChange={setSelectedRegion}
           onSpecializationChange={setSelectedSpecialization}
           onRefresh={refreshData}
-          showAddButton={false}
         />
         
         <div className="flex flex-1 gap-4 overflow-hidden">
@@ -66,13 +86,13 @@ const AdminScheduler: React.FC = () => {
               onVisitMove={moveVisit}
               onVisitSelect={handleVisitSelect}
               onVisitAssign={handleVisitAssignFromCalendar}
+              onSlotClick={handleSlotClick}
             />
           </div>
           
           <UnassignedVisitsSidebar
             visits={unassignedVisits}
             onVisitSelect={handleVisitSelect}
-            showAddButton={false}
           />
         </div>
       </div>
@@ -82,6 +102,16 @@ const AdminScheduler: React.FC = () => {
         onClose={() => setShowSuggestions(false)}
         visit={selectedVisit}
         onAssign={handleAssignVisit}
+      />
+
+      <AssignVisitModal
+        isOpen={showAssignModal}
+        onClose={() => {
+          setShowAssignModal(false);
+          setSelectedSlot(null);
+        }}
+        selectedSlot={selectedSlot}
+        onCreateVisit={handleCreateVisit}
       />
     </Layout>
   );
