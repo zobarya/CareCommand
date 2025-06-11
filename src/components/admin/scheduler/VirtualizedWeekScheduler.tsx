@@ -74,7 +74,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
       return { ungrouped: filteredCaregivers };
     }
     
-    const grouped = filteredCaregivers.reduce((acc, caregiver) => {
+    const grouped = filteredCaregivers.reduce((acc: Record<string, any[]>, caregiver) => {
       const region = caregiver.region || 'Unassigned';
       if (!acc[region]) acc[region] = [];
       acc[region].push(caregiver);
@@ -88,7 +88,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
     const data: any[] = [];
     
     if (groupByRegion) {
-      Object.entries(groupedCaregivers).forEach(([region, regionCaregivers]) => {
+      Object.entries(groupedCaregivers).forEach(([region, regionCaregivers]: [string, any[]]) => {
         data.push({ type: 'region', region, count: regionCaregivers.length });
         if (expandedRegions.has(region)) {
           regionCaregivers.forEach(caregiver => {
