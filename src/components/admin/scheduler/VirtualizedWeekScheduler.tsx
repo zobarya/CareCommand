@@ -120,6 +120,14 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
     });
   };
 
+  const getCaregiverWorkload = (caregiverId: string) => {
+    const caregiverVisits = scheduledVisits.filter(visit => visit.caregiverId === caregiverId);
+    const assignedHours = caregiverVisits.reduce((total, visit) => total + (visit.duration || 60) / 60, 0);
+    const caregiver = caregivers.find(c => c.id === caregiverId);
+    const maxHours = caregiver?.maxHours || 40;
+    return { assignedHours: Math.round(assignedHours), maxHours };
+  };
+
   const handleSlotClick = (caregiverId: string, caregiverName: string, date: Date, time: string) => {
     const visits = getVisitsForSlot(caregiverId, date, time);
     if (visits.length === 0) {
@@ -159,20 +167,20 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
     
     if (item.type === 'region') {
       return (
-        <div style={style} className="border-b bg-muted/50">
+        <div style={style} className="border-b bg-muted/30 shadow-sm">
           <button
             onClick={() => toggleRegion(item.region)}
-            className="w-full p-3 flex items-center gap-2 hover:bg-muted/70 transition-colors"
+            className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors rounded-lg mx-2 my-1"
           >
             {expandedRegions.has(item.region) ? (
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4 text-primary" />
             ) : (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 text-primary" />
             )}
-            <Users className="w-4 h-4" />
-            <span className="font-medium">{item.region} Region</span>
+            <Users className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-foreground">{item.region} Region</span>
             <Badge variant="secondary" className="ml-auto">
-              {item.count}
+              {item.count} caregivers
             </Badge>
           </button>
         </div>
@@ -181,84 +189,98 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
 
     const { caregiver } = item;
     const hasVisits = scheduledVisits.some(visit => visit.caregiverId === caregiver.id);
+    const workload = getCaregiverWorkload(caregiver.id);
     
     return (
-      <div style={style} className="border-b">
-        <div className="grid grid-cols-8">
-          <div className="p-3 border-r bg-muted/20">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-xs font-medium">
-                  {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
-                </span>
+      <div style={style} className="hover:bg-muted/20 transition-colors group">
+        <Card className="mx-2 my-1 shadow-sm border border-border/50">
+          <div className="grid grid-cols-8 min-h-[120px]">
+            {/* Caregiver Info Column */}
+            <div className="p-4 border-r bg-card flex flex-col justify-center">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-semibold text-primary">
+                    {caregiver.name.split(' ').map((n: string) => n[0]).join('')}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm text-foreground truncate">
+                    {caregiver.name}
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {caregiver.role} • {caregiver.region}
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {workload.assignedHours}/{workload.maxHours} hrs
+                  </Badge>
+                </div>
+                {!hasVisits && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleCaregiverCollapse(caregiver.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronDown className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">{caregiver.name}</div>
-                <div className="text-xs text-muted-foreground">{caregiver.role}</div>
-              </div>
-              {!hasVisits && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleCaregiverCollapse(caregiver.id)}
-                  className="opacity-50 hover:opacity-100"
-                >
-                  <ChevronDown className="w-3 h-3" />
-                </Button>
-              )}
             </div>
-          </div>
-          
-          {weekDays.map((day) => (
-            <div key={day.toISOString()} className="border-r min-h-[80px]">
-              <div className="p-1 space-y-1">
-                {timeSlots.map((time) => {
-                  const visits = getVisitsForSlot(caregiver.id, day, time);
-                  const isEmpty = visits.length === 0;
-                  
-                  return (
-                    <div
-                      key={time}
-                      className={`min-h-[24px] rounded p-1 text-xs cursor-pointer transition-colors ${
-                        visits.length > 0
-                          ? 'bg-primary/10 hover:bg-primary/20'
-                          : 'hover:bg-muted/50 border border-dashed border-muted-foreground/20 bg-muted/10'
-                      }`}
-                      onClick={() => {
-                        if (visits.length > 0) {
-                          handleVisitClick(visits[0]);
-                        } else {
-                          handleSlotClick(caregiver.id, caregiver.name, day, time);
-                        }
-                      }}
-                    >
-                      {visits.length > 0 ? (
-                        <div className="space-y-1">
-                          {visits.map((visit) => (
-                            <div key={visit.id} className="bg-background rounded p-1 shadow-sm">
-                              <div className="font-medium truncate">{visit.patientName}</div>
-                              <div className="flex items-center gap-1 text-muted-foreground">
-                                <Clock className="w-3 h-3" />
-                                <span>{visit.startTime}</span>
+            
+            {/* Time Slots Columns */}
+            {weekDays.map((day) => (
+              <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
+                <div className="p-2 space-y-2">
+                  {timeSlots.map((time) => {
+                    const visits = getVisitsForSlot(caregiver.id, day, time);
+                    const isEmpty = visits.length === 0;
+                    
+                    return (
+                      <div
+                        key={time}
+                        className={`min-h-[32px] rounded-md p-2 text-xs cursor-pointer transition-all duration-200 ${
+                          visits.length > 0
+                            ? 'bg-primary/10 hover:bg-primary/20 border border-primary/20 shadow-sm'
+                            : 'hover:bg-muted/60 border border-dashed border-muted-foreground/30 bg-muted/5 hover:border-muted-foreground/50'
+                        }`}
+                        onClick={() => {
+                          if (visits.length > 0) {
+                            handleVisitClick(visits[0]);
+                          } else {
+                            handleSlotClick(caregiver.id, caregiver.name, day, time);
+                          }
+                        }}
+                      >
+                        {visits.length > 0 ? (
+                          <div className="space-y-1">
+                            {visits.map((visit) => (
+                              <div key={visit.id} className="bg-background rounded-sm p-1.5 shadow-sm border border-border/20">
+                                <div className="font-medium truncate text-xs text-foreground">
+                                  {visit.patientName}
+                                </div>
+                                <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{visit.startTime}</span>
+                                </div>
+                                <Badge variant="secondary" className="text-xs mt-1">
+                                  {visit.serviceType}
+                                </Badge>
                               </div>
-                              <Badge variant="secondary" className="text-xs">
-                                {visit.serviceType}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-muted-foreground/60 text-center">
-                          {time}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-muted-foreground/60 text-center text-xs font-medium">
+                            {time}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Card>
       </div>
     );
   };
@@ -276,7 +298,7 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search caregivers..."
+              placeholder="Search caregivers by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -319,30 +341,36 @@ const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
       </CardHeader>
       
       <CardContent className="p-0">
-        <div className="overflow-auto max-h-[calc(100vh-300px)]">
-          <div className="min-w-[800px]">
+        <div className="overflow-hidden max-h-[calc(100vh-300px)]">
+          <div className="min-w-[900px]">
             {/* Sticky Header */}
-            <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-10 shadow-sm">
-              <div className="p-3 border-r bg-muted/50 font-medium">
-                Caregiver ({flattenedData.filter(item => item.type === 'caregiver').length})
+            <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-20 shadow-md">
+              <div className="p-4 border-r bg-muted/80 font-semibold backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Caregivers ({flattenedData.filter(item => item.type === 'caregiver').length})
+                </div>
               </div>
               {weekDays.map((day) => (
-                <div key={day.toISOString()} className="p-3 border-r bg-muted/50 text-center">
-                  <div className="font-medium">{format(day, 'EEE')}</div>
+                <div key={day.toISOString()} className="p-4 border-r last:border-r-0 bg-muted/80 text-center backdrop-blur-sm">
+                  <div className="font-semibold text-foreground">{format(day, 'EEE')}</div>
                   <div className="text-sm text-muted-foreground">{format(day, 'MMM d')}</div>
                 </div>
               ))}
             </div>
 
             {/* Virtualized Rows */}
-            <List
-              height={Math.min(600, flattenedData.length * 90)}
-              itemCount={flattenedData.length}
-              itemSize={flattenedData[0]?.type === 'region' ? 60 : 90}
-              width="100%"
-            >
-              {Row}
-            </List>
+            <div className="bg-muted/5">
+              <List
+                height={Math.min(700, Math.max(400, flattenedData.length * 140))}
+                itemCount={flattenedData.length}
+                itemSize={(index) => flattenedData[index]?.type === 'region' ? 70 : 140}
+                width="100%"
+                overscanCount={5}
+              >
+                {Row}
+              </List>
+            </div>
           </div>
         </div>
       </CardContent>
