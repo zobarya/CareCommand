@@ -75,10 +75,10 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
   
   return (
     <div style={style} className="hover:bg-muted/20 transition-colors group border-b border-border/50">
-      <div className="grid grid-cols-8 min-h-[120px]">
-        {/* Caregiver Info Column */}
-        <div className="p-4 border-r bg-background flex flex-col justify-center relative z-10">
-          <div className="flex items-start gap-3">
+      <div className="grid grid-cols-8 h-full">
+        {/* Caregiver Info Column - Vertically Centered */}
+        <div className="p-4 border-r bg-background flex items-center justify-center relative z-10">
+          <div className="flex items-center gap-3 w-full">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-semibold text-primary">
                 {caregiver.name ? caregiver.name.split(' ').map((n: string) => n[0]).join('') : '??'}
@@ -98,24 +98,25 @@ const SchedulerRow: React.FC<SchedulerRowProps> = ({
           </div>
         </div>
         
-        {/* Time Slots Columns - Show ALL slots for each day */}
+        {/* Time Slots Columns - Show ALL slots for each day with clear separation */}
         {weekDays.map((day) => (
           <div key={day.toISOString()} className="border-r last:border-r-0 hover:bg-muted/10 transition-colors">
-            <div className="p-2 space-y-2">
+            <div className="p-2 space-y-1 h-full flex flex-col">
               {timeSlots.map((time) => {
                 const visits = getVisitsForSlot(caregiver.id, day, time);
                 
                 return (
-                  <SchedulerTimeSlot
-                    key={time}
-                    caregiverId={caregiver.id}
-                    caregiverName={caregiver.name}
-                    day={day}
-                    time={time}
-                    visits={visits}
-                    onSlotClick={onSlotClick}
-                    onVisitClick={onVisitClick}
-                  />
+                  <div key={time} className="border-b border-border/20 pb-1 last:border-b-0">
+                    <SchedulerTimeSlot
+                      caregiverId={caregiver.id}
+                      caregiverName={caregiver.name}
+                      day={day}
+                      time={time}
+                      visits={visits}
+                      onSlotClick={onSlotClick}
+                      onVisitClick={onVisitClick}
+                    />
+                  </div>
                 );
               })}
             </div>
