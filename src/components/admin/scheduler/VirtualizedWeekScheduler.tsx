@@ -31,8 +31,8 @@ const VirtualizedWeekScheduler: React.FC<ExtendedVirtualizedWeekSchedulerProps> 
   };
 
   const handleVisitDrop = (visitId: string, caregiverId: string, date: string, time: string) => {
-    console.log('Visit dropped:', { visitId, caregiverId, date, time });
-    onVisitMove(visitId, caregiverId, time);
+    console.log('VirtualizedWeekScheduler: Visit dropped:', { visitId, caregiverId, date, time });
+    onVisitMove(visitId, caregiverId, date, time);
   };
 
   return (

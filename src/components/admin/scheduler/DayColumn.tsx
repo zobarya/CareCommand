@@ -15,7 +15,7 @@ interface DayColumnProps {
   onVisitClick: (visit: any) => void;
   onDragOver: (e: React.DragEvent, slotId: string) => void;
   onDragLeave: () => void;
-  onDrop: (e: React.DragEvent, caregiverId: string, date: Date, time: string) => void;
+  onDrop: (e: React.DragEvent, caregiverId: string, date: string, time: string) => void;
 }
 
 const DayColumn: React.FC<DayColumnProps> = ({
@@ -71,13 +71,22 @@ const DayColumn: React.FC<DayColumnProps> = ({
     const visitId = e.dataTransfer.getData('text/plain');
     console.log('DayColumn: Dropped visit ID:', visitId);
     
+    if (!visitId) {
+      console.error('No visit ID found in drag data');
+      return;
+    }
+    
     // Use a default time or the next available slot
     const nextHour = dayVisits.length > 0 
       ? Math.max(...dayVisits.map(v => parseInt(v.startTime.split(':')[0]))) + 1
       : 9;
     const dropTime = `${nextHour.toString().padStart(2, '0')}:00`;
     
-    onDrop(e, caregiverId, day, dropTime);
+    // Pass the date as a string in YYYY-MM-DD format
+    const targetDate = day.toISOString().split('T')[0];
+    console.log('DayColumn: Calling onDrop with:', { visitId, caregiverId, targetDate, dropTime });
+    
+    onDrop(e, visitId, caregiverId, targetDate, dropTime);
   };
 
   return (

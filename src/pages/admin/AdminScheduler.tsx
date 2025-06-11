@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import SchedulerFilters from '@/components/admin/scheduler/SchedulerFilters';
@@ -34,6 +33,7 @@ const AdminScheduler: React.FC = () => {
     unassignedVisits,
     assignVisit,
     moveVisit,
+    handleVisitDrop,
     addUnassignedVisit,
     addScheduledVisit,
     refreshData
@@ -121,11 +121,11 @@ const AdminScheduler: React.FC = () => {
     setShowAddVisitModal(true);
   };
 
-  const handleMoveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
-    console.log('AdminScheduler: Moving visit', { visitId, newCaregiverId, newTimeSlot });
-    moveVisit(visitId, newCaregiverId, newTimeSlot);
+  const handleMoveVisit = (visitId: string, newCaregiverId: string, newDate: string, newTimeSlot: string) => {
+    console.log('AdminScheduler: Handling visit move/drop', { visitId, newCaregiverId, newDate, newTimeSlot });
+    handleVisitDrop(visitId, newCaregiverId, newDate, newTimeSlot);
     toast({
-      title: "Visit Moved",
+      title: "Visit Updated",
       description: "Visit has been successfully moved to the new time slot.",
     });
   };

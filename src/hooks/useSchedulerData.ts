@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Get current week dates for better demo experience
@@ -130,12 +129,12 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
   const [scheduledVisits, setScheduledVisits] = useState(mockScheduledVisits);
   const [unassignedVisits, setUnassignedVisits] = useState(mockUnassignedVisits);
 
-  const assignVisit = (visitId: string, caregiverId: string, timeSlot: string) => {
-    console.log('Assigning visit:', { visitId, caregiverId, timeSlot });
+  const assignVisit = (visitId: string, caregiverId: string, timeSlot: string, targetDate?: string) => {
+    console.log('Assigning visit:', { visitId, caregiverId, timeSlot, targetDate });
     
     const visit = unassignedVisits.find(v => v.id === visitId);
     if (!visit) {
-      console.error('Visit not found:', visitId);
+      console.error('Visit not found in unassigned:', visitId);
       return;
     }
 
@@ -146,11 +145,12 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
       return updated;
     });
     
-    // Add to scheduled
+    // Add to scheduled with updated date if provided
     const scheduledVisit = {
       ...visit,
       caregiverId,
       startTime: timeSlot,
+      date: targetDate || visit.date,
       status: 'scheduled' as const
     };
     
@@ -161,18 +161,45 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     });
   };
 
-  const moveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
-    console.log('Moving visit:', { visitId, newCaregiverId, newTimeSlot });
+  const moveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string, newDate?: string) => {
+    console.log('Moving visit:', { visitId, newCaregiverId, newTimeSlot, newDate });
     
     setScheduledVisits(prev => {
       const updated = prev.map(visit => 
         visit.id === visitId 
-          ? { ...visit, caregiverId: newCaregiverId, startTime: newTimeSlot }
+          ? { 
+              ...visit, 
+              caregiverId: newCaregiverId, 
+              startTime: newTimeSlot,
+              date: newDate || visit.date
+            }
           : visit
       );
       console.log('Moved visit, updated scheduled visits:', updated);
       return updated;
     });
+  };
+
+  const handleVisitDrop = (visitId: string, caregiverId: string, targetDate: string, timeSlot: string) => {
+    console.log('Handling visit drop:', { visitId, caregiverId, targetDate, timeSlot });
+    
+    // Check if it's an unassigned visit
+    const unassignedVisit = unassignedVisits.find(v => v.id === visitId);
+    if (unassignedVisit) {
+      console.log('Assigning unassigned visit');
+      assignVisit(visitId, caregiverId, timeSlot, targetDate);
+      return;
+    }
+    
+    // Check if it's a scheduled visit
+    const scheduledVisit = scheduledVisits.find(v => v.id === visitId);
+    if (scheduledVisit) {
+      console.log('Moving scheduled visit');
+      moveVisit(visitId, caregiverId, timeSlot, targetDate);
+      return;
+    }
+    
+    console.error('Visit not found in either unassigned or scheduled:', visitId);
   };
 
   const addUnassignedVisit = (visitData: any) => {
@@ -221,6 +248,7 @@ export const useSchedulerData = (selectedWeek: Date, selectedRegion: string, sel
     unassignedVisits,
     assignVisit,
     moveVisit,
+    handleVisitDrop,
     addUnassignedVisit,
     addScheduledVisit,
     refreshData
