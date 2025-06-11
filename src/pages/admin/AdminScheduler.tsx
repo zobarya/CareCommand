@@ -7,6 +7,7 @@ import UnassignedVisitsSidebar from '@/components/admin/scheduler/UnassignedVisi
 import CaregiverSuggestionsModal from '@/components/admin/scheduler/CaregiverSuggestionsModal';
 import AssignVisitModal from '@/components/admin/scheduler/AssignVisitModal';
 import { useSchedulerData } from '@/hooks/useSchedulerData';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminScheduler: React.FC = () => {
   const [selectedWeek, setSelectedWeek] = useState(new Date());
@@ -25,6 +26,8 @@ const AdminScheduler: React.FC = () => {
     time: string;
   } | null>(null);
 
+  const { toast } = useToast();
+
   const {
     caregivers,
     scheduledVisits,
@@ -32,6 +35,7 @@ const AdminScheduler: React.FC = () => {
     assignVisit,
     moveVisit,
     addUnassignedVisit,
+    addScheduledVisit,
     refreshData
   } = useSchedulerData(selectedWeek, selectedRegion, selectedSpecialization);
 
@@ -39,6 +43,10 @@ const AdminScheduler: React.FC = () => {
     assignVisit(visitId, caregiverId, timeSlot);
     setShowSuggestions(false);
     setSelectedVisit(null);
+    toast({
+      title: "Visit Assigned Successfully",
+      description: "The visit has been assigned to the caregiver.",
+    });
   };
 
   const handleVisitSelect = (visit: any) => {
@@ -58,20 +66,41 @@ const AdminScheduler: React.FC = () => {
 
   const handleCreateVisit = (visitData: any) => {
     console.log('Creating visit:', visitData);
+    
     if (selectedSlot) {
       // If created from a specific slot, assign it immediately
       const newVisit = {
+        id: Date.now().toString(),
         ...visitData,
         caregiverId: selectedSlot.caregiverId,
         date: selectedSlot.date,
         startTime: selectedSlot.time,
+        status: 'scheduled'
       };
-      // In real app, this would make an API call
-      refreshData();
+      
+      // Add to scheduled visits for immediate UI update
+      addScheduledVisit(newVisit);
+      
+      toast({
+        title: "Visit Created & Assigned",
+        description: `Visit scheduled for ${selectedSlot.caregiverName} on ${selectedSlot.date} at ${selectedSlot.time}`,
+      });
     } else {
       // If created from add button, add to unassigned
-      addUnassignedVisit(visitData);
+      const newVisit = {
+        id: Date.now().toString(),
+        ...visitData,
+        status: 'unassigned'
+      };
+      
+      addUnassignedVisit(newVisit);
+      
+      toast({
+        title: "Visit Created",
+        description: "Visit added to unassigned list. Drag to schedule or use suggestions.",
+      });
     }
+    
     setShowAssignModal(false);
     setShowAddVisitModal(false);
     setSelectedSlot(null);
@@ -81,6 +110,26 @@ const AdminScheduler: React.FC = () => {
     setSelectedSlot(null);
     setShowAddVisitModal(true);
   };
+
+  const handleMoveVisit = (visitId: string, newCaregiverId: string, newTimeSlot: string) => {
+    moveVisit(visitId, newCaregiverId, newTimeSlot);
+    toast({
+      title: "Visit Moved",
+      description: "Visit has been successfully moved to the new time slot.",
+    });
+  };
+
+  // Filter caregivers based on current filters
+  const filteredCaregivers = caregivers.filter(caregiver => {
+    const matchesSearch = searchTerm === '' || 
+      caregiver.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = selectedRegion === 'all' || 
+      caregiver.region.toLowerCase() === selectedRegion.toLowerCase();
+    const matchesSpecialization = selectedSpecialization === 'all' || 
+      caregiver.role.toLowerCase().includes(selectedSpecialization.toLowerCase());
+    
+    return matchesSearch && matchesRegion && matchesSpecialization;
+  });
 
   return (
     <Layout title="Enhanced Scheduler" role="admin">
@@ -92,6 +141,7 @@ const AdminScheduler: React.FC = () => {
             selectedSpecialization={selectedSpecialization}
             searchTerm={searchTerm}
             groupByRegion={groupByRegion}
+            caregiverCount={filteredCaregivers.length}
             onWeekChange={setSelectedWeek}
             onRegionChange={setSelectedRegion}
             onSpecializationChange={setSelectedSpecialization}
@@ -104,10 +154,14 @@ const AdminScheduler: React.FC = () => {
         <div className="flex flex-1 gap-4 overflow-hidden min-h-0">
           <div className="flex-1 min-h-0">
             <VirtualizedWeekScheduler
-              caregivers={caregivers}
+              caregivers={filteredCaregivers}
               scheduledVisits={scheduledVisits}
               selectedWeek={selectedWeek}
-              onVisitMove={moveVisit}
+              searchTerm={searchTerm}
+              regionFilter={selectedRegion}
+              roleFilter={selectedSpecialization}
+              groupByRegion={groupByRegion}
+              onVisitMove={handleMoveVisit}
               onVisitSelect={handleVisitSelect}
               onVisitAssign={handleVisitAssignFromCalendar}
               onSlotClick={handleSlotClick}

@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
-import { Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import CaregiverGroupHeader from './CaregiverGroupHeader';
 import SchedulerWeekHeader from './SchedulerWeekHeader';
 import CaregiverRow from './CaregiverRow';
@@ -28,26 +29,20 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
     '13:00', '14:00', '15:00', '16:00', '17:00'
   ];
 
-  const [expandedRegions, setExpandedRegions] = useState<Set<string>>(new Set(['North', 'Central', 'South', 'East']));
+  const [expandedRegions, setExpandedRegions] = useState<Set<string>>(
+    new Set(['North', 'Central', 'South', 'East', 'West'])
+  );
   const [dragOverSlot, setDragOverSlot] = useState<string | null>(null);
-
-  // Filter caregivers based on search and filters
-  const filteredCaregivers = caregivers.filter(caregiver => {
-    const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRegion = regionFilter === 'all' || caregiver.region.toLowerCase() === regionFilter.toLowerCase();
-    const matchesRole = roleFilter === 'all' || caregiver.role.toLowerCase() === roleFilter.toLowerCase();
-    return matchesSearch && matchesRegion && matchesRole;
-  });
 
   // Group caregivers by region if needed
   const caregiverGroups: Record<string, Caregiver[]> = groupByRegion 
-    ? filteredCaregivers.reduce((groups, caregiver) => {
+    ? caregivers.reduce((groups, caregiver) => {
         const region = caregiver.region;
         if (!groups[region]) groups[region] = [];
         groups[region].push(caregiver);
         return groups;
       }, {} as Record<string, Caregiver[]>)
-    : { 'All': filteredCaregivers };
+    : { 'All': caregivers };
 
   const handleDragOver = (e: React.DragEvent, slotId: string) => {
     e.preventDefault();
@@ -78,19 +73,55 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
     setExpandedRegions(newExpanded);
   };
 
+  const totalCaregivers = caregivers.length;
+  const visibleCaregivers = groupByRegion 
+    ? Object.entries(caregiverGroups).reduce((count, [region, regionCaregivers]) => {
+        return count + (expandedRegions.has(region) ? regionCaregivers.length : 0);
+      }, 0)
+    : totalCaregivers;
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
+      {/* Header */}
       <div className="flex-shrink-0 bg-background border-b">
         <div className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5" />
-            <h2 className="text-lg font-semibold">
-              Caregiver Schedule - Week of {format(weekStart, 'MMM d, yyyy')}
-            </h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              <h2 className="text-lg font-semibold">
+                Caregiver Schedule - Week of {format(weekStart, 'MMM d, yyyy')}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">
+                {visibleCaregivers} of {totalCaregivers} caregivers
+              </Badge>
+              {groupByRegion && (
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExpandedRegions(new Set(['North', 'Central', 'South', 'East', 'West']))}
+                  >
+                    <ChevronDown className="w-4 h-4 mr-1" />
+                    Expand All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExpandedRegions(new Set())}
+                  >
+                    <ChevronUp className="w-4 h-4 mr-1" />
+                    Collapse All
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
       
+      {/* Main Content */}
       <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
           <div className="min-w-[1200px]">
@@ -128,6 +159,14 @@ const SchedulerGrid: React.FC<SchedulerGridProps> = ({
                   }
                 </div>
               ))}
+              
+              {caregivers.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">No caregivers found</p>
+                  <p className="text-sm">Try adjusting your search or filter criteria</p>
+                </div>
+              )}
             </div>
           </div>
         </ScrollArea>

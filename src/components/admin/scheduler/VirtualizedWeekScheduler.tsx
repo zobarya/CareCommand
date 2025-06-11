@@ -1,20 +1,27 @@
+
 import React, { useState } from 'react';
 import { VirtualizedWeekSchedulerProps } from './types';
 import SchedulerGrid from './SchedulerGrid';
 
-const VirtualizedWeekScheduler: React.FC<VirtualizedWeekSchedulerProps> = ({
+interface ExtendedVirtualizedWeekSchedulerProps extends VirtualizedWeekSchedulerProps {
+  searchTerm: string;
+  regionFilter: string;
+  roleFilter: string;
+  groupByRegion: boolean;
+}
+
+const VirtualizedWeekScheduler: React.FC<ExtendedVirtualizedWeekSchedulerProps> = ({
   caregivers,
   scheduledVisits,
   selectedWeek,
+  searchTerm,
+  regionFilter,
+  roleFilter,
+  groupByRegion,
   onSlotClick,
   onVisitSelect,
   onVisitMove,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [regionFilter, setRegionFilter] = useState('all');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [groupByRegion, setGroupByRegion] = useState(false);
-
   const handleSlotClick = (caregiverId: string, caregiverName: string, date: string, time: string) => {
     onSlotClick(caregiverId, caregiverName, date, time);
   };

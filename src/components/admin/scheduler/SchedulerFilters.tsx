@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { format, addWeeks, subWeeks } from 'date-fns';
-import { ChevronLeft, ChevronRight, RefreshCw, Info, Search, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw, Info, Search, Users, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ interface SchedulerFiltersProps {
   selectedSpecialization: string;
   searchTerm: string;
   groupByRegion: boolean;
+  caregiverCount: number;
   onWeekChange: (week: Date) => void;
   onRegionChange: (region: string) => void;
   onSpecializationChange: (specialization: string) => void;
@@ -32,6 +34,7 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
   selectedSpecialization,
   searchTerm,
   groupByRegion,
+  caregiverCount,
   onWeekChange,
   onRegionChange,
   onSpecializationChange,
@@ -39,6 +42,14 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
   onGroupByRegionToggle,
   onRefresh,
 }) => {
+  const hasActiveFilters = selectedRegion !== 'all' || selectedSpecialization !== 'all' || searchTerm !== '';
+
+  const clearAllFilters = () => {
+    onRegionChange('all');
+    onSpecializationChange('all');
+    onSearchChange('');
+  };
+
   return (
     <div className="bg-background border-b p-4 space-y-4">
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
@@ -65,6 +76,12 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {hasActiveFilters && (
+            <Button variant="outline" size="sm" onClick={clearAllFilters}>
+              <X className="w-4 h-4 mr-2" />
+              Clear Filters
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={onRefresh}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
@@ -97,6 +114,7 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
               <SelectItem value="central">Central</SelectItem>
               <SelectItem value="south">South</SelectItem>
               <SelectItem value="east">East</SelectItem>
+              <SelectItem value="west">West</SelectItem>
             </SelectContent>
           </Select>
 
@@ -105,10 +123,11 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
               <SelectValue placeholder="Specialization" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Specializations</SelectItem>
-              <SelectItem value="rn">RN</SelectItem>
-              <SelectItem value="lpn">LPN</SelectItem>
-              <SelectItem value="cna">CNA</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="registered nurse">Registered Nurse</SelectItem>
+              <SelectItem value="licensed practical nurse">Licensed Practical Nurse</SelectItem>
+              <SelectItem value="home health aide">Home Health Aide</SelectItem>
+              <SelectItem value="physical therapist">Physical Therapist</SelectItem>
             </SelectContent>
           </Select>
 
@@ -123,10 +142,24 @@ const SchedulerFilters: React.FC<SchedulerFiltersProps> = ({
         </div>
       </div>
 
-      {/* Help Text */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Info className="w-4 h-4" />
-        <span>Click empty slots to schedule visits • Drag visits from unassigned panel to assign</span>
+      {/* Filter Status and Results */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Info className="w-4 h-4" />
+          <span>Click empty slots to schedule visits • Drag visits from unassigned panel to assign</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-sm">
+            {caregiverCount} caregivers shown
+          </Badge>
+          {hasActiveFilters && (
+            <Badge variant="outline" className="text-sm">
+              <Filter className="w-3 h-3 mr-1" />
+              Filtered
+            </Badge>
+          )}
+        </div>
       </div>
     </div>
   );
