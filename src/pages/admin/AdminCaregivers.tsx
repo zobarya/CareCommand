@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
@@ -12,8 +11,11 @@ import CaregiverFilters from '@/components/admin/CaregiverFilters';
 import WorkloadSummaryStats from '@/components/admin/WorkloadSummaryStats';
 import WorkloadActions from '@/components/admin/WorkloadActions';
 import WorkloadInsights from '@/components/admin/WorkloadInsights';
+import CaregiverUtilizationHeatmap from '@/components/admin/CaregiverUtilizationHeatmap';
+import HeatmapFilters from '@/components/admin/HeatmapFilters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCaregivers } from '@/hooks/useCaregivers';
+import { startOfWeek } from 'date-fns';
 
 interface Caregiver {
   id: string;
@@ -28,6 +30,13 @@ interface Caregiver {
   maxHours: number;
   visits: number;
   photo: string;
+  weeklyUtilization?: {
+    [date: string]: {
+      hours: number;
+      visits: number;
+      patients: number;
+    };
+  };
 }
 
 const AdminCaregivers: React.FC = () => {
@@ -36,13 +45,17 @@ const AdminCaregivers: React.FC = () => {
   const [isDetailsCaregiverOpen, setIsDetailsCaregiverOpen] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<Caregiver | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeView, setActiveView] = useState<'list' | 'workload'>('list');
+  const [activeView, setActiveView] = useState<'list' | 'workload' | 'heatmap'>('list');
   const [region, setRegion] = useState<string>('all');
   const [role, setRole] = useState<string>('all');
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>({
     start: new Date(),
     end: new Date(new Date().setDate(new Date().getDate() + 6)),
   });
+
+  // Heatmap specific filters
+  const [heatmapWeekStart, setHeatmapWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [showOverbookedOnly, setShowOverbookedOnly] = useState(false);
 
   const { caregivers, handleUpdateCaregiver, handleAddCaregiver, regions, roles } = useCaregivers();
 
@@ -72,6 +85,15 @@ const AdminCaregivers: React.FC = () => {
     const matchesRegion = region === 'all' || caregiver.region === region;
     const matchesRole = role === 'all' || caregiver.role.includes(role);
     
+    // For heatmap view, filter overbooked caregivers if toggle is on
+    if (activeView === 'heatmap' && showOverbookedOnly) {
+      const weeklyTotal = Object.values(caregiver.weeklyUtilization || {}).reduce(
+        (total, day) => total + day.hours, 0
+      );
+      const isOverbooked = weeklyTotal > caregiver.maxHours;
+      return matchesSearch && matchesRegion && matchesRole && isOverbooked;
+    }
+    
     return matchesSearch && matchesRegion && matchesRole;
   });
 
@@ -85,12 +107,13 @@ const AdminCaregivers: React.FC = () => {
 
   return (
     <Layout title="Caregivers" role="admin">
-      <Tabs value={activeView} onValueChange={(value) => setActiveView(value as 'list' | 'workload')} className="w-full">
+      <Tabs value={activeView} onValueChange={(value) => setActiveView(value as 'list' | 'workload' | 'heatmap')} className="w-full">
         <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
           <div>
             <TabsList>
               <TabsTrigger value="list">Caregiver List</TabsTrigger>
               <TabsTrigger value="workload">Workload Analysis</TabsTrigger>
+              <TabsTrigger value="heatmap">Utilization Heatmap</TabsTrigger>
             </TabsList>
           </div>
           <div className="flex items-center gap-2">
@@ -145,6 +168,26 @@ const AdminCaregivers: React.FC = () => {
           />
           
           <CaregiverWorkloadView caregivers={filteredCaregivers} />
+        </TabsContent>
+
+        <TabsContent value="heatmap" className="space-y-6">
+          <HeatmapFilters
+            weekStartDate={heatmapWeekStart}
+            region={region}
+            role={role}
+            showOverbookedOnly={showOverbookedOnly}
+            regions={regions}
+            roles={roles}
+            onWeekChange={setHeatmapWeekStart}
+            onRegionChange={setRegion}
+            onRoleChange={setRole}
+            onShowOverbookedToggle={setShowOverbookedOnly}
+          />
+          
+          <CaregiverUtilizationHeatmap
+            caregivers={filteredCaregivers}
+            weekStartDate={heatmapWeekStart}
+          />
         </TabsContent>
       </Tabs>
 

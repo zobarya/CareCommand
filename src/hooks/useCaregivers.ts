@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import { format, addDays, startOfWeek } from 'date-fns';
 
 interface Caregiver {
   id: string;
@@ -14,7 +14,35 @@ interface Caregiver {
   maxHours: number;
   visits: number;
   photo: string;
+  weeklyUtilization: {
+    [date: string]: {
+      hours: number;
+      visits: number;
+      patients: number;
+    };
+  };
 }
+
+const generateMockWeeklyData = () => {
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const weeklyData: { [date: string]: { hours: number; visits: number; patients: number } } = {};
+  
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(weekStart, i);
+    const dateKey = format(date, 'yyyy-MM-dd');
+    
+    // Generate realistic data (weekdays more busy than weekends)
+    const isWeekend = i >= 5;
+    const baseHours = isWeekend ? Math.random() * 4 : Math.random() * 8;
+    const hours = Math.round(baseHours * 10) / 10;
+    const visits = Math.floor(hours / 2) + Math.floor(Math.random() * 2);
+    const patients = Math.max(1, Math.floor(visits * 0.7));
+    
+    weeklyData[dateKey] = { hours, visits, patients };
+  }
+  
+  return weeklyData;
+};
 
 export const useCaregivers = () => {
   const [caregivers, setCaregivers] = useState<Caregiver[]>([
@@ -30,7 +58,8 @@ export const useCaregivers = () => {
       assignedHours: 38,
       maxHours: 40,
       visits: 12,
-      photo: 'JD'
+      photo: 'JD',
+      weeklyUtilization: generateMockWeeklyData()
     },
     {
       id: '2',
@@ -44,7 +73,8 @@ export const useCaregivers = () => {
       assignedHours: 22,
       maxHours: 25,
       visits: 10,
-      photo: 'MJ'
+      photo: 'MJ',
+      weeklyUtilization: generateMockWeeklyData()
     },
     {
       id: '3',
@@ -58,7 +88,8 @@ export const useCaregivers = () => {
       assignedHours: 35,
       maxHours: 40,
       visits: 8,
-      photo: 'SW'
+      photo: 'SW',
+      weeklyUtilization: generateMockWeeklyData()
     },
     {
       id: '4',
@@ -72,7 +103,8 @@ export const useCaregivers = () => {
       assignedHours: 0,
       maxHours: 0,
       visits: 0,
-      photo: 'RC'
+      photo: 'RC',
+      weeklyUtilization: {}
     },
     {
       id: '5',
@@ -86,7 +118,8 @@ export const useCaregivers = () => {
       assignedHours: 42,
       maxHours: 40,
       visits: 14,
-      photo: 'LM'
+      photo: 'LM',
+      weeklyUtilization: generateMockWeeklyData()
     },
   ]);
 
@@ -107,7 +140,8 @@ export const useCaregivers = () => {
       assignedHours: 0,
       maxHours: newCaregiverData.availability === 'full-time' ? 40 : 25,
       visits: 0,
-      photo: `${newCaregiverData.firstName.charAt(0)}${newCaregiverData.lastName.charAt(0)}`
+      photo: `${newCaregiverData.firstName.charAt(0)}${newCaregiverData.lastName.charAt(0)}`,
+      weeklyUtilization: generateMockWeeklyData()
     };
     setCaregivers(prev => [...prev, newCaregiver]);
   };
