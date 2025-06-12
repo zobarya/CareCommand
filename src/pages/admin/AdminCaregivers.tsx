@@ -1,7 +1,6 @@
+
 import React, { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
 import AddCaregiverDialog from '@/components/admin/AddCaregiverDialog';
 import EditCaregiverDialog from '@/components/admin/EditCaregiverDialog';
 import CaregiverDetailsDialog from '@/components/admin/CaregiverDetailsDialog';
@@ -14,126 +13,54 @@ import WorkloadActions from '@/components/admin/WorkloadActions';
 import WorkloadInsights from '@/components/admin/WorkloadInsights';
 import CaregiverUtilizationHeatmap from '@/components/admin/CaregiverUtilizationHeatmap';
 import HeatmapFilters from '@/components/admin/HeatmapFilters';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CaregiverTabsHeader from '@/components/admin/CaregiverTabsHeader';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useCaregivers } from '@/hooks/useCaregivers';
-import { startOfWeek } from 'date-fns';
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  carePlan: string;
-  status: string;
-  nextVisit: string;
-  contactInfo: string;
-}
-
-interface Caregiver {
-  id: string;
-  name: string;
-  role: string;
-  specialty: string;
-  status: string;
-  patients: number;
-  availability: string;
-  region: string;
-  assignedHours: number;
-  maxHours: number;
-  visits: number;
-  photo: string;
-  patientsList: Patient[];
-  weeklyUtilization?: {
-    [date: string]: {
-      hours: number;
-      visits: number;
-      patients: number;
-    };
-  };
-}
+import { useCaregiverManagement } from '@/hooks/useCaregiverManagement';
+import { useCaregiverFilters } from '@/hooks/useCaregiverFilters';
 
 const AdminCaregivers: React.FC = () => {
-  const [isAddCaregiverOpen, setIsAddCaregiverOpen] = useState(false);
-  const [isEditCaregiverOpen, setIsEditCaregiverOpen] = useState(false);
-  const [isDetailsCaregiverOpen, setIsDetailsCaregiverOpen] = useState(false);
-  const [isPatientDetailsOpen, setIsPatientDetailsOpen] = useState(false);
-  const [selectedCaregiver, setSelectedCaregiver] = useState<Caregiver | null>(null);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [activeView, setActiveView] = useState<'list' | 'workload' | 'heatmap'>('list');
-  const [region, setRegion] = useState<string>('all');
-  const [role, setRole] = useState<string>('all');
-  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>({
-    start: new Date(),
-    end: new Date(new Date().setDate(new Date().getDate() + 6)),
-  });
-
-  // Heatmap specific filters
-  const [heatmapWeekStart, setHeatmapWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [showOverbookedOnly, setShowOverbookedOnly] = useState(false);
-
+  
   const { caregivers, handleUpdateCaregiver, handleAddCaregiver, regions, roles } = useCaregivers();
+  
+  const {
+    isAddCaregiverOpen,
+    isEditCaregiverOpen,
+    isDetailsCaregiverOpen,
+    isPatientDetailsOpen,
+    selectedCaregiver,
+    selectedPatient,
+    setIsAddCaregiverOpen,
+    setIsEditCaregiverOpen,
+    setIsDetailsCaregiverOpen,
+    setIsPatientDetailsOpen,
+    handleCaregiverClick,
+    handleEditCaregiver,
+    handlePatientClick,
+  } = useCaregiverManagement(caregivers);
 
-  const handleCaregiverClick = (caregiver: Caregiver) => {
-    setSelectedCaregiver(caregiver);
-    setIsDetailsCaregiverOpen(true);
-  };
-
-  const handleEditCaregiver = (caregiver: Caregiver, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
-    setSelectedCaregiver(caregiver);
-    setIsEditCaregiverOpen(true);
-  };
-
-  const handlePatientClick = (patient: Patient) => {
-    // Convert patient to the format expected by PatientDetailsDialog
-    const patientForDialog = {
-      id: patient.id,
-      name: patient.name,
-      age: patient.age,
-      carePlan: patient.carePlan,
-      status: patient.status,
-      caregiver: selectedCaregiver?.name || 'Unknown',
-      nextVisit: patient.nextVisit
-    };
-    setSelectedPatient(patientForDialog);
-    setIsPatientDetailsOpen(true);
-  };
+  const {
+    searchTerm,
+    region,
+    role,
+    dateRange,
+    heatmapWeekStart,
+    showOverbookedOnly,
+    setSearchTerm,
+    setRegion,
+    setRole,
+    setDateRange,
+    setHeatmapWeekStart,
+    setShowOverbookedOnly,
+    filterCaregivers,
+  } = useCaregiverFilters();
 
   const handleRefreshData = () => {
-    // In a real app, this would refetch data from the server
     console.log('Refreshing workload data...');
   };
 
-  const filteredCaregivers = caregivers.filter(caregiver => {
-    const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      caregiver.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      caregiver.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      caregiver.patientsList.some(patient => 
-        patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        patient.carePlan.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    
-    const matchesRegion = region === 'all' || caregiver.region === region;
-    const matchesRole = role === 'all' || caregiver.role.includes(role);
-    
-    // For heatmap view, filter overbooked caregivers if toggle is on
-    if (activeView === 'heatmap' && showOverbookedOnly) {
-      const weeklyTotal = Object.values(caregiver.weeklyUtilization || {}).reduce(
-        (total, day) => total + day.hours, 0
-      );
-      const weeklyUtilizationPercent = caregiver.maxHours > 0 
-        ? (weeklyTotal / caregiver.maxHours) * 100 
-        : 0;
-      // Fixed: Changed threshold from > 100 to >= 91 to match the visual indicators
-      const isOverbooked = weeklyUtilizationPercent >= 91;
-      return matchesSearch && matchesRegion && matchesRole && isOverbooked;
-    }
-    
-    return matchesSearch && matchesRegion && matchesRole;
-  });
-
+  const filteredCaregivers = filterCaregivers(caregivers, activeView);
   const activeCaregivers = filteredCaregivers.filter(c => c.status === 'Active');
   const hasOverloadedStaff = activeCaregivers.some(c => 
     c.maxHours > 0 && (c.assignedHours / c.maxHours) >= 0.95
@@ -145,34 +72,11 @@ const AdminCaregivers: React.FC = () => {
   return (
     <Layout title="Caregivers" role="admin">
       <Tabs value={activeView} onValueChange={(value) => setActiveView(value as 'list' | 'workload' | 'heatmap')} className="w-full">
-        <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
-          <div>
-            <TabsList>
-              <TabsTrigger value="list">Caregiver List</TabsTrigger>
-              <TabsTrigger value="workload">Workload Analysis</TabsTrigger>
-              <TabsTrigger value="heatmap">Utilization Heatmap</TabsTrigger>
-            </TabsList>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input 
-                type="text" 
-                placeholder="Search caregivers..." 
-                className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button 
-              className="flex items-center whitespace-nowrap"
-              onClick={() => setIsAddCaregiverOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Caregiver
-            </Button>
-          </div>
-        </div>
+        <CaregiverTabsHeader
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onAddCaregiver={() => setIsAddCaregiverOpen(true)}
+        />
 
         <TabsContent value="list">
           <CaregiverTable

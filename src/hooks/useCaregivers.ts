@@ -1,38 +1,6 @@
 import { useState } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  carePlan: string;
-  status: string;
-  nextVisit: string;
-  contactInfo: string;
-}
-
-interface Caregiver {
-  id: string;
-  name: string;
-  role: string;
-  specialty: string;
-  status: string;
-  patients: number;
-  availability: string;
-  region: string;
-  assignedHours: number;
-  maxHours: number;
-  visits: number;
-  photo: string;
-  patientsList: Patient[];
-  weeklyUtilization: {
-    [date: string]: {
-      hours: number;
-      visits: number;
-      patients: number;
-    };
-  };
-}
+import { Patient, Caregiver } from '@/types/admin';
 
 const generateMockPatients = (caregiverId: string, count: number): Patient[] => {
   const patientNames = [

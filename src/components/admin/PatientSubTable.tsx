@@ -1,17 +1,7 @@
-
 import React from 'react';
 import { User, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  carePlan: string;
-  status: string;
-  nextVisit: string;
-  contactInfo: string;
-}
+import { Patient } from '@/types/admin';
 
 interface PatientSubTableProps {
   patients: Patient[];

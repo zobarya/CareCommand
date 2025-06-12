@@ -1,34 +1,8 @@
-
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ExpandableCaregiverRow from './ExpandableCaregiverRow';
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  carePlan: string;
-  status: string;
-  nextVisit: string;
-  contactInfo: string;
-}
-
-interface Caregiver {
-  id: string;
-  name: string;
-  role: string;
-  specialty: string;
-  status: string;
-  patients: number;
-  availability: string;
-  region: string;
-  assignedHours: number;
-  maxHours: number;
-  visits: number;
-  photo: string;
-  patientsList: Patient[];
-}
+import { Patient, Caregiver } from '@/types/admin';
 
 interface CaregiverTableProps {
   caregivers: Caregiver[];
