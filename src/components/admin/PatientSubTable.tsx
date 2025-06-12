@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { User, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Patient } from '@/types/admin';
 
 interface PatientSubTableProps {
@@ -23,37 +25,35 @@ const PatientSubTable: React.FC<PatientSubTableProps> = ({
   return (
     <div className="bg-muted/20 rounded-lg border border-muted/40 overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/30">
-            <tr>
-              <th className="text-left py-2 px-4 font-medium">Patient Name</th>
-              <th className="text-left py-2 px-4 font-medium">Age</th>
-              <th className="text-left py-2 px-4 font-medium">Care Plan</th>
-              <th className="text-left py-2 px-4 font-medium">Status</th>
-              <th className="text-left py-2 px-4 font-medium">Next Visit</th>
-              <th className="text-right py-2 px-4 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {patients.map((patient, index) => (
-              <tr 
-                key={patient.id} 
-                className={`hover:bg-muted/30 cursor-pointer ${
-                  index !== patients.length - 1 ? 'border-b border-muted/20' : ''
-                }`}
+        <Table className="text-sm">
+          <TableHeader className="bg-muted/30">
+            <TableRow>
+              <TableHead className="text-left font-medium">Patient Name</TableHead>
+              <TableHead className="text-left font-medium">Age</TableHead>
+              <TableHead className="text-left font-medium">Care Plan</TableHead>
+              <TableHead className="text-left font-medium">Status</TableHead>
+              <TableHead className="text-left font-medium">Next Visit</TableHead>
+              <TableHead className="text-right font-medium">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {patients.map((patient) => (
+              <TableRow 
+                key={patient.id}
+                className="hover:bg-muted/30 cursor-pointer"
                 onClick={() => onPatientClick?.(patient)}
               >
-                <td className="py-2 px-4">
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                       <User className="h-3 w-3 text-primary" />
                     </div>
                     <span className="font-medium">{patient.name}</span>
                   </div>
-                </td>
-                <td className="py-2 px-4">{patient.age}</td>
-                <td className="py-2 px-4">{patient.carePlan}</td>
-                <td className="py-2 px-4">
+                </TableCell>
+                <TableCell>{patient.age}</TableCell>
+                <TableCell>{patient.carePlan}</TableCell>
+                <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     patient.status === 'Active' 
                       ? 'bg-green-100 text-green-800' 
@@ -61,9 +61,9 @@ const PatientSubTable: React.FC<PatientSubTableProps> = ({
                   }`}>
                     {patient.status}
                   </span>
-                </td>
-                <td className="py-2 px-4">{patient.nextVisit}</td>
-                <td className="py-2 px-4 text-right">
+                </TableCell>
+                <TableCell>{patient.nextVisit}</TableCell>
+                <TableCell className="text-right">
                   <Button 
                     variant="ghost" 
                     size="sm"
@@ -74,11 +74,11 @@ const PatientSubTable: React.FC<PatientSubTableProps> = ({
                   >
                     <Eye className="h-3 w-3" />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

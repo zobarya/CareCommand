@@ -2,6 +2,7 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, User, Pencil } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { TableRow, TableCell } from '@/components/ui/table';
 import PatientSubTable from './PatientSubTable';
 import { Patient, Caregiver } from '@/types/admin';
 
@@ -27,8 +28,8 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggle}>
       <CollapsibleTrigger asChild>
-        <tr className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer group">
-          <td className="py-3 px-4">
+        <TableRow className="hover:bg-gray-50 cursor-pointer group">
+          <TableCell>
             <div className="flex items-center">
               <div className="mr-2 text-gray-400 group-hover:text-gray-600">
                 {isExpanded ? (
@@ -49,10 +50,10 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
                 )}
               </div>
             </div>
-          </td>
-          <td className="py-3 px-4">{caregiver.role}</td>
-          <td className="py-3 px-4">{caregiver.specialty}</td>
-          <td className="py-3 px-4">
+          </TableCell>
+          <TableCell>{caregiver.role}</TableCell>
+          <TableCell>{caregiver.specialty}</TableCell>
+          <TableCell>
             <span className={`px-2 py-1 rounded-full text-xs ${
               caregiver.status === 'Active' 
                 ? 'bg-green-100 text-green-800' 
@@ -60,10 +61,10 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
             }`}>
               {caregiver.status}
             </span>
-          </td>
-          <td className="py-3 px-4">{patientCount}</td>
-          <td className="py-3 px-4">{caregiver.availability}</td>
-          <td className="py-3 px-4 text-right">
+          </TableCell>
+          <TableCell>{patientCount}</TableCell>
+          <TableCell>{caregiver.availability}</TableCell>
+          <TableCell className="text-right">
             <button 
               className="text-gray-600 hover:text-primary"
               onClick={(e) => {
@@ -73,14 +74,14 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
             >
               <Pencil className="h-4 w-4" />
             </button>
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       </CollapsibleTrigger>
       
       {patientCount > 0 && (
         <CollapsibleContent asChild>
-          <tr>
-            <td colSpan={7} className="p-0">
+          <TableRow>
+            <TableCell colSpan={7} className="p-0">
               <div className="px-4 pb-4 pt-2 bg-gray-50/50">
                 <div className="ml-6">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">
@@ -92,8 +93,8 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
                   />
                 </div>
               </div>
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         </CollapsibleContent>
       )}
     </Collapsible>

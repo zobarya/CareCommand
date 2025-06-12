@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ExpandableCaregiverRow from './ExpandableCaregiverRow';
 import { Patient, Caregiver } from '@/types/admin';
 
@@ -68,19 +69,19 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
       )}
       
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4">Name</th>
-              <th className="text-left py-3 px-4">Role</th>
-              <th className="text-left py-3 px-4">Specialty</th>
-              <th className="text-left py-3 px-4">Status</th>
-              <th className="text-left py-3 px-4">Patients</th>
-              <th className="text-left py-3 px-4">Availability</th>
-              <th className="text-right py-3 px-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-left">Name</TableHead>
+              <TableHead className="text-left">Role</TableHead>
+              <TableHead className="text-left">Specialty</TableHead>
+              <TableHead className="text-left">Status</TableHead>
+              <TableHead className="text-left">Patients</TableHead>
+              <TableHead className="text-left">Availability</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {caregivers.map(caregiver => (
               <ExpandableCaregiverRow
                 key={caregiver.id}
@@ -92,8 +93,8 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
                 onPatientClick={onPatientClick}
               />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
