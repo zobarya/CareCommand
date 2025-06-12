@@ -90,7 +90,11 @@ const AdminCaregivers: React.FC = () => {
       const weeklyTotal = Object.values(caregiver.weeklyUtilization || {}).reduce(
         (total, day) => total + day.hours, 0
       );
-      const isOverbooked = weeklyTotal > caregiver.maxHours;
+      const weeklyUtilizationPercent = caregiver.maxHours > 0 
+        ? (weeklyTotal / caregiver.maxHours) * 100 
+        : 0;
+      // Fixed: Changed threshold from > 100 to >= 91 to match the visual indicators
+      const isOverbooked = weeklyUtilizationPercent >= 91;
       return matchesSearch && matchesRegion && matchesRole && isOverbooked;
     }
     

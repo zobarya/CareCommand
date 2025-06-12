@@ -67,7 +67,8 @@ const CaregiverUtilizationHeatmap: React.FC<CaregiverUtilizationHeatmapProps> = 
                 ? Math.round((weeklyTotal / caregiver.maxHours) * 100)
                 : 0;
 
-              const isOverbooked = weeklyUtilizationPercent > 100;
+              // Fixed: Changed threshold from > 100 to >= 91 to match the visual color coding
+              const isOverbooked = weeklyUtilizationPercent >= 91;
 
               return (
                 <tr key={caregiver.id} className="border-b hover:bg-muted/20">
