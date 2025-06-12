@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import AddCaregiverDialog from '@/components/admin/AddCaregiverDialog';
 import EditCaregiverDialog from '@/components/admin/EditCaregiverDialog';
 import CaregiverDetailsDialog from '@/components/admin/CaregiverDetailsDialog';
+import PatientDetailsDialog from '@/components/admin/PatientDetailsDialog';
 import CaregiverTable from '@/components/admin/CaregiverTable';
 import CaregiverWorkloadView from '@/components/admin/CaregiverWorkloadView';
 import CaregiverFilters from '@/components/admin/CaregiverFilters';
@@ -16,6 +17,16 @@ import HeatmapFilters from '@/components/admin/HeatmapFilters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCaregivers } from '@/hooks/useCaregivers';
 import { startOfWeek } from 'date-fns';
+
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  carePlan: string;
+  status: string;
+  nextVisit: string;
+  contactInfo: string;
+}
 
 interface Caregiver {
   id: string;
@@ -30,6 +41,7 @@ interface Caregiver {
   maxHours: number;
   visits: number;
   photo: string;
+  patientsList: Patient[];
   weeklyUtilization?: {
     [date: string]: {
       hours: number;
@@ -43,7 +55,9 @@ const AdminCaregivers: React.FC = () => {
   const [isAddCaregiverOpen, setIsAddCaregiverOpen] = useState(false);
   const [isEditCaregiverOpen, setIsEditCaregiverOpen] = useState(false);
   const [isDetailsCaregiverOpen, setIsDetailsCaregiverOpen] = useState(false);
+  const [isPatientDetailsOpen, setIsPatientDetailsOpen] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<Caregiver | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeView, setActiveView] = useState<'list' | 'workload' | 'heatmap'>('list');
   const [region, setRegion] = useState<string>('all');
@@ -72,6 +86,21 @@ const AdminCaregivers: React.FC = () => {
     setIsEditCaregiverOpen(true);
   };
 
+  const handlePatientClick = (patient: Patient) => {
+    // Convert patient to the format expected by PatientDetailsDialog
+    const patientForDialog = {
+      id: patient.id,
+      name: patient.name,
+      age: patient.age,
+      carePlan: patient.carePlan,
+      status: patient.status,
+      caregiver: selectedCaregiver?.name || 'Unknown',
+      nextVisit: patient.nextVisit
+    };
+    setSelectedPatient(patientForDialog);
+    setIsPatientDetailsOpen(true);
+  };
+
   const handleRefreshData = () => {
     // In a real app, this would refetch data from the server
     console.log('Refreshing workload data...');
@@ -80,7 +109,11 @@ const AdminCaregivers: React.FC = () => {
   const filteredCaregivers = caregivers.filter(caregiver => {
     const matchesSearch = caregiver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       caregiver.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      caregiver.specialty.toLowerCase().includes(searchTerm.toLowerCase());
+      caregiver.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      caregiver.patientsList.some(patient => 
+        patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        patient.carePlan.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     
     const matchesRegion = region === 'all' || caregiver.region === region;
     const matchesRole = role === 'all' || caregiver.role.includes(role);
@@ -146,6 +179,7 @@ const AdminCaregivers: React.FC = () => {
             caregivers={filteredCaregivers}
             onCaregiverClick={handleCaregiverClick}
             onEditCaregiver={handleEditCaregiver}
+            onPatientClick={handlePatientClick}
           />
         </TabsContent>
 
@@ -210,6 +244,11 @@ const AdminCaregivers: React.FC = () => {
         open={isDetailsCaregiverOpen} 
         onOpenChange={setIsDetailsCaregiverOpen}
         caregiver={selectedCaregiver}
+      />
+      <PatientDetailsDialog 
+        open={isPatientDetailsOpen} 
+        onOpenChange={setIsPatientDetailsOpen}
+        patient={selectedPatient}
       />
     </Layout>
   );

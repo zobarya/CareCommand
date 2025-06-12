@@ -1,6 +1,18 @@
 
-import React from 'react';
-import { Pencil, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import ExpandableCaregiverRow from './ExpandableCaregiverRow';
+
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  carePlan: string;
+  status: string;
+  nextVisit: string;
+  contactInfo: string;
+}
 
 interface Caregiver {
   id: string;
@@ -15,21 +27,60 @@ interface Caregiver {
   maxHours: number;
   visits: number;
   photo: string;
+  patientsList: Patient[];
 }
 
 interface CaregiverTableProps {
   caregivers: Caregiver[];
   onCaregiverClick: (caregiver: Caregiver) => void;
   onEditCaregiver: (caregiver: Caregiver, e?: React.MouseEvent) => void;
+  onPatientClick?: (patient: Patient) => void;
 }
 
 const CaregiverTable: React.FC<CaregiverTableProps> = ({
   caregivers,
   onCaregiverClick,
   onEditCaregiver,
+  onPatientClick,
 }) => {
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const handleExpandAll = () => {
+    const caregiverIds = caregivers.filter(c => c.patientsList.length > 0).map(c => c.id);
+    setExpandedRows(new Set(caregiverIds));
+  };
+
+  const handleCollapseAll = () => {
+    setExpandedRows(new Set());
+  };
+
+  const hasExpandableRows = caregivers.some(c => c.patientsList.length > 0);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+      {hasExpandableRows && (
+        <div className="flex gap-2 mb-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExpandAll}
+            disabled={expandedRows.size === caregivers.filter(c => c.patientsList.length > 0).length}
+          >
+            <ChevronDown className="h-4 w-4 mr-1" />
+            Expand All
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleCollapseAll}
+            disabled={expandedRows.size === 0}
+          >
+            <ChevronUp className="h-4 w-4 mr-1" />
+            Collapse All
+          </Button>
+        </div>
+      )}
+      
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -45,41 +96,13 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
           </thead>
           <tbody>
             {caregivers.map(caregiver => (
-              <tr 
-                key={caregiver.id} 
-                className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                onClick={() => onCaregiverClick(caregiver)}
-              >
-                <td className="py-3 px-4">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
-                      <User className="h-4 w-4" />
-                    </div>
-                    <span className="font-medium">{caregiver.name}</span>
-                  </div>
-                </td>
-                <td className="py-3 px-4">{caregiver.role}</td>
-                <td className="py-3 px-4">{caregiver.specialty}</td>
-                <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    caregiver.status === 'Active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {caregiver.status}
-                  </span>
-                </td>
-                <td className="py-3 px-4">{caregiver.patients}</td>
-                <td className="py-3 px-4">{caregiver.availability}</td>
-                <td className="py-3 px-4 text-right">
-                  <button 
-                    className="text-gray-600 hover:text-primary"
-                    onClick={(e) => onEditCaregiver(caregiver, e)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                </td>
-              </tr>
+              <ExpandableCaregiverRow
+                key={caregiver.id}
+                caregiver={caregiver}
+                onCaregiverClick={onCaregiverClick}
+                onEditCaregiver={onEditCaregiver}
+                onPatientClick={onPatientClick}
+              />
             ))}
           </tbody>
         </table>

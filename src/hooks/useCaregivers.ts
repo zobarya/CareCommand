@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  carePlan: string;
+  status: string;
+  nextVisit: string;
+  contactInfo: string;
+}
+
 interface Caregiver {
   id: string;
   name: string;
@@ -14,6 +24,7 @@ interface Caregiver {
   maxHours: number;
   visits: number;
   photo: string;
+  patientsList: Patient[];
   weeklyUtilization: {
     [date: string]: {
       hours: number;
@@ -22,6 +33,45 @@ interface Caregiver {
     };
   };
 }
+
+const generateMockPatients = (caregiverId: string, count: number): Patient[] => {
+  const patientNames = [
+    'Margaret Thompson', 'Robert Johnson', 'Dorothy Miller', 'William Davis',
+    'Helen Wilson', 'Charles Brown', 'Ruth Garcia', 'Frank Rodriguez',
+    'Anna Martinez', 'George Anderson', 'Marie Taylor', 'Paul Thomas'
+  ];
+  
+  const carePlans = [
+    'Post-surgical recovery', 'Medication management', 'Physical therapy',
+    'Wound care', 'Diabetes management', 'Mobility assistance',
+    'Chronic pain management', 'Dementia care', 'Fall prevention'
+  ];
+
+  const patients: Patient[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const patientId = `${caregiverId}-patient-${i + 1}`;
+    const name = patientNames[Math.floor(Math.random() * patientNames.length)];
+    const age = Math.floor(Math.random() * 30) + 65; // Ages 65-95
+    const carePlan = carePlans[Math.floor(Math.random() * carePlans.length)];
+    const status = Math.random() > 0.1 ? 'Active' : 'Inactive';
+    
+    const nextVisitDays = Math.floor(Math.random() * 7) + 1;
+    const nextVisit = format(addDays(new Date(), nextVisitDays), 'MMM d, yyyy');
+    
+    patients.push({
+      id: patientId,
+      name,
+      age,
+      carePlan,
+      status,
+      nextVisit,
+      contactInfo: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`
+    });
+  }
+  
+  return patients;
+};
 
 const generateMockWeeklyData = (weekStartDate?: Date) => {
   const weekStart = weekStartDate ? startOfWeek(weekStartDate, { weekStartsOn: 1 }) : startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -73,6 +123,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 12,
       photo: 'JD',
+      patientsList: generateMockPatients('1', 6),
       weeklyUtilization: generateMultiWeekData()
     },
     {
@@ -88,6 +139,7 @@ export const useCaregivers = () => {
       maxHours: 25,
       visits: 10,
       photo: 'MJ',
+      patientsList: generateMockPatients('2', 8),
       weeklyUtilization: generateMultiWeekData()
     },
     {
@@ -103,6 +155,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 8,
       photo: 'SW',
+      patientsList: generateMockPatients('3', 5),
       weeklyUtilization: generateMultiWeekData()
     },
     {
@@ -118,6 +171,7 @@ export const useCaregivers = () => {
       maxHours: 0,
       visits: 0,
       photo: 'RC',
+      patientsList: [],
       weeklyUtilization: {}
     },
     {
@@ -133,6 +187,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 14,
       photo: 'LM',
+      patientsList: generateMockPatients('5', 4),
       weeklyUtilization: generateMultiWeekData()
     },
   ]);
@@ -155,6 +210,7 @@ export const useCaregivers = () => {
       maxHours: newCaregiverData.availability === 'full-time' ? 40 : 25,
       visits: 0,
       photo: `${newCaregiverData.firstName.charAt(0)}${newCaregiverData.lastName.charAt(0)}`,
+      patientsList: [],
       weeklyUtilization: generateMultiWeekData()
     };
     setCaregivers(prev => [...prev, newCaregiver]);
