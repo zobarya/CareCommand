@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -69,34 +68,32 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
       )}
       
       <div className="overflow-x-auto">
-        <div className="min-w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-left w-1/6">Name</TableHead>
-                <TableHead className="text-left w-1/6">Role</TableHead>
-                <TableHead className="text-left w-1/6">Specialty</TableHead>
-                <TableHead className="text-left w-1/6">Status</TableHead>
-                <TableHead className="text-left w-1/6">Patients</TableHead>
-                <TableHead className="text-left w-1/6">Availability</TableHead>
-                <TableHead className="text-right w-24">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {caregivers.map(caregiver => (
-                <ExpandableCaregiverRow
-                  key={caregiver.id}
-                  caregiver={caregiver}
-                  isExpanded={expandedRows.has(caregiver.id)}
-                  onToggle={() => handleRowToggle(caregiver.id)}
-                  onCaregiverClick={onCaregiverClick}
-                  onEditCaregiver={onEditCaregiver}
-                  onPatientClick={onPatientClick}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <Table className="table-fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-left w-64">Name</TableHead>
+              <TableHead className="text-left w-32">Role</TableHead>
+              <TableHead className="text-left w-32">Specialty</TableHead>
+              <TableHead className="text-left w-24">Status</TableHead>
+              <TableHead className="text-left w-20">Patients</TableHead>
+              <TableHead className="text-left w-32">Availability</TableHead>
+              <TableHead className="text-right w-20">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {caregivers.map(caregiver => (
+              <ExpandableCaregiverRow
+                key={caregiver.id}
+                caregiver={caregiver}
+                isExpanded={expandedRows.has(caregiver.id)}
+                onToggle={() => handleRowToggle(caregiver.id)}
+                onCaregiverClick={onCaregiverClick}
+                onEditCaregiver={onEditCaregiver}
+                onPatientClick={onPatientClick}
+              />
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
