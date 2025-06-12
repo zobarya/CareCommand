@@ -63,6 +63,12 @@ const CaregiverUtilizationHeatmap: React.FC<CaregiverUtilizationHeatmapProps> = 
                 return total + (dayData?.hours || 0);
               }, 0);
 
+              const weeklyUtilizationPercent = caregiver.maxHours > 0 
+                ? Math.round((weeklyTotal / caregiver.maxHours) * 100)
+                : 0;
+
+              const isOverbooked = weeklyUtilizationPercent > 100;
+
               return (
                 <tr key={caregiver.id} className="border-b hover:bg-muted/20">
                   <td className="p-4 sticky left-0 bg-background border-r">
@@ -92,13 +98,12 @@ const CaregiverUtilizationHeatmap: React.FC<CaregiverUtilizationHeatmapProps> = 
                     );
                   })}
                   <td className="p-4 text-center">
-                    <div className="font-semibold">
-                      {weeklyTotal}/{caregiver.maxHours} hrs
+                    <div className={`font-semibold ${isOverbooked ? 'text-red-600' : ''}`}>
+                      {weeklyTotal.toFixed(1)}/{caregiver.maxHours} hrs
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {caregiver.maxHours > 0 
-                        ? Math.round((weeklyTotal / caregiver.maxHours) * 100)
-                        : 0}%
+                    <div className={`text-sm ${isOverbooked ? 'text-red-600' : 'text-muted-foreground'}`}>
+                      {weeklyUtilizationPercent}%
+                      {isOverbooked && ' ⚠️'}
                     </div>
                   </td>
                 </tr>

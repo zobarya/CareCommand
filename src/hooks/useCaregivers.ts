@@ -23,8 +23,8 @@ interface Caregiver {
   };
 }
 
-const generateMockWeeklyData = () => {
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+const generateMockWeeklyData = (weekStartDate?: Date) => {
+  const weekStart = weekStartDate ? startOfWeek(weekStartDate, { weekStartsOn: 1 }) : startOfWeek(new Date(), { weekStartsOn: 1 });
   const weeklyData: { [date: string]: { hours: number; visits: number; patients: number } } = {};
   
   for (let i = 0; i < 7; i++) {
@@ -44,6 +44,20 @@ const generateMockWeeklyData = () => {
   return weeklyData;
 };
 
+// Generate data for multiple weeks to ensure we have data for any week the user selects
+const generateMultiWeekData = () => {
+  const allData: { [date: string]: { hours: number; visits: number; patients: number } } = {};
+  
+  // Generate data for 8 weeks (4 before current, current, 3 after)
+  for (let weekOffset = -4; weekOffset <= 3; weekOffset++) {
+    const weekStart = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), weekOffset * 7);
+    const weekData = generateMockWeeklyData(weekStart);
+    Object.assign(allData, weekData);
+  }
+  
+  return allData;
+};
+
 export const useCaregivers = () => {
   const [caregivers, setCaregivers] = useState<Caregiver[]>([
     {
@@ -59,7 +73,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 12,
       photo: 'JD',
-      weeklyUtilization: generateMockWeeklyData()
+      weeklyUtilization: generateMultiWeekData()
     },
     {
       id: '2',
@@ -74,7 +88,7 @@ export const useCaregivers = () => {
       maxHours: 25,
       visits: 10,
       photo: 'MJ',
-      weeklyUtilization: generateMockWeeklyData()
+      weeklyUtilization: generateMultiWeekData()
     },
     {
       id: '3',
@@ -89,7 +103,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 8,
       photo: 'SW',
-      weeklyUtilization: generateMockWeeklyData()
+      weeklyUtilization: generateMultiWeekData()
     },
     {
       id: '4',
@@ -119,7 +133,7 @@ export const useCaregivers = () => {
       maxHours: 40,
       visits: 14,
       photo: 'LM',
-      weeklyUtilization: generateMockWeeklyData()
+      weeklyUtilization: generateMultiWeekData()
     },
   ]);
 
@@ -141,7 +155,7 @@ export const useCaregivers = () => {
       maxHours: newCaregiverData.availability === 'full-time' ? 40 : 25,
       visits: 0,
       photo: `${newCaregiverData.firstName.charAt(0)}${newCaregiverData.lastName.charAt(0)}`,
-      weeklyUtilization: generateMockWeeklyData()
+      weeklyUtilization: generateMultiWeekData()
     };
     setCaregivers(prev => [...prev, newCaregiver]);
   };

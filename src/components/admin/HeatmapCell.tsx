@@ -46,14 +46,14 @@ const HeatmapCell: React.FC<HeatmapCellProps> = ({
           )}>
             <div className="text-lg">{getUtilizationSymbol()}</div>
             <div className="text-xs font-medium">
-              {hours}h
+              {hours.toFixed(1)}h
             </div>
           </div>
         </TooltipTrigger>
         <TooltipContent>
           <div className="text-sm">
             <div className="font-medium">{date}</div>
-            <div>{hours} hrs · {visits} visits · {patients} patients</div>
+            <div>{hours.toFixed(1)} hrs · {visits} visits · {patients} patients</div>
             <div className="text-muted-foreground">
               {utilizationPercent.toFixed(0)}% utilization
             </div>
