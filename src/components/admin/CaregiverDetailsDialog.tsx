@@ -2,21 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { User, Clock, MapPin, Award, Activity, Users } from 'lucide-react';
-
-interface Caregiver {
-  id: string;
-  name: string;
-  role: string;
-  specialty: string;
-  status: string;
-  patients: number;
-  availability: string;
-  region: string;
-  assignedHours: number;
-  maxHours: number;
-  visits: number;
-  photo: string;
-}
+import { Caregiver } from '@/types/admin';
 
 interface CaregiverDetailsDialogProps {
   open: boolean;

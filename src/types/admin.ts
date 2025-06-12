@@ -33,7 +33,7 @@ export interface Caregiver {
   visits: number;
   photo: string;
   patientsList: Patient[];
-  weeklyUtilization?: {
+  weeklyUtilization: {
     [date: string]: {
       hours: number;
       visits: number;

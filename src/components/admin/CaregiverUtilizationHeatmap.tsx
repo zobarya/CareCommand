@@ -2,21 +2,7 @@
 import React from 'react';
 import { format, startOfWeek, addDays } from 'date-fns';
 import HeatmapCell from './HeatmapCell';
-
-interface Caregiver {
-  id: string;
-  name: string;
-  role: string;
-  region: string;
-  maxHours: number;
-  weeklyUtilization: {
-    [date: string]: {
-      hours: number;
-      visits: number;
-      patients: number;
-    };
-  };
-}
+import { Caregiver } from '@/types/admin';
 
 interface CaregiverUtilizationHeatmapProps {
   caregivers: Caregiver[];
