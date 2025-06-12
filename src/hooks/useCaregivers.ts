@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { Patient, Caregiver } from '@/types/admin';
@@ -77,91 +78,98 @@ const generateMultiWeekData = () => {
 };
 
 export const useCaregivers = () => {
-  const [caregivers, setCaregivers] = useState<Caregiver[]>([
-    {
-      id: '1',
-      name: 'Jane Doe',
-      role: 'Registered Nurse',
-      specialty: 'Geriatric Care',
-      status: 'Active',
-      patients: 6,
-      availability: 'Full-time',
-      region: 'North',
-      assignedHours: 38,
-      maxHours: 40,
-      visits: 12,
-      photo: 'JD',
-      patientsList: generateMockPatients('1', 6),
-      weeklyUtilization: generateMultiWeekData()
-    },
-    {
-      id: '2',
-      name: 'Mike Johnson',
-      role: 'Home Health Aide',
-      specialty: 'Physical Assistance',
-      status: 'Active',
-      patients: 8,
-      availability: 'Part-time',
-      region: 'South',
-      assignedHours: 22,
-      maxHours: 25,
-      visits: 10,
-      photo: 'MJ',
-      patientsList: generateMockPatients('2', 8),
-      weeklyUtilization: generateMultiWeekData()
-    },
-    {
-      id: '3',
-      name: 'Sarah Williams',
-      role: 'Licensed Practical Nurse',
-      specialty: 'Wound Care',
-      status: 'Active',
-      patients: 5,
-      availability: 'Full-time',
-      region: 'East',
-      assignedHours: 35,
-      maxHours: 40,
-      visits: 8,
-      photo: 'SW',
-      patientsList: generateMockPatients('3', 5),
-      weeklyUtilization: generateMultiWeekData()
-    },
-    {
-      id: '4',
-      name: 'Robert Chen',
-      role: 'Physical Therapist',
-      specialty: 'Rehabilitation',
-      status: 'Inactive',
-      patients: 0,
-      availability: 'On Leave',
-      region: 'West',
-      assignedHours: 0,
-      maxHours: 0,
-      visits: 0,
-      photo: 'RC',
-      patientsList: [],
-      weeklyUtilization: {}
-    },
-    {
-      id: '5',
-      name: 'Lisa Martinez',
-      role: 'Registered Nurse',
-      specialty: 'Pediatric Care',
-      status: 'Active',
-      patients: 4,
-      availability: 'Full-time',
-      region: 'Central',
-      assignedHours: 42,
-      maxHours: 40,
-      visits: 14,
-      photo: 'LM',
-      patientsList: generateMockPatients('5', 4),
-      weeklyUtilization: generateMultiWeekData()
-    },
-  ]);
+  const [caregivers, setCaregivers] = useState<Caregiver[]>(() => {
+    const mockCaregivers = [
+      {
+        id: '1',
+        name: 'Jane Doe',
+        role: 'Registered Nurse',
+        specialty: 'Geriatric Care',
+        status: 'Active',
+        availability: 'Full-time',
+        region: 'North',
+        assignedHours: 38,
+        maxHours: 40,
+        visits: 12,
+        photo: 'JD',
+        patientsList: generateMockPatients('1', 6),
+        weeklyUtilization: generateMultiWeekData()
+      },
+      {
+        id: '2',
+        name: 'Mike Johnson',
+        role: 'Home Health Aide',
+        specialty: 'Physical Assistance',
+        status: 'Active',
+        availability: 'Part-time',
+        region: 'South',
+        assignedHours: 22,
+        maxHours: 25,
+        visits: 10,
+        photo: 'MJ',
+        patientsList: generateMockPatients('2', 8),
+        weeklyUtilization: generateMultiWeekData()
+      },
+      {
+        id: '3',
+        name: 'Sarah Williams',
+        role: 'Licensed Practical Nurse',
+        specialty: 'Wound Care',
+        status: 'Active',
+        availability: 'Full-time',
+        region: 'East',
+        assignedHours: 35,
+        maxHours: 40,
+        visits: 8,
+        photo: 'SW',
+        patientsList: generateMockPatients('3', 5),
+        weeklyUtilization: generateMultiWeekData()
+      },
+      {
+        id: '4',
+        name: 'Robert Chen',
+        role: 'Physical Therapist',
+        specialty: 'Rehabilitation',
+        status: 'Inactive',
+        availability: 'On Leave',
+        region: 'West',
+        assignedHours: 0,
+        maxHours: 0,
+        visits: 0,
+        photo: 'RC',
+        patientsList: [],
+        weeklyUtilization: {}
+      },
+      {
+        id: '5',
+        name: 'Lisa Martinez',
+        role: 'Registered Nurse',
+        specialty: 'Pediatric Care',
+        status: 'Active',
+        availability: 'Full-time',
+        region: 'Central',
+        assignedHours: 42,
+        maxHours: 40,
+        visits: 14,
+        photo: 'LM',
+        patientsList: generateMockPatients('5', 4),
+        weeklyUtilization: generateMultiWeekData()
+      },
+    ];
+
+    // Ensure patients count matches patientsList length
+    return mockCaregivers.map(caregiver => ({
+      ...caregiver,
+      patients: caregiver.patientsList.length
+    }));
+  });
 
   const handleUpdateCaregiver = (updatedCaregiver: Caregiver) => {
-    setCaregivers(prev => prev.map(c => c.id === updatedCaregiver.id ? updatedCaregiver : c));
+    setCaregivers(prev => prev.map(c => 
+      c.id === updatedCaregiver.id 
+        ? { ...updatedCaregiver, patients: updatedCaregiver.patientsList.length }
+        : c
+    ));
   };
 
   const handleAddCaregiver = (newCaregiverData: any) => {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,18 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
     setExpandedRows(new Set());
   };
 
+  const handleRowToggle = (caregiverId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(caregiverId)) {
+      newExpandedRows.delete(caregiverId);
+    } else {
+      newExpandedRows.add(caregiverId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
   const hasExpandableRows = caregivers.some(c => c.patientsList.length > 0);
+  const expandableCaregiversCount = caregivers.filter(c => c.patientsList.length > 0).length;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
@@ -38,7 +50,7 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
             variant="outline" 
             size="sm" 
             onClick={handleExpandAll}
-            disabled={expandedRows.size === caregivers.filter(c => c.patientsList.length > 0).length}
+            disabled={expandedRows.size === expandableCaregiversCount}
           >
             <ChevronDown className="h-4 w-4 mr-1" />
             Expand All
@@ -73,6 +85,8 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
               <ExpandableCaregiverRow
                 key={caregiver.id}
                 caregiver={caregiver}
+                isExpanded={expandedRows.has(caregiver.id)}
+                onToggle={() => handleRowToggle(caregiver.id)}
                 onCaregiverClick={onCaregiverClick}
                 onEditCaregiver={onEditCaregiver}
                 onPatientClick={onPatientClick}

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { ChevronDown, ChevronRight, User, Pencil } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import PatientSubTable from './PatientSubTable';
@@ -6,6 +7,8 @@ import { Patient, Caregiver } from '@/types/admin';
 
 interface ExpandableCaregiverRowProps {
   caregiver: Caregiver;
+  isExpanded: boolean;
+  onToggle: () => void;
   onCaregiverClick: (caregiver: Caregiver) => void;
   onEditCaregiver: (caregiver: Caregiver, e?: React.MouseEvent) => void;
   onPatientClick?: (patient: Patient) => void;
@@ -13,14 +16,16 @@ interface ExpandableCaregiverRowProps {
 
 const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
   caregiver,
+  isExpanded,
+  onToggle,
   onCaregiverClick,
   onEditCaregiver,
   onPatientClick,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const patientCount = caregiver.patientsList.length;
 
   return (
-    <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+    <Collapsible open={isExpanded} onOpenChange={onToggle}>
       <CollapsibleTrigger asChild>
         <tr className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer group">
           <td className="py-3 px-4">
@@ -37,9 +42,9 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
               </div>
               <div>
                 <span className="font-medium">{caregiver.name}</span>
-                {caregiver.patients > 0 && (
+                {patientCount > 0 && (
                   <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    {caregiver.patients} patients
+                    {patientCount} patients
                   </span>
                 )}
               </div>
@@ -56,7 +61,7 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
               {caregiver.status}
             </span>
           </td>
-          <td className="py-3 px-4">{caregiver.patients}</td>
+          <td className="py-3 px-4">{patientCount}</td>
           <td className="py-3 px-4">{caregiver.availability}</td>
           <td className="py-3 px-4 text-right">
             <button 
@@ -72,23 +77,25 @@ const ExpandableCaregiverRow: React.FC<ExpandableCaregiverRowProps> = ({
         </tr>
       </CollapsibleTrigger>
       
-      <CollapsibleContent asChild>
-        <tr>
-          <td colSpan={7} className="p-0">
-            <div className="px-4 pb-4 pt-2 bg-gray-50/50">
-              <div className="ml-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  Assigned Patients ({caregiver.patientsList.length})
-                </h4>
-                <PatientSubTable 
-                  patients={caregiver.patientsList} 
-                  onPatientClick={onPatientClick}
-                />
+      {patientCount > 0 && (
+        <CollapsibleContent asChild>
+          <tr>
+            <td colSpan={7} className="p-0">
+              <div className="px-4 pb-4 pt-2 bg-gray-50/50">
+                <div className="ml-6">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Assigned Patients ({patientCount})
+                  </h4>
+                  <PatientSubTable 
+                    patients={caregiver.patientsList} 
+                    onPatientClick={onPatientClick}
+                  />
+                </div>
               </div>
-            </div>
-          </td>
-        </tr>
-      </CollapsibleContent>
+            </td>
+          </tr>
+        </CollapsibleContent>
+      )}
     </Collapsible>
   );
 };
