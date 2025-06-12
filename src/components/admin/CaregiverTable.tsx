@@ -69,32 +69,34 @@ const CaregiverTable: React.FC<CaregiverTableProps> = ({
       )}
       
       <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-left">Name</TableHead>
-              <TableHead className="text-left">Role</TableHead>
-              <TableHead className="text-left">Specialty</TableHead>
-              <TableHead className="text-left">Status</TableHead>
-              <TableHead className="text-left">Patients</TableHead>
-              <TableHead className="text-left">Availability</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {caregivers.map(caregiver => (
-              <ExpandableCaregiverRow
-                key={caregiver.id}
-                caregiver={caregiver}
-                isExpanded={expandedRows.has(caregiver.id)}
-                onToggle={() => handleRowToggle(caregiver.id)}
-                onCaregiverClick={onCaregiverClick}
-                onEditCaregiver={onEditCaregiver}
-                onPatientClick={onPatientClick}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <div className="min-w-full">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-left w-1/6">Name</TableHead>
+                <TableHead className="text-left w-1/6">Role</TableHead>
+                <TableHead className="text-left w-1/6">Specialty</TableHead>
+                <TableHead className="text-left w-1/6">Status</TableHead>
+                <TableHead className="text-left w-1/6">Patients</TableHead>
+                <TableHead className="text-left w-1/6">Availability</TableHead>
+                <TableHead className="text-right w-24">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {caregivers.map(caregiver => (
+                <ExpandableCaregiverRow
+                  key={caregiver.id}
+                  caregiver={caregiver}
+                  isExpanded={expandedRows.has(caregiver.id)}
+                  onToggle={() => handleRowToggle(caregiver.id)}
+                  onCaregiverClick={onCaregiverClick}
+                  onEditCaregiver={onEditCaregiver}
+                  onPatientClick={onPatientClick}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
